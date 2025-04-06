@@ -1,4 +1,6 @@
-# WhatsApp extensions for Azure Functions
+![Icon](assets/img/icon.png) WhatsApp agents for Azure Functions
+
+Create agents for WhatsApp using Azure Functions.
 
 ## License
 
