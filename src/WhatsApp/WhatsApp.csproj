@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackageId>Devlooped.WhatsApp</PackageId>
+    <Description>WhatsApp agents for Azure Functions</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" Version="1.2.4" />
+  </ItemGroup>
 
 </Project>
