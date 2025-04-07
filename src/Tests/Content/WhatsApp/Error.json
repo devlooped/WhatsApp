@@ -1,0 +1,37 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "729104583621947",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "12025550123",
+              "phone_number_id": "813920475164208"
+            },
+            "statuses": [
+              {
+                "id": "wamid.XYZgMDEyMzQ1Njc4OTA5MRUCABEYEjU5NkM3ODlFQjAxMjM0NTY7OA==",
+                "status": "sent",
+                "timestamp": "1698741239",
+                "recipient_id": "447700900123",
+                "errors": [
+                  {
+                    "code": 470,
+                    "title": "Rate limit exceeded",
+                    "message": "Too many requests sent",
+                    "error_data": { "details": "Request limit reached for this phone number within the current time window." },
+                    "href": "https:\/\/developers.facebook.com\/docs\/whatsapp\/cloud-api\/support\/error-codes\/"
+                  }
+                ]
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}
