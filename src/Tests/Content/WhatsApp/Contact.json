@@ -1,0 +1,65 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "927481035162874",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "447912345678",
+              "phone_number_id": "813506927401235"
+            },
+            "contacts": [
+              {
+                "profile": { "name": "Xyr" },
+                "wa_id": "447890123456"
+              }
+            ],
+            "messages": [
+              {
+                "from": "447890123456",
+                "id": "wamid.HBgNNDcyODkwMTIzNDU2NhUCABIYFjE4QTlDMzU2MkJDOTg3RUY2NDg5RTFEMTIzQzVFRAA==",
+                "timestamp": "1892345612",
+                "type": "contacts",
+                "contacts": [
+                  {
+                    "emails": [
+                      {
+                        "email": "john\u0040example.com",
+                        "type": "HOME"
+                      }
+                    ],
+                    "name": {
+                      "first_name": "Robert",
+                      "last_name": "Smith",
+                      "formatted_name": "Robert Smith"
+                    },
+                    "org": {
+                      "company": "null",
+                      "title": "Digital Architect"
+                    },
+                    "phones": [
+                      {
+                        "phone": "+44 7890 123456",
+                        "wa_id": "447890123456",
+                        "type": "MOBILE"
+                      },
+                      {
+                        "phone": "+1 (555) 321-9876",
+                        "wa_id": "15553219876",
+                        "type": "google"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}

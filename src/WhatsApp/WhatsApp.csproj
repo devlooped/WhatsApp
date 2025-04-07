@@ -8,6 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="NuGetizer" Version="1.2.4" />
+    <PackageReference Include="Devlooped.JQ" Version="1.7.1.6" />
+    <PackageReference Include="PolySharp" Version="1.15.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="@(Compile -> WithMetadataValue('NuGetPackageId', 'Devlooped.JQ'))" Visible="false" />
   </ItemGroup>
 
 </Project>
