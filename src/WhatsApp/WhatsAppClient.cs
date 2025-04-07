@@ -9,13 +9,28 @@ using Microsoft.Extensions.Options;
 
 namespace Devlooped.WhatsApp;
 
+/// <summary>
+/// Default implementation of the <see cref="IWhatsAppClient"/>.
+/// </summary>
+/// <param name="httpFactory">The factory used to make HTTP requests. The name <c>whatsapp</c> is used when creating clients, 
+/// which allows customization at the app level.</param>
+/// <param name="options">Configuration options for communicating with the service.</param>
+/// <param name="logger">A logger for messages.</param>
 public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions> options, ILogger<WhatsAppClient> logger) : IWhatsAppClient
 {
     readonly MetaOptions options = options.Value;
 
+    /// <summary>
+    /// Creates a new instance of the <see cref="WhatsAppClient"/> class.
+    /// </summary>
+    /// <remarks>
+    /// This method is used mostly in tests so you don't need to create an <see cref="IOptions{MetaOptions}"/>.
+    /// </remarks>
     public static IWhatsAppClient Create(IHttpClientFactory httpFactory, MetaOptions options, ILogger<WhatsAppClient> logger)
         => new WhatsAppClient(httpFactory, Options.Create(options), logger);
 
+    /// <inheritdoc />
+    /// <exception cref="ArgumentException"></exception>
     public async Task<bool> SendAync(string from, object payload)
     {
         if (!options.Numbers.TryGetValue(from, out var token))

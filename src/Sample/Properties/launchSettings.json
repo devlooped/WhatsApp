@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Sample": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 4242",
+      "launchBrowser": false
+    }
+  }
+}
