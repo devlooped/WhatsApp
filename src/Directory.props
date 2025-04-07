@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>Devlooped.WhatsApp</RootNamespace>
+    <UserSecretsId>41fc668e-a410-48d4-9884-c2937478d9e1</UserSecretsId>
   </PropertyGroup>
 
 </Project>
