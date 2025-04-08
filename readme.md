@@ -6,6 +6,8 @@
 [![License](https://img.shields.io/github/license/devlooped/WhatsApp.svg?color=blue)](https://github.com//devlooped/WhatsApp/blob/main/license.txt)
 [![Build](https://github.com/devlooped/WhatsApp/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/devlooped/WhatsApp/actions/workflows/build.yml)
 
+<!-- #content -->
+
 Create agents for WhatsApp using Azure Functions.
 
 ## Usage
@@ -165,3 +167,6 @@ See [AGPLv3](https://opensource.org/license/agpl-v3) and
 If you use this project and distribute or host commercial software without 
 sharing the code under AGPLv3, you must obtain a commercial license from 
 [Devlooped](mailto:hello@devlooped.com).
+
+<!-- #content -->
+<!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
