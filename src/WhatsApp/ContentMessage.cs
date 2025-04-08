@@ -17,9 +17,10 @@ public record ContentMessage(string Id, Service To, User From, long Timestamp, C
     public const string JQ =
         """
         .entry[].changes[].value.metadata as $phone |
-        .entry[].changes[].value.contacts[] as $user |
-        .entry[].changes[].value.messages[] | 
-        .type as $type |
+        .entry[].changes[].value.contacts[]? as $user |
+        .entry[].changes[].value.messages[]? | 
+        select(. != null and .type != "interactive") | 
+        .type as $type | 
         {
             id: .id,
             timestamp: .timestamp | tonumber,
@@ -61,6 +62,7 @@ public record ContentMessage(string Id, Service To, User From, long Timestamp, C
                     sha256: .[$type].sha256
                 }
                 else {
+                    "$type": "unknown",    
                     raw: .
                 }
                 end

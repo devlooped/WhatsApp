@@ -6,11 +6,19 @@
 public enum MessageType
 {
     /// <summary>
+    /// Message contains user content.
+    /// </summary>
+    Content,
+    /// <summary>
     /// Message contains an error.
     /// </summary>
     Error,
     /// <summary>
-    /// Message contains user content.
+    /// Message contains a status update.
     /// </summary>
-    Content
+    Status,
+    /// <summary>
+    /// Message contains a button reply.
+    /// </summary>
+    Interactive,
 }

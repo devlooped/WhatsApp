@@ -1,25 +1,24 @@
 ﻿namespace Devlooped.WhatsApp;
 
 /// <summary>
-/// A <see cref="Message"/> containing an <see cref="Error"/>.
+/// A <see cref="Message"/> containing a status update.
 /// </summary>
 /// <param name="Id">The message identifier.</param>
 /// <param name="To">The service that received the message from the Cloud API.</param>
 /// <param name="From">The user that sent the message.</param>
 /// <param name="Timestamp">Timestamp of the message.</param>
-/// <param name="Error">The error.</param>
-public record ErrorMessage(string Id, Service To, User From, long Timestamp, Error Error) : Message(Id, To, From, Timestamp)
+/// <param name="Status">The message status.</param>
+public record StatusMessage(string Id, Service To, User From, long Timestamp, Status Status) : Message(Id, To, From, Timestamp)
 {
     /// <summary>
     /// A JQ query that transforms WhatsApp Cloud API JSON into the serialization 
-    /// expected by <see cref="ErrorMessage"/>.
+    /// expected by <see cref="StatusMessage"/>.
     /// </summary>
     public const string JQ =
         """
         .entry[].changes[].value.metadata as $phone |
-        .entry[].changes[].value.statuses[]? | 
-        select(. != null) | 
-        {
+        .entry[].changes[].value.statuses[] | 
+        select(. != null) | {
             id: .id,
             timestamp: .timestamp | tonumber,
             to: {
@@ -30,21 +29,17 @@ public record ErrorMessage(string Id, Service To, User From, long Timestamp, Err
                 name: .recipient_id,
                 number: .recipient_id
             },
-            error: .errors[]? | {
-                code: .code,
-                message: (.error_data.details // .message),
-            }
-        }
+            status: .status
+        }        
         """;
 
     /// <inheritdoc/>
-    public override MessageType Type => MessageType.Error;
+    public override MessageType Type => MessageType.Status;
 }
 
-/// <summary>
-/// The error in an <see cref="ErrorMessage"/>.
-/// </summary>
-/// <param name="Code">The error code.</param>
-/// <param name="Message">The error message.</param>
-public record Error(int Code, string Message);
-
+public enum Status
+{
+    Sent,
+    Delivered,
+    Read,
+}

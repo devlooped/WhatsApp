@@ -51,15 +51,17 @@ public class AzureFunctions(
     [Function("whatsapp_message")]
     public async Task<HttpResponseMessage> Message([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp")] HttpRequest req)
     {
-        logger.LogInformation("Received WhatsApp message.");
-        var json = await new StreamReader(req.Body).ReadToEndAsync();
+        using var reader = new StreamReader(req.Body, Encoding.UTF8);
+        var json = await reader.ReadToEndAsync();
+        logger.LogDebug("Received WhatsApp message: {Message}.", json);
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
         {
             var queue = queueClient.GetQueueClient("whatsapp");
             await queue.CreateIfNotExistsAsync();
             await queue.SendMessageAsync(json);
-            await whatsapp.MarkReadAsync(message.To.Id, message.Id);
+            if (message.Type == MessageType.Content)
+                await whatsapp.MarkReadAsync(message.To.Id, message.Id);
         }
         else
         {
@@ -72,7 +74,7 @@ public class AzureFunctions(
     [Function("whatsapp_process")]
     public async Task Process([QueueTrigger("whatsapp", Connection = "AzureWebJobsStorage")] string json)
     {
-        logger.LogInformation("Processing WhatsApp message.");
+        logger.LogDebug("Processing WhatsApp message: {Message}", json);
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
         {
@@ -86,7 +88,7 @@ public class AzureFunctions(
             }
 
             await handler.HandleAsync(message);
-            await table.AddEntityAsync(new TableEntity(message.From.Number, message.Id));
+            await table.UpsertEntityAsync(new TableEntity(message.From.Number, message.Id));
             logger.LogInformation($"Completed work item: {message.Id}");
         }
         else

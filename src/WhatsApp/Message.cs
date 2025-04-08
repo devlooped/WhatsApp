@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
@@ -31,9 +32,17 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
         if (!string.IsNullOrEmpty(jq))
             return JsonSerializer.Deserialize(jq, MessageSerializerContext.Default.ContentMessage);
 
+        jq = await JQ.ExecuteAsync(json, InteractiveMessage.JQ);
+        if (!string.IsNullOrEmpty(jq))
+            return JsonSerializer.Deserialize(jq, MessageSerializerContext.Default.InteractiveMessage);
+
         jq = await JQ.ExecuteAsync(json, ErrorMessage.JQ);
         if (!string.IsNullOrEmpty(jq))
             return JsonSerializer.Deserialize(jq, MessageSerializerContext.Default.ErrorMessage);
+
+        jq = await JQ.ExecuteAsync(json, StatusMessage.JQ);
+        if (!string.IsNullOrEmpty(jq))
+            return JsonSerializer.Deserialize(jq, MessageSerializerContext.Default.StatusMessage);
 
         // NOTE: unsupported payloads would not generate a JQ output, so we can safely ignore them.
         return default;
@@ -44,8 +53,10 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
     /// </summary>
     public abstract MessageType Type { get; }
 
-    [JsonSourceGenerationOptions(JsonSerializerDefaults.Web, WriteIndented = true)]
-    [JsonSerializable(typeof(ErrorMessage))]
+    [JsonSourceGenerationOptions(JsonSerializerDefaults.Web, WriteIndented = true, UseStringEnumConverter = true)]
     [JsonSerializable(typeof(ContentMessage))]
+    [JsonSerializable(typeof(ErrorMessage))]
+    [JsonSerializable(typeof(InteractiveMessage))]
+    [JsonSerializable(typeof(StatusMessage))]
     partial class MessageSerializerContext : JsonSerializerContext { }
 }
