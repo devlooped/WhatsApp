@@ -132,6 +132,18 @@ corresponding access token for it. To get a permanent access token for
 use, you'd need to create a [system user](https://business.facebook.com/latest/settings/system_users) 
 with full control permissions to the WhatsApp Business API (app).
 
+## Scalability and Performance
+
+In order to quickly and efficiently process incoming messages, the library uses 
+Azure Storage Queues to queue incoming messages from WhatsApp, which provides 
+a reliable and scalable way to handle incoming messages. It also uses Azure Table Storage 
+to detect duplicate messages and avoid processing the same message multiple times.
+
+If `QueueServiceClient` and `TableServiceClient` are registered in the DI container 
+before invoking `UseWhatsApp`, the library will automatically use them. Otherwise, 
+it will register both services using the `AzureWebJobsStorage` connection string, 
+therefore sharing storage with the Azure Functions runtime.
+
 ## License
 
 We offer this project under a dual licensing model, tailored to the needs 
