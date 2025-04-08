@@ -5,12 +5,12 @@
 /// </summary>
 public enum ContentType
 {
-    Document,
-    Contact,
-    Text,
-    Location,
-    Image,
-    Video,
     Audio,
+    Contact,
+    Document,
+    Image,
+    Location,
+    Text,
+    Video,
     Unknown // For the 'raw' case
 }
