@@ -41,7 +41,7 @@ builder.UseWhatsApp<IWhatsAppClient, ILogger<IWhatsAppClient>>(async (client, lo
     }
     else if (message is InteractiveMessage interactive)
     {
-        logger.LogWarning("👤 User chose button {Button}({Title})", interactive.Button.Id, interactive.Button.Title);
+        logger.LogWarning("👤 User chose button {Button} ({Title})", interactive.Button.Id, interactive.Button.Title);
         return;
     }
     else if (message is StatusMessage status)
