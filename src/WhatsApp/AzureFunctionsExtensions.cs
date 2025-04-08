@@ -6,7 +6,6 @@ using Azure.Storage.Queues;
 using Devlooped.WhatsApp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Http.Resilience;
 
 namespace Microsoft.Azure.Functions.Worker.Builder;
 
@@ -15,19 +14,9 @@ namespace Microsoft.Azure.Functions.Worker.Builder;
 /// </summary>
 public static class AzureFunctionsExtensions
 {
-    /// <summary>
-    /// Configure the WhatsApp handler for Azure Functions.
-    /// </summary>
-    public static IFunctionsWorkerApplicationBuilder UseWhatsApp(this IFunctionsWorkerApplicationBuilder builder, Func<IServiceProvider, Message, Task> handler)
-    {
-        builder.Services.AddSingleton<IWhatsAppHandler>(services => new AnonymousWhatsAppHandler(services, handler));
-        ConfigureServices(builder.Services);
-        return builder;
-    }
-
     static void ConfigureServices(IServiceCollection services)
     {
-        services.AddHttpClient().ConfigureHttpClientDefaults(http => http.AddStandardResilienceHandler());
+        services.AddHttpClient("whatsapp").AddStandardResilienceHandler();
         services.AddSingleton<IWhatsAppClient, WhatsAppClient>();
 
         if (services.FirstOrDefault(x => x.ServiceType == typeof(QueueServiceClient)) == null)
@@ -75,6 +64,26 @@ public static class AzureFunctionsExtensions
         where THandler : class, IWhatsAppHandler
     {
         builder.Services.AddSingleton<IWhatsAppHandler, THandler>();
+        ConfigureServices(builder.Services);
+        return builder;
+    }
+
+    /// <summary>
+    /// Configure the WhatsApp handler for Azure Functions.
+    /// </summary>
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp(this IFunctionsWorkerApplicationBuilder builder, Func<IServiceProvider, Message, Task> handler)
+    {
+        builder.Services.AddSingleton<IWhatsAppHandler>(services => new AnonymousWhatsAppHandler(services, handler));
+        ConfigureServices(builder.Services);
+        return builder;
+    }
+
+    /// <summary>
+    /// Configure the WhatsApp handler for Azure Functions.
+    /// </summary>
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp(this IFunctionsWorkerApplicationBuilder builder, Func<Message, Task> handler)
+    {
+        builder.Services.AddSingleton<IWhatsAppHandler>(services => new SimpleAnonymousWhatsAppHandler(handler));
         ConfigureServices(builder.Services);
         return builder;
     }
@@ -158,6 +167,11 @@ public static class AzureFunctionsExtensions
         builder.Services.AddSingleton<IWhatsAppHandler>(services => new AnonymousWhatsAppHandler<TService1, TService2, TService3, TService4, TService5, TService6>(services.GetRequiredService<TService1>(), services.GetRequiredService<TService2>(), services.GetRequiredService<TService3>(), services.GetRequiredService<TService4>(), services.GetRequiredService<TService5>(), services.GetRequiredService<TService6>(), handler));
         ConfigureServices(builder.Services);
         return builder;
+    }
+
+    class SimpleAnonymousWhatsAppHandler(Func<Message, Task> handler) : IWhatsAppHandler
+    {
+        public Task HandleAsync(Message message) => handler(message);
     }
 
     class AnonymousWhatsAppHandler(IServiceProvider services, Func<IServiceProvider, Message, Task> handler) : IWhatsAppHandler

@@ -31,9 +31,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
     {
         var (configuration, client) = Initialize();
 
-        var result = await client.SendTextAync(configuration["SendFrom"]!, configuration["SendTo"]!, "Hi there!");
-
-        Assert.True(result);
+        await client.SendTextAync(configuration["SendFrom"]!, configuration["SendTo"]!, "Hi there!");
     }
 
     [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
@@ -43,7 +41,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
 
         // Send an interactive message with three buttons showcasing the payload/value 
         // being different than the button text
-        var result = await client.SendAync(configuration["SendFrom"]!, new
+        await client.SendAync(configuration["SendFrom"]!, new
         {
             messaging_product = "whatsapp",
             recipient_type = "individual",
@@ -66,8 +64,6 @@ public class WhatsAppClientTests(ITestOutputHelper output)
                 }
             }
         });
-
-        Assert.True(result);
     }
 
     (IConfiguration configuration, WhatsAppClient client) Initialize()

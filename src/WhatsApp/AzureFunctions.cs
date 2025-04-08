@@ -71,7 +71,18 @@ public class AzureFunctions(
             await queue.CreateIfNotExistsAsync();
             await queue.SendMessageAsync(json);
             if (message.Type == MessageType.Content)
-                await whatsapp.MarkReadAsync(message.To.Id, message.Id);
+            {
+                try
+                {
+                    // Best-effort to mark as read. This might be an old message callback, 
+                    // or the message might have been deleted.
+                    await whatsapp.MarkReadAsync(message.To.Id, message.Id);
+                }
+                catch (HttpRequestException e)
+                {
+                    logger.LogWarning("Failed to mark message as read: {Id}\r\n{Payload}", message.Id, e.Message);
+                }
+            }
         }
         else
         {
