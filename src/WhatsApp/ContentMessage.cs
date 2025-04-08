@@ -53,7 +53,13 @@ public record ContentMessage(string Id, Service To, User From, long Timestamp, C
                 }
                 elif $type == "location" then {
                     "$type": $type,
-                    location: .location,
+                    location: {
+                     latitude: .location.latitude,
+                     longitude: .location.longitude   
+                    },
+                    address: .location.address,
+                    name: .location.name,
+                    url: .location.url
                 }
                 elif $type == "image" or $type == "video" or $type == "audio" then {
                     "$type": $type,

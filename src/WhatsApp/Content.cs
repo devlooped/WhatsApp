@@ -70,7 +70,10 @@ public record Location(double Latitude, double Longitude);
 /// Content contains a location.
 /// </summary>
 /// <param name="Location">The location provided as content.</param>
-public record LocationContent(Location Location) : Content
+/// <param name="Address">Optional address of the shared location.</param>
+/// <param name="Name">Optional name of the shared location.</param>
+/// <param name="Url">Optional URL of the shared location.</param>
+public record LocationContent(Location Location, string? Address, string? Name, string? Url) : Content
 {
     /// <inheritdoc/>
     public override ContentType Type => ContentType.Location;
