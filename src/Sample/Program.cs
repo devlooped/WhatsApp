@@ -9,7 +9,7 @@ var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 builder.Configuration.AddUserSecrets<Program>();
 
-builder.UseWhatsApp<IWhatsAppClient, ILogger<IWhatsAppClient>>(async (client, logger, message) =>
+builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>>(async (client, logger, message) =>
 {
     logger.LogInformation("💬 Received message: {Message}", message);
 
@@ -49,11 +49,13 @@ builder.UseWhatsApp<IWhatsAppClient, ILogger<IWhatsAppClient>>(async (client, lo
         logger.LogInformation("☑️ New message status: {Status}", status.Status);
         return;
     }
-
-    await client.ReactAsync(message.To.Id, message.From.Number, message.Id, "🧠");
-    // simulate some hard work at hand, like doing some LLM-stuff :)
-    await Task.Delay(2000);
-    await client.SendTextAync(message.To.Id, message.From.Number, "I'm alive, but I'm just a sample 🤷‍.");
+    else if (message is ContentMessage content)
+    {
+        await client.ReactAsync(from: message.To.Id, to: message.From.Number, message.Id, "🧠");
+        // simulate some hard work at hand, like doing some LLM-stuff :)
+        await Task.Delay(2000);
+        await client.SendTextAync(message.To.Id, message.From.Number, $"☑️ Got your {content.Type.ToString().ToLowerInvariant()}");
+    }
 });
 
 builder.Build().Run();
