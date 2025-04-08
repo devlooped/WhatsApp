@@ -30,8 +30,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
         => new WhatsAppClient(httpFactory, Options.Create(options), logger);
 
     /// <inheritdoc />
-    /// <exception cref="ArgumentException"></exception>
-    public async Task<bool> SendAync(string from, object payload)
+    public async Task SendAync(string from, object payload)
     {
         if (!options.Numbers.TryGetValue(from, out var token))
             throw new ArgumentException($"The number '{from}' is not registered in the options.", nameof(from));
@@ -46,10 +45,8 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
         if (!result.IsSuccessStatusCode)
         {
             var error = JsonNode.Parse(await result.Content.ReadAsStringAsync())?.ToJsonString(new() { WriteIndented = true });
-            logger.LogError("Failed to send WhatsApp message: {error}", error);
-            return false;
+            logger.LogError("Failed to send WhatsApp message from {From}: {Error}", from, error);
+            throw new HttpRequestException(error, null, result.StatusCode);
         }
-
-        return true;
     }
 }

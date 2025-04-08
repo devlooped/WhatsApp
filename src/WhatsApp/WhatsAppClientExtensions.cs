@@ -14,7 +14,7 @@ public static class WhatsAppClientExtensions
         });
 
 
-    public static Task<bool> ReactAsync(this IWhatsAppClient client, string from, string to, string messageId, string reaction)
+    public static Task ReactAsync(this IWhatsAppClient client, string from, string to, string messageId, string reaction)
         => client.SendAync(from, new
         {
             messaging_product = "whatsapp",
@@ -28,7 +28,7 @@ public static class WhatsAppClientExtensions
             }
         });
 
-    public static Task<bool> SendTextAync(this IWhatsAppClient client, string from, string to, string message)
+    public static Task SendTextAync(this IWhatsAppClient client, string from, string to, string message)
         => client.SendAync(from, new
         {
             messaging_product = "whatsapp",

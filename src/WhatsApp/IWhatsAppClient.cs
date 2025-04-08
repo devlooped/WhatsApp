@@ -14,5 +14,7 @@ public interface IWhatsAppClient
     /// <param name="payload">The message payload.</param>
     /// <returns>Whether the message was successfully sent.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages"/>
-    Task<bool> SendAync(string from, object payload);
+    /// <exception cref="ArgumentException">The number <paramref name="from"/> is not registered in <see cref="MetaOptions"/>.</exception>
+    /// <exception cref="HttpRequestException">The HTTP request failed. Exception message contains the error response body from WhatsApp.</exception>
+    Task SendAync(string from, object payload);
 }
