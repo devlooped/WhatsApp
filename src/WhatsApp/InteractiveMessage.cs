@@ -1,0 +1,42 @@
+﻿namespace Devlooped.WhatsApp;
+
+/// <summary>
+/// A <see cref="Message"/> containing an interactive button reply.
+/// </summary>
+/// <param name="Id">The message identifier.</param>
+/// <param name="To">The service that received the message from the Cloud API.</param>
+/// <param name="From">The user that sent the message.</param>
+/// <param name="Timestamp">Timestamp of the message.</param>
+/// <param name="Button">The button selected by the user.</param>
+public record InteractiveMessage(string Id, Service To, User From, long Timestamp, Button Button) : Message(Id, To, From, Timestamp)
+{
+    /// <summary>
+    /// A JQ query that transforms WhatsApp Cloud API JSON into the serialization 
+    /// expected by <see cref="InteractiveMessage"/>.
+    /// </summary>
+    public const string JQ =
+        """
+        .entry[].changes[].value.metadata as $phone |
+        .entry[].changes[].value.contacts[]? as $user |
+        .entry[].changes[].value.messages[]? | 
+        select(. != null and .type == "interactive") | 
+        {
+            id: .id,
+            timestamp: .timestamp | tonumber,
+            to: {
+                id: $phone.phone_number_id,
+                number: $phone.display_phone_number
+            },
+            from: {
+                name: $user.profile.name,
+                number: $user.wa_id
+            },
+            button: .interactive.button_reply
+        }
+        """;
+
+    /// <inheritdoc/>
+    public override MessageType Type => MessageType.Interactive;
+}
+
+public record Button(string Id, string Title);

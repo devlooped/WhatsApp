@@ -6,6 +6,7 @@ using Azure.Storage.Queues;
 using Devlooped.WhatsApp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Http.Resilience;
 
 namespace Microsoft.Azure.Functions.Worker.Builder;
 
@@ -26,7 +27,7 @@ public static class AzureFunctionsExtensions
 
     static void ConfigureServices(IServiceCollection services)
     {
-        services.AddHttpClient();
+        services.AddHttpClient().ConfigureHttpClientDefaults(http => http.AddStandardResilienceHandler());
         services.AddSingleton<IWhatsAppClient, WhatsAppClient>();
 
         if (services.FirstOrDefault(x => x.ServiceType == typeof(QueueServiceClient)) == null)
