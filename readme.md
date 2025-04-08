@@ -58,7 +58,7 @@ builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>>(async (client, logger, me
     logger.LogInformation($"Got message type {message.Type}");
     // Reply to an incoming content message, for example.
     if (message is ContentMessage content)
-        await client.SendTextAync(message.To.Id, message.From.Number, $"Got your {content.}");
+        await client.ReplyAsync(message, $"☑️ Got your {content.Content.Type}");
 }
 ```
 
@@ -86,10 +86,10 @@ common scenarios, such as reacting to a message and replying with plain text:
 ```csharp
 if (message is ContentMessage content)
 {
-    await client.ReactAsync(from: message.To.Id, to: message.From.Number, message.Id, "🧠");
+    await client.ReactAsync(message, "🧠");
     // simulate some hard work at hand, like doing some LLM-stuff :)
     await Task.Delay(2000);
-    await client.SendTextAync(message.To.Id, message.From.Number, $"☑️ Processed your {content.Type}");
+    await client.ReplyAsync(message, $"☑️ Got your {content.Content.Type}");
 }
 ```
 

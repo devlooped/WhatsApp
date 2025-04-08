@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Devlooped.WhatsApp.CodeAnalysis</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <PackFolder>analyzers/dotnet/cs</PackFolder>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <IsRoslynComponent>true</IsRoslynComponent>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\WhatsApp\IWhatsAppClient.cs" Link="IWhatsAppClient.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" Version="1.2.4" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" Pack="false" />
+    <PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Threading.Tasks;
 
 namespace Devlooped.WhatsApp;
 
@@ -16,5 +17,6 @@ public interface IWhatsAppClient
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages"/>
     /// <exception cref="ArgumentException">The number <paramref name="from"/> is not registered in <see cref="MetaOptions"/>.</exception>
     /// <exception cref="HttpRequestException">The HTTP request failed. Exception message contains the error response body from WhatsApp.</exception>
-    Task SendAync(string from, object payload);
+    [Description(nameof(Devlooped) + nameof(WhatsApp) + nameof(IWhatsAppClient) + nameof(SendAsync))]
+    Task SendAsync(string from, object payload);
 }

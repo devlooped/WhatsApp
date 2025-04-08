@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
@@ -25,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WhatsApp\WhatsApp.csproj" />
+    <ProjectReference Include="..\CodeAnalysis\CodeAnalysis.csproj" OutputItemType="Analyzer" Aliases="CodeAnalysis" />
   </ItemGroup>
 
   <ItemGroup>

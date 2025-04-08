@@ -30,7 +30,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
         => new WhatsAppClient(httpFactory, Options.Create(options), logger);
 
     /// <inheritdoc />
-    public async Task SendAync(string from, object payload)
+    public async Task SendAsync(string from, object payload)
     {
         if (!options.Numbers.TryGetValue(from, out var token))
             throw new ArgumentException($"The number '{from}' is not registered in the options.", nameof(from));
