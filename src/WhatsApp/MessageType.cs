@@ -14,11 +14,11 @@ public enum MessageType
     /// </summary>
     Error,
     /// <summary>
-    /// Message contains a status update.
-    /// </summary>
-    Status,
-    /// <summary>
     /// Message contains a button reply.
     /// </summary>
     Interactive,
+    /// <summary>
+    /// Message contains a status update.
+    /// </summary>
+    Status,
 }
