@@ -45,7 +45,7 @@ public record ContentMessage(string Id, Service To, User From, long Timestamp, C
                     name: .contacts[].name.first_name,
                     surname: .contacts[].name.last_name,
                     numbers: [.contacts[].phones[] | 
-                        select(.type == "MOBILE") | .wa_id]
+                        select(.wa_id? != null) | .wa_id]
                 }
                 elif $type == "text" then {
                     "$type": $type,
