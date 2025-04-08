@@ -21,6 +21,6 @@ See [AGPLv3](https://opensource.org/license/agpl-v3) and
 
 **For OEMs, ISVs, VARs, and other commercial application distributors:**
 
-If you combine this project and distribute commercial software without 
+If you use this project and distribute or host commercial software without 
 sharing the code under AGPLv3, you must obtain a commercial license from 
 [Devlooped](mailto:hello@devlooped.com).
