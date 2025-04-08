@@ -57,6 +57,16 @@ public class AzureFunctions(
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
         {
+            // Ensure idempotent processing
+            var table = tableClient.GetTableClient("whatsapp");
+            await table.CreateIfNotExistsAsync();
+            if (await table.GetEntityIfExistsAsync<TableEntity>(message.From.Number, message.Id) is { HasValue: true } existing)
+            {
+                logger.LogInformation("Skipping already handled message {Id}", message.Id);
+                return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+            }
+
+            // Otherwise, queue the new message
             var queue = queueClient.GetQueueClient("whatsapp");
             await queue.CreateIfNotExistsAsync();
             await queue.SendMessageAsync(json);
@@ -78,7 +88,9 @@ public class AzureFunctions(
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
         {
-            // Ensure idempotent processing
+            // Ensure idempotent processing at dequeue time, since we might have been called 
+            // multiple times for the same message by WhatsApp (Message method) while processing was still 
+            // happening (and therefore we didn't save the entity yet).
             var table = tableClient.GetTableClient("whatsapp");
             await table.CreateIfNotExistsAsync();
             if (await table.GetEntityIfExistsAsync<TableEntity>(message.From.Number, message.Id) is { HasValue: true } existing)
