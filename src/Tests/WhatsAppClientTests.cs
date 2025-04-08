@@ -54,15 +54,14 @@ public class WhatsAppClientTests(ITestOutputHelper output)
                 type = "button",
                 body = new
                 {
-                    text = "Choose a button"
+                    text = "Is SpaceX great?"
                 },
                 action = new
                 {
                     buttons = new[]
                     {
-                        new { type = "reply", reply = new { id = "1", title = "Button 1" } },
-                        new { type = "reply", reply = new { id = "2", title = "Button 2" } },
-                        new { type = "reply", reply = new { id = "3", title = "Button 3" } }
+                        new { type = "reply", reply = new { id = "btn_yes", title = "Yes" } },
+                        new { type = "reply", reply = new { id = "btn_no", title = "No" } },
                     }
                 }
             }
