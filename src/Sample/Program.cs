@@ -1,10 +1,21 @@
-﻿using Devlooped.WhatsApp;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using Devlooped.WhatsApp;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 var builder = FunctionsApplication.CreateBuilder(args);
+var options = new JsonSerializerOptions(JsonSerializerDefaults.General)
+{
+    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    Converters =
+    {
+        new JsonStringEnumConverter()
+    },
+    WriteIndented = true
+};
 
 builder.ConfigureFunctionsWebApplication();
 builder.Configuration.AddUserSecrets<Program>();
@@ -18,7 +29,7 @@ builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>>(async (client, logger, me
         // Reengagement error, we need to invite the user.
         if (error.Error.Code == 131047)
         {
-            await client.SendAync(error.To.Id, new
+            await client.SendAsync(error.To.Id, new
             {
                 messaging_product = "whatsapp",
                 to = error.From.Number,
@@ -51,10 +62,10 @@ builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>>(async (client, logger, me
     }
     else if (message is ContentMessage content)
     {
-        await client.ReactAsync(from: message.To.Id, to: message.From.Number, message.Id, "🧠");
+        await client.ReactAsync(message, "🧠");
         // simulate some hard work at hand, like doing some LLM-stuff :)
-        await Task.Delay(2000);
-        await client.SendTextAync(message.To.Id, message.From.Number, $"☑️ Got your {content.Type.ToString().ToLowerInvariant()}");
+        //await Task.Delay(2000);
+        await client.ReplyAsync(message, $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}");
     }
 });
 

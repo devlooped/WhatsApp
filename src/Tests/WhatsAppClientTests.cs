@@ -21,7 +21,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
             VerifyToken = "asdf"
         }, MockLogger.Create<WhatsAppClient>());
 
-        var ex = await Assert.ThrowsAsync<ArgumentException>(() => client.SendAync("1234", new { }));
+        var ex = await Assert.ThrowsAsync<ArgumentException>(() => client.SendAsync("1234", new { }));
 
         Assert.Equal("from", ex.ParamName);
     }
@@ -31,7 +31,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
     {
         var (configuration, client) = Initialize();
 
-        await client.SendTextAync(configuration["SendFrom"]!, configuration["SendTo"]!, "Hi there!");
+        await client.SendAync(configuration["SendFrom"]!, configuration["SendTo"]!, "Hi there!");
     }
 
     [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
@@ -41,7 +41,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
 
         // Send an interactive message with three buttons showcasing the payload/value 
         // being different than the button text
-        await client.SendAync(configuration["SendFrom"]!, new
+        await client.SendAsync(configuration["SendFrom"]!, new
         {
             messaging_product = "whatsapp",
             recipient_type = "individual",

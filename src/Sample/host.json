@@ -12,6 +12,11 @@
         "excludedTypes": "Request"
       },
       "enableLiveMetricsFilters": true
+    },
+    "logLevel": {
+      "Microsoft": "Warning",
+      "System": "Warning",
+      "Devlooped": "Trace"
     }
   }
 }
