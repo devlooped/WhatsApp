@@ -1,4 +1,6 @@
-﻿namespace Devlooped.WhatsApp;
+﻿using System.Text.Json.Serialization;
+
+namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// A <see cref="Message"/> containing an interactive button reply.
@@ -10,32 +12,8 @@
 /// <param name="Button">The button selected by the user.</param>
 public record InteractiveMessage(string Id, Service To, User From, long Timestamp, Button Button) : Message(Id, To, From, Timestamp)
 {
-    /// <summary>
-    /// A JQ query that transforms WhatsApp Cloud API JSON into the serialization 
-    /// expected by <see cref="InteractiveMessage"/>.
-    /// </summary>
-    public const string JQ =
-        """
-        .entry[].changes[].value.metadata as $phone |
-        .entry[].changes[].value.contacts[]? as $user |
-        .entry[].changes[].value.messages[]? | 
-        select(. != null and .type == "interactive") | 
-        {
-            id: .id,
-            timestamp: .timestamp | tonumber,
-            to: {
-                id: $phone.phone_number_id,
-                number: $phone.display_phone_number
-            },
-            from: {
-                name: $user.profile.name,
-                number: $user.wa_id
-            },
-            button: .interactive.button_reply
-        }
-        """;
-
     /// <inheritdoc/>
+    [JsonIgnore]
     public override MessageType Type => MessageType.Interactive;
 }
 

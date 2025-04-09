@@ -21,4 +21,8 @@ public enum MessageType
     /// Message contains a status update.
     /// </summary>
     Status,
+    /// <summary>
+    /// Message type is not supported by the WhatsApp for Business service.
+    /// </summary>
+    Unsupported,
 }

@@ -124,4 +124,17 @@ public class WhatsAppModelTests(ITestOutputHelper output)
         Assert.Equal("btn_yes", interactive.Button.Id);
         Assert.Equal("Yes", interactive.Button.Title);
     }
+
+    [Fact]
+    public async Task DeserializeUnsupported()
+    {
+        var json = await File.ReadAllTextAsync($"Content/WhatsApp/Unsupported.json");
+        var message = await Message.DeserializeAsync(json);
+
+        var unsupported = Assert.IsType<UnsupportedMessage>(message);
+
+        Assert.NotNull(message);
+        Assert.NotNull(message.To);
+        Assert.NotNull(message.From);
+    }
 }

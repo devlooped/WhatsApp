@@ -67,6 +67,11 @@ builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>>(async (client, logger, me
         //await Task.Delay(2000);
         await client.ReplyAsync(message, $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}");
     }
+    else if (message is UnsupportedMessage unsupported)
+    {
+        await client.ReactAsync(message, "⚠️");
+        return;
+    }
 });
 
 builder.Build().Run();
