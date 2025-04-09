@@ -89,9 +89,15 @@ if (message is ContentMessage content)
     await client.ReactAsync(message, "🧠");
     // simulate some hard work at hand, like doing some LLM-stuff :)
     await Task.Delay(2000);
-    await client.ReplyAsync(message, $"☑️ Got your {content.Content.Type}");
+    var json = JsonSerializer.Serialize(content, options);
+    await client.ReplyAsync(message, $"☑️ Got your {content.Content.Type}:\r\n{json}");
 }
 ```
+
+The above code would render as follows in WhatsApp:
+
+![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/whatsapp.png)
+
 
 ## Configuration
 
