@@ -162,11 +162,16 @@ AGPLv3, under certain conditions.
 See [AGPLv3](https://opensource.org/license/agpl-v3) and 
 [Universal FOSS Exception](https://oss.oracle.com/licenses/universal-foss-exception/).
 
-**For OEMs, ISVs, VARs, and other commercial application distributors:**
+**For OEMs, ISVs, VARs, and other commercial uses:**
 
 If you use this project and distribute or host commercial software without 
 sharing the code under AGPLv3, you must obtain a commercial license from 
-[Devlooped](mailto:hello@devlooped.com).
+[Devlooped](mailto:hello@devlooped.com). Alternatively, you can sponsor 
+on [GitHub Sponsors](https://github.com/sponsors/devlooped) at the AGPLv3 
+tier or above per developer, which grants you a commercial license for 
+the duration of the sponsorship. You can sponsor through each individual 
+developer's account or through your GitHub organization (and get invoiced 
+alongside your GitHub Enterprise subscription if you have one).
 
 <!-- #content -->
 <!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
