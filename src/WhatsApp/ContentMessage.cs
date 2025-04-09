@@ -10,7 +10,7 @@ namespace Devlooped.WhatsApp;
 /// <param name="From">The user that sent the message.</param>
 /// <param name="Timestamp">Timestamp of the message.</param>
 /// <param name="Content">Message content.</param>
-public record ContentMessage(string Id, Service To, User From, long Timestamp, Content Content) : Message(Id, To, From, Timestamp)
+public record ContentMessage(string Id, Service To, User From, long Timestamp, Content Content) : UserMessage(Id, To, From, Timestamp)
 {
     /// <inheritdoc/>
     [JsonIgnore]

@@ -10,7 +10,7 @@ namespace Devlooped.WhatsApp;
 /// <param name="From">The user that sent the message.</param>
 /// <param name="Timestamp">Timestamp of the message.</param>
 /// <param name="Error">The error.</param>
-public record ErrorMessage(string Id, Service To, User From, long Timestamp, Error Error) : Message(Id, To, From, Timestamp)
+public record ErrorMessage(string Id, Service To, User From, long Timestamp, Error Error) : SystemMessage(Id, To, From, Timestamp)
 {
     /// <inheritdoc/>
     [JsonIgnore]

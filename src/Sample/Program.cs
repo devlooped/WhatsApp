@@ -3,24 +3,29 @@ using System.Text.Json.Serialization;
 using Devlooped.WhatsApp;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 var builder = FunctionsApplication.CreateBuilder(args);
-var options = new JsonSerializerOptions(JsonSerializerDefaults.General)
+builder.ConfigureFunctionsWebApplication();
+
+#if DEBUG
+builder.Environment.EnvironmentName = "Development";
+builder.Configuration.AddUserSecrets<Program>();
+#endif
+builder.Services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.General)
 {
     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     Converters =
     {
         new JsonStringEnumConverter()
     },
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     WriteIndented = true
-};
+});
 
-builder.ConfigureFunctionsWebApplication();
-builder.Configuration.AddUserSecrets<Program>();
-
-builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>>(async (client, logger, message) =>
+builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>, JsonSerializerOptions>(async (client, logger, options, message) =>
 {
     logger.LogInformation("💬 Received message: {Message}", message);
 
@@ -52,24 +57,31 @@ builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>>(async (client, logger, me
     }
     else if (message is InteractiveMessage interactive)
     {
-        logger.LogWarning("👤 User chose button {Button} ({Title})", interactive.Button.Id, interactive.Button.Title);
+        logger.LogWarning("👤 chose {Button} ({Title})", interactive.Button.Id, interactive.Button.Title);
+        await client.ReplyAsync(interactive, $"👤 chose: {interactive.Button.Title} ({interactive.Button.Id})");
+        return;
+    }
+    else if (message is ReactionMessage reaction)
+    {
+        logger.LogInformation("👤 reaction: {Reaction}", reaction.Emoji);
+        await client.ReplyAsync(reaction, $"👤 reaction: {reaction.Emoji}");
         return;
     }
     else if (message is StatusMessage status)
     {
-        logger.LogInformation("☑️ New message status: {Status}", status.Status);
+        logger.LogInformation("☑️ status: {Status}", status.Status);
         return;
     }
     else if (message is ContentMessage content)
     {
-        await client.ReactAsync(message, "🧠");
+        await client.ReactAsync(content, "🧠");
         // simulate some hard work at hand, like doing some LLM-stuff :)
         //await Task.Delay(2000);
-        await client.ReplyAsync(message, $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}");
+        await client.ReplyAsync(content, $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}");
     }
     else if (message is UnsupportedMessage unsupported)
     {
-        await client.ReactAsync(message, "⚠️");
+        logger.LogWarning("⚠️ {Message}", unsupported);
         return;
     }
 });

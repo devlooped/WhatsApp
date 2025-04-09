@@ -4,6 +4,7 @@
     <RootNamespace>Devlooped.WhatsApp</RootNamespace>
     <UserSecretsId>41fc668e-a410-48d4-9884-c2937478d9e1</UserSecretsId>
     <PackageLicenseExpression>AGPL-3.0-or-later WITH Universal-FOSS-exception-1.0</PackageLicenseExpression>
+    <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
 </Project>
