@@ -14,9 +14,10 @@
       "enableLiveMetricsFilters": true
     },
     "logLevel": {
+      "default": "Warning",
+      "Function": "Information",
       "Microsoft": "Warning",
-      "System": "Warning",
-      "Devlooped": "Trace"
+      "System": "Warning"
     }
   }
 }

@@ -14,6 +14,13 @@ builder.ConfigureFunctionsWebApplication();
 builder.Environment.EnvironmentName = "Development";
 builder.Configuration.AddUserSecrets<Program>();
 #endif
+
+if (builder.Environment.IsDevelopment())
+{
+    // TODO: doesn't seem to work.
+    builder.Logging.AddFilter("Devlooped.WhatsApp.AzureFunctions", LogLevel.Trace);
+}
+
 builder.Services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.General)
 {
     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
