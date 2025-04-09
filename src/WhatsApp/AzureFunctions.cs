@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Microsoft.AspNetCore.Http;
@@ -27,27 +24,6 @@ public class AzureFunctions(
     IOptions<MetaOptions> options,
     ILogger<AzureFunctions> logger)
 {
-    [Function("whatsapp_register")]
-    public HttpResponseMessage Register([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "whatsapp")] HttpRequest req)
-    {
-        if (req.Query.TryGetValue("hub.mode", out var mode) && mode == "subscribe" &&
-            req.Query.TryGetValue("hub.verify_token", out var token) && token == options.Value.VerifyToken &&
-            req.Query.TryGetValue("hub.challenge", out var values) &&
-            values.ToString() is { } challenge)
-        {
-            logger.LogInformation("Registering webhook callback.");
-            return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
-            {
-                Content = new StringContent(challenge, Encoding.UTF8, "text/plain")
-            };
-        }
-
-        return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest)
-        {
-            Content = new StringContent("Received verification token doesn't match the configured one.", Encoding.UTF8, "text/plain")
-        };
-    }
-
     [Function("whatsapp_message")]
     public async Task<HttpResponseMessage> Message([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp")] HttpRequest req)
     {
@@ -60,7 +36,7 @@ public class AzureFunctions(
             // Ensure idempotent processing
             var table = tableClient.GetTableClient("whatsapp");
             await table.CreateIfNotExistsAsync();
-            if (await table.GetEntityIfExistsAsync<TableEntity>(message.From.Number, message.Id) is { HasValue: true } existing)
+            if (await table.GetEntityIfExistsAsync<TableEntity>(message.From.Number, message.NotificationId) is { HasValue: true } existing)
             {
                 logger.LogInformation("Skipping already handled message {Id}", message.Id);
                 return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
@@ -70,7 +46,10 @@ public class AzureFunctions(
             var queue = queueClient.GetQueueClient("whatsapp");
             await queue.CreateIfNotExistsAsync();
             await queue.SendMessageAsync(json);
-            if (message.Type == MessageType.Content)
+
+            // Mark read these two types of messages we want to explicitly acknowledge from users.
+            if (message.Type == MessageType.Content ||
+                message.Type == MessageType.Interactive)
             {
                 try
                 {
@@ -104,7 +83,7 @@ public class AzureFunctions(
             // happening (and therefore we didn't save the entity yet).
             var table = tableClient.GetTableClient("whatsapp");
             await table.CreateIfNotExistsAsync();
-            if (await table.GetEntityIfExistsAsync<TableEntity>(message.From.Number, message.Id) is { HasValue: true } existing)
+            if (await table.GetEntityIfExistsAsync<TableEntity>(message.From.Number, message.NotificationId) is { HasValue: true } existing)
             {
                 logger.LogInformation("Skipping already handled message {Id}", message.Id);
                 return;
@@ -118,5 +97,26 @@ public class AzureFunctions(
         {
             logger.LogWarning("Failed to deserialize message.");
         }
+    }
+
+    [Function("whatsapp_register")]
+    public HttpResponseMessage Register([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "whatsapp")] HttpRequest req)
+    {
+        if (req.Query.TryGetValue("hub.mode", out var mode) && mode == "subscribe" &&
+            req.Query.TryGetValue("hub.verify_token", out var token) && token == options.Value.VerifyToken &&
+            req.Query.TryGetValue("hub.challenge", out var values) &&
+            values.ToString() is { } challenge)
+        {
+            logger.LogInformation("Registering webhook callback.");
+            return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new StringContent(challenge, Encoding.UTF8, "text/plain")
+            };
+        }
+
+        return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest)
+        {
+            Content = new StringContent("Received verification token doesn't match the configured one.", Encoding.UTF8, "text/plain")
+        };
     }
 }

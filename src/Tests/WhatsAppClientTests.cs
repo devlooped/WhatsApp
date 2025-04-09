@@ -31,7 +31,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
     {
         var (configuration, client) = Initialize();
 
-        await client.SendAync(configuration["SendFrom"]!, configuration["SendTo"]!, "Hi there!");
+        await client.SendAsync(configuration["SendFrom"]!, configuration["SendTo"]!, "Hi there!");
     }
 
     [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]

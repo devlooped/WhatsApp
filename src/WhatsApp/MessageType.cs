@@ -18,6 +18,10 @@ public enum MessageType
     /// </summary>
     Interactive,
     /// <summary>
+    /// Message contains a reaction to a message.
+    /// </summary>
+    Reaction,
+    /// <summary>
     /// Message contains a status update.
     /// </summary>
     Status,
