@@ -1,4 +1,6 @@
-﻿namespace Devlooped.WhatsApp;
+﻿using System.Text.Json.Serialization;
+
+namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// A <see cref="Message"/> containing an <see cref="Error"/>.
@@ -10,34 +12,8 @@
 /// <param name="Error">The error.</param>
 public record ErrorMessage(string Id, Service To, User From, long Timestamp, Error Error) : Message(Id, To, From, Timestamp)
 {
-    /// <summary>
-    /// A JQ query that transforms WhatsApp Cloud API JSON into the serialization 
-    /// expected by <see cref="ErrorMessage"/>.
-    /// </summary>
-    public const string JQ =
-        """
-        .entry[].changes[].value.metadata as $phone |
-        .entry[].changes[].value.statuses[]? | 
-        select(. != null) | 
-        {
-            id: .id,
-            timestamp: .timestamp | tonumber,
-            to: {
-                id: $phone.phone_number_id,
-                number: $phone.display_phone_number
-            },
-            from: {
-                name: .recipient_id,
-                number: .recipient_id
-            },
-            error: .errors[]? | {
-                code: .code,
-                message: (.error_data.details // .message),
-            }
-        }
-        """;
-
     /// <inheritdoc/>
+    [JsonIgnore]
     public override MessageType Type => MessageType.Error;
 }
 

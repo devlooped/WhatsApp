@@ -34,6 +34,7 @@ public abstract record Content
 public record DocumentContent(string Id, string Name, string Mime, string Sha256) : Content
 {
     /// <inheritdoc/>
+    [JsonIgnore]
     public override ContentType Type => ContentType.Document;
 }
 
@@ -46,6 +47,7 @@ public record DocumentContent(string Id, string Name, string Mime, string Sha256
 public record ContactContent(string Name, string Surname, string[] Numbers) : Content
 {
     /// <inheritdoc/>
+    [JsonIgnore]
     public override ContentType Type => ContentType.Contact;
 }
 
@@ -56,6 +58,7 @@ public record ContactContent(string Name, string Surname, string[] Numbers) : Co
 public record TextContent(string Text) : Content
 {
     /// <inheritdoc/>
+    [JsonIgnore]
     public override ContentType Type => ContentType.Text;
 }
 
@@ -76,6 +79,7 @@ public record Location(double Latitude, double Longitude);
 public record LocationContent(Location Location, string? Address, string? Name, string? Url) : Content
 {
     /// <inheritdoc/>
+    [JsonIgnore]
     public override ContentType Type => ContentType.Location;
 }
 
@@ -96,6 +100,7 @@ public abstract record MediaContent(string Id, string Mime, string Sha256) : Con
 public record AudioContent(string Id, string Mime, string Sha256) : MediaContent(Id, Mime, Sha256)
 {
     /// <inheritdoc/>
+    [JsonIgnore]
     public override ContentType Type => ContentType.Audio;
 }
 
@@ -108,6 +113,7 @@ public record AudioContent(string Id, string Mime, string Sha256) : MediaContent
 public record ImageContent(string Id, string Mime, string Sha256) : MediaContent(Id, Mime, Sha256)
 {
     /// <inheritdoc/>
+    [JsonIgnore]
     public override ContentType Type => ContentType.Image;
 }
 
@@ -120,6 +126,7 @@ public record ImageContent(string Id, string Mime, string Sha256) : MediaContent
 public record VideoContent(string Id, string Mime, string Sha256) : MediaContent(Id, Mime, Sha256)
 {
     /// <inheritdoc/>
+    [JsonIgnore]
     public override ContentType Type => ContentType.Video;
 }
 
@@ -130,5 +137,6 @@ public record VideoContent(string Id, string Mime, string Sha256) : MediaContent
 public record UnknownContent(JsonElement Raw) : Content
 {
     /// <inheritdoc/>
+    [JsonIgnore]
     public override ContentType Type => ContentType.Unknown;
 }
