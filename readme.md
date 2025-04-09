@@ -101,7 +101,7 @@ The above code would render as follows in WhatsApp:
 
 ## Configuration
 
-You need to register an app in the Meta [App Dashboard](https://developers.facebook.com/apps/]. 
+You need to register an app in the Meta [App Dashboard](https://developers.facebook.com/apps/). 
 The app must then be configured to use the WhatsApp Business API, and the webhook and 
 verification token (an arbitrary value) must be set up in the app settings under WhatsApp. 
 The webhook URL is `/whatsapp` under your Azure Functions app.
@@ -168,7 +168,7 @@ AGPLv3, under certain conditions.
 See [AGPLv3](https://opensource.org/license/agpl-v3) and 
 [Universal FOSS Exception](https://oss.oracle.com/licenses/universal-foss-exception/).
 
-**For OEMs, ISVs, VARs, and other commercial uses:**
+**For OEMs, ISVs, VARs, and other commercial users:**
 
 If you use this project and distribute or host commercial software without 
 sharing the code under AGPLv3, you must obtain a commercial license from 
@@ -176,8 +176,7 @@ sharing the code under AGPLv3, you must obtain a commercial license from
 on [GitHub Sponsors](https://github.com/sponsors/devlooped) at the AGPLv3 
 tier or above per developer, which grants you a commercial license for 
 the duration of the sponsorship. You can sponsor through each individual 
-developer's account or through your GitHub organization (and get invoiced 
-alongside your GitHub Enterprise subscription if you have one).
+developer's account or through your GitHub organization.
 
 <!-- #content -->
 <!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
