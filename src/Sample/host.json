@@ -15,7 +15,7 @@
     },
     "logLevel": {
       "default": "Warning",
-      "Function": "Information",
+      "Function": "Trace",
       "Microsoft": "Warning",
       "System": "Warning"
     }
