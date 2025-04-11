@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Devlooped.WhatsApp</AssemblyName>
     <Description>WhatsApp agents for Azure Functions</Description>
     <PackageId>Devlooped.WhatsApp</PackageId>
+    <PackContent>false</PackContent>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,7 +17,7 @@
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
     <PackageReference Include="NuGetizer" Version="1.2.4" />
-    <PackageReference Include="Devlooped.JQ" Version="1.7.1.8" />
+    <PackageReference Include="Devlooped.JQ" Version="1.7.1.8" PackExclude="contentFiles" />
     <PackageReference Include="PolySharp" Version="1.15.0" />
     <PackageReference Include="System.Net.Http.Json" Version="8.0.1" />
   </ItemGroup>
@@ -26,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Tests"/>
+    <InternalsVisibleTo Include="Tests" />
   </ItemGroup>
 
 </Project>
