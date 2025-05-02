@@ -1,6 +1,4 @@
-﻿using Devlooped.WhatsApp;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Host;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
 
 namespace Devlooped.WhatsApp;

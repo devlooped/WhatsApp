@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Azure.Data.Tables;
+﻿using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Devlooped.WhatsApp;
 using Microsoft.Extensions.Configuration;

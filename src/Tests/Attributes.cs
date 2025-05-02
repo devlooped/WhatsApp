@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
-using Xunit;
+﻿using Microsoft.Extensions.Configuration;
 
 namespace Xunit;
 
