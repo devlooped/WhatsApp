@@ -58,6 +58,15 @@ public static class AzureFunctionsExtensions
     }
 
     /// <summary>
+    /// Configure WhatsApp functions and use an already registered service that implements <see cref="IWhatsAppHandler"/>.
+    /// </summary>
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp(this IFunctionsWorkerApplicationBuilder builder)
+    {
+        ConfigureServices(builder.Services);
+        return builder;
+    }
+
+    /// <summary>
     /// Configure the WhatsApp handler for Azure Functions.
     /// </summary>
     public static IFunctionsWorkerApplicationBuilder UseWhatsApp<THandler>(this IFunctionsWorkerApplicationBuilder builder)
