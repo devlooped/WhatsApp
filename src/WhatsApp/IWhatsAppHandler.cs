@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Devlooped.WhatsApp;
+﻿namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// Interface for handling incoming WhatsApp messages.

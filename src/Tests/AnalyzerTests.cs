@@ -1,14 +1,7 @@
 ﻿extern alias CodeAnalysis;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Analyzer = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerVerifier<CodeAnalysis.Devlooped.WhatsApp.SendStringAnalyzer, Microsoft.CodeAnalysis.Testing.DefaultVerifier>;
-using AnalyzerTest = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerTest<CodeAnalysis.Devlooped.WhatsApp.SendStringAnalyzer, Microsoft.CodeAnalysis.Testing.DefaultVerifier>;
 using SendStringAnalyzer = CodeAnalysis.Devlooped.WhatsApp.SendStringAnalyzer;
 
 namespace Devlooped.WhatsApp;
