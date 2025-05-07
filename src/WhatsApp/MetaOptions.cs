@@ -23,6 +23,6 @@ public class MetaOptions
     /// <summary>
     /// Contains pairs of number ID > access token for WhatsApp for Business phone numbers.
     /// </summary>
-    [MinLength(1, ErrorMessage = "At least one number ID > access token pair is required, i.e. Meta:12345=asdf.")]
+    [MinLength(1, ErrorMessage = "At least one number ID > access token pair is required, i.e. Meta:Numbers:12345=asdf")]
     public IDictionary<string, string> Numbers { get; set; } = new Dictionary<string, string>();
 }
