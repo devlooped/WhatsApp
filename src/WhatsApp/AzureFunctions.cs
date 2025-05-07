@@ -2,6 +2,7 @@
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,7 +26,7 @@ public class AzureFunctions(
     ILogger<AzureFunctions> logger)
 {
     [Function("whatsapp_message")]
-    public async Task<HttpResponseMessage> Message([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp")] HttpRequest req)
+    public async Task<IActionResult> Message([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp")] HttpRequest req)
     {
         using var reader = new StreamReader(req.Body, Encoding.UTF8);
         var json = await reader.ReadToEndAsync();
@@ -39,7 +40,7 @@ public class AzureFunctions(
             if (await table.GetEntityIfExistsAsync<TableEntity>(message.From.Number, message.NotificationId) is { HasValue: true } existing)
             {
                 logger.LogInformation("Skipping already handled message {Id}", message.Id);
-                return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+                return new OkResult();
             }
 
             // Otherwise, queue the new message
@@ -68,7 +69,7 @@ public class AzureFunctions(
             logger.LogWarning("Unsupported message type received: \r\n{Payload}", json);
         }
 
-        return new HttpResponseMessage(System.Net.HttpStatusCode.OK);
+        return new OkResult();
     }
 
     [Function("whatsapp_process")]
@@ -100,7 +101,7 @@ public class AzureFunctions(
     }
 
     [Function("whatsapp_register")]
-    public HttpResponseMessage Register([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "whatsapp")] HttpRequest req)
+    public IActionResult Register([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "whatsapp")] HttpRequest req)
     {
         if (req.Query.TryGetValue("hub.mode", out var mode) && mode == "subscribe" &&
             req.Query.TryGetValue("hub.verify_token", out var token) && token == options.Value.VerifyToken &&
@@ -108,15 +109,10 @@ public class AzureFunctions(
             values.ToString() is { } challenge)
         {
             logger.LogInformation("Registering webhook callback.");
-            return new HttpResponseMessage(System.Net.HttpStatusCode.OK)
-            {
-                Content = new StringContent(challenge, Encoding.UTF8, "text/plain")
-            };
+
+            return new OkObjectResult(challenge);
         }
 
-        return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest)
-        {
-            Content = new StringContent("Received verification token doesn't match the configured one.", Encoding.UTF8, "text/plain")
-        };
+        return new BadRequestObjectResult("Received verification token doesn't match the configured one.");
     }
 }

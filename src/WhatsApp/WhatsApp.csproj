@@ -11,6 +11,8 @@
   <ItemGroup>
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.3.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage.Queues" Version="5.5.2" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.10.0" />
