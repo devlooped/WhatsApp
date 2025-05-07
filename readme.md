@@ -212,6 +212,7 @@ developer's account or through your GitHub organization.
 [![Jordan S. Jones](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/jordansjones.png "Jordan S. Jones")](https://github.com/jordansjones)
 [![domischell](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/DominicSchell.png "domischell")](https://github.com/DominicSchell)
 [![Mauricio Scheffer](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/mausch.png "Mauricio Scheffer")](https://github.com/mausch)
+[![Justin Wendlandt](https://raw.githubusercontent.com/devlooped/sponsors/main/.github/avatars/jwendl.png "Justin Wendlandt")](https://github.com/jwendl)
 
 
 <!-- sponsors.md -->
