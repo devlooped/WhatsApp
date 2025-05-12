@@ -27,22 +27,36 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
         => new WhatsAppClient(httpFactory, Options.Create(options), logger);
 
     /// <inheritdoc />
-    public async Task SendAsync(string from, object payload)
+    public HttpClient CreateHttp(string numberId)
     {
-        if (!options.Numbers.TryGetValue(from, out var token))
-            throw new ArgumentException($"The number '{from}' is not registered in the options.", nameof(from));
+        if (!options.Numbers.TryGetValue(numberId, out var token))
+            throw new ArgumentException($"The number '{numberId}' is not registered in the options.", nameof(numberId));
+
+        var http = httpFactory.CreateClient("whatsapp");
+        http.BaseAddress = new Uri($"https://graph.facebook.com/{options.ApiVersion}/");
+        http.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {token}");
+        http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        return http;
+    }
+
+    /// <inheritdoc />
+    public async Task SendAsync(string numberId, object payload)
+    {
+        if (!options.Numbers.TryGetValue(numberId, out var token))
+            throw new ArgumentException($"The number '{numberId}' is not registered in the options.", nameof(numberId));
 
         using var http = httpFactory.CreateClient("whatsapp");
 
         http.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {token}");
         http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        var result = await http.PostAsJsonAsync($"https://graph.facebook.com/{options.ApiVersion}/{from}/messages", payload);
+        var result = await http.PostAsJsonAsync($"https://graph.facebook.com/{options.ApiVersion}/{numberId}/messages", payload);
 
         if (!result.IsSuccessStatusCode)
         {
             var error = JsonNode.Parse(await result.Content.ReadAsStringAsync())?.ToJsonString(new() { WriteIndented = true });
-            logger.LogError("Failed to send WhatsApp message from {From}: {Error}", from, error);
+            logger.LogError("Failed to send WhatsApp message from {From}: {Error}", numberId, error);
             throw new HttpRequestException(error, null, result.StatusCode);
         }
     }

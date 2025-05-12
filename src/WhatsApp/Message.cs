@@ -226,7 +226,7 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
 
         var jq = await Devlooped.JQ.ExecuteAsync(json, JQ);
         if (!string.IsNullOrEmpty(jq))
-            return JsonSerializer.Deserialize(jq, MessageSerializerContext.Default.Message);
+            return JsonSerializer.Deserialize(jq, WhatsAppSerializerContext.Default.Message);
 
         // NOTE: unsupported payloads would not generate a JQ output, so we can safely ignore them.
         return default;
@@ -237,19 +237,4 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
     /// </summary>
     [JsonIgnore]
     public abstract MessageType Type { get; }
-
-    [JsonSourceGenerationOptions(JsonSerializerDefaults.Web,
-        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        UseStringEnumConverter = true,
-        UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
-        WriteIndented = true
-        )]
-    [JsonSerializable(typeof(Message))]
-    [JsonSerializable(typeof(ContentMessage))]
-    [JsonSerializable(typeof(ErrorMessage))]
-    [JsonSerializable(typeof(InteractiveMessage))]
-    [JsonSerializable(typeof(ReactionMessage))]
-    [JsonSerializable(typeof(StatusMessage))]
-    [JsonSerializable(typeof(UnsupportedMessage))]
-    partial class MessageSerializerContext : JsonSerializerContext { }
 }

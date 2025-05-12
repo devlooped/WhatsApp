@@ -3,8 +3,20 @@
 /// <summary>
 /// Usability extensions for common messaging scenarios for WhatsApp.
 /// </summary>
-public static class WhatsAppClientExtensions
+public static partial class WhatsAppClientExtensions
 {
+    /// <summary>
+    /// Creates an authenticated HTTP client for the given service number.
+    /// </summary>
+    public static HttpClient CreateHttp(this IWhatsAppClient client, Service service)
+        => client.CreateHttp(service.Id);
+
+    /// <summary>
+    /// Creates an authenticated HTTP client for the service number that received the given message.
+    /// </summary>
+    public static HttpClient CreateHttp(this IWhatsAppClient client, Message message)
+        => client.CreateHttp(message.To.Id);
+
     /// <summary>
     /// Marks the message as read. Happens automatically when the <see cref="AzureFunctions.Message(Microsoft.AspNetCore.Http.HttpRequest)"/> 
     /// webhook endpoint is invoked with a message.
