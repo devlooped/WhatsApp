@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Net.Http.Json;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
@@ -17,7 +18,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
 
         var ex = await Assert.ThrowsAsync<ArgumentException>(() => client.SendAsync("1234", new { }));
 
-        Assert.Equal("from", ex.ParamName);
+        Assert.Equal("numberId", ex.ParamName);
     }
 
     [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
@@ -59,6 +60,45 @@ public class WhatsAppClientTests(ITestOutputHelper output)
             }
         });
     }
+
+    [SecretsFact("Meta:VerifyToken", "MediaTo")]
+    public async Task ResolvesMediaIdFromHttpClient()
+    {
+        var (configuration, client) = Initialize();
+
+        var media = await client.ResolveMediaAsync(configuration["MediaTo"]!, "4075001832719300");
+
+        Assert.NotNull(media);
+
+        using var http = client.CreateHttp(configuration["MediaTo"]!);
+        var stream = await http.GetStreamAsync(media.Url);
+        using var fs = new FileStream("document.pdf", FileMode.Create, FileAccess.Write);
+        await stream.CopyToAsync(fs);
+    }
+
+    [SecretsFact("Meta:VerifyToken", "MediaTo")]
+    public async Task ResolveMediaThrowsForNonExistentId()
+    {
+        var (configuration, client) = Initialize();
+
+        var ex = await Assert.ThrowsAsync<GraphMethodException>(() => client.ResolveMediaAsync(configuration["MediaTo"]!, "123456789"));
+
+        Assert.Contains("123456789", ex.Message);
+        Assert.Equal(100, ex.Code);
+        Assert.Equal(33, ex.Subcode);
+    }
+
+    [SecretsFact("Meta:VerifyToken", "MediaTo")]
+    public async Task ResolveMediaThrowsForNonMediaMessage()
+    {
+        var (configuration, client) = Initialize();
+
+        await Assert.ThrowsAsync<NotSupportedException>(() => client.ResolveMediaAsync(
+            new ContentMessage("asdf", new Service("asdf", "1234"), new User("kzu", "2134"), 0,
+                new UnknownContent(new System.Text.Json.JsonElement()))));
+    }
+
+    record Media(string Url, string MimeType, long FileSize);
 
     (IConfiguration configuration, WhatsAppClient client) Initialize()
     {
