@@ -25,20 +25,6 @@ public abstract record Content
 }
 
 /// <summary>
-/// Content contains a document.
-/// </summary>
-/// <param name="Id">Document identifier.</param>
-/// <param name="Name">Document name.</param>
-/// <param name="Mime">Mime type of the document content.</param>
-/// <param name="Sha256">Hash of the document content.</param>
-public record DocumentContent(string Id, string Name, string Mime, string Sha256) : Content
-{
-    /// <inheritdoc/>
-    [JsonIgnore]
-    public override ContentType Type => ContentType.Document;
-}
-
-/// <summary>
 /// Content contains contact information.
 /// </summary>
 /// <param name="Name">Name of the contact.</param>
@@ -90,6 +76,20 @@ public record LocationContent(Location Location, string? Address, string? Name, 
 /// <param name="Mime">The mime type of the media.</param>
 /// <param name="Sha256">Hash of the media.</param>
 public abstract record MediaContent(string Id, string Mime, string Sha256) : Content;
+
+/// <summary>
+/// Content contains a document.
+/// </summary>
+/// <param name="Id">Document identifier.</param>
+/// <param name="Name">Document name.</param>
+/// <param name="Mime">Mime type of the document content.</param>
+/// <param name="Sha256">Hash of the document content.</param>
+public record DocumentContent(string Id, string Name, string Mime, string Sha256) : MediaContent(Id, Mime, Sha256)
+{
+    /// <inheritdoc/>
+    [JsonIgnore]
+    public override ContentType Type => ContentType.Document;
+}
 
 /// <summary>
 /// Content contains audio.
