@@ -62,6 +62,6 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
 
         var response = await result.Content.ReadFromJsonAsync(WhatsAppSerializerContext.Default.SendResponse);
 
-        return response?.Messages.FirstOrDefault()?.Id;
+        return response?.Messages?.FirstOrDefault()?.Id;
     }
 }
