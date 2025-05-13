@@ -41,7 +41,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
     }
 
     /// <inheritdoc />
-    public async Task SendAsync(string numberId, object payload)
+    public async Task<string?> SendAsync(string numberId, object payload)
     {
         if (!options.Numbers.TryGetValue(numberId, out var token))
             throw new ArgumentException($"The number '{numberId}' is not registered in the options.", nameof(numberId));
@@ -59,5 +59,9 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
             logger.LogError("Failed to send WhatsApp message from {From}: {Error}", numberId, error);
             throw new HttpRequestException(error, null, result.StatusCode);
         }
+
+        var response = await result.Content.ReadFromJsonAsync(WhatsAppSerializerContext.Default.SendResponse);
+
+        return response?.Messages.FirstOrDefault()?.Id;
     }
 }

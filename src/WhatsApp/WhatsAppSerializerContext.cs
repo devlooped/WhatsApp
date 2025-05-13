@@ -21,6 +21,12 @@ namespace Devlooped.WhatsApp;
 [JsonSerializable(typeof(MediaReference))]
 [JsonSerializable(typeof(GraphMethodException))]
 [JsonSerializable(typeof(ErrorResponse))]
+[JsonSerializable(typeof(SendResponse))]
+[JsonSerializable(typeof(MessageId))]
 partial class WhatsAppSerializerContext : JsonSerializerContext { }
 
 record ErrorResponse(GraphMethodException Error);
+
+record SendResponse(MessageId[] Messages);
+
+record MessageId(string Id);

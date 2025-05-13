@@ -26,7 +26,49 @@ public class WhatsAppClientTests(ITestOutputHelper output)
     {
         var (configuration, client) = Initialize();
 
-        await client.SendAsync(configuration["SendFrom"]!, configuration["SendTo"]!, "Hi there!");
+        var id = await client.SendAsync(configuration["SendFrom"]!, configuration["SendTo"]!, "Hi there!");
+
+        Assert.NotNull(id);
+        Assert.NotEmpty(id);
+    }
+
+    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    public async Task ReactToSentMessageAsync()
+    {
+        var (configuration, client) = Initialize();
+
+        var id = await client.SendAsync(configuration["SendFrom"]!, configuration["SendTo"]!, "Hi there!");
+
+        Assert.NotNull(id);
+        Assert.NotEmpty(id);
+
+        await client.ReactAsync(configuration["SendFrom"]!, configuration["SendTo"]!, id, "🙏");
+    }
+
+    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    public async Task ReplyToSentMessageAsync()
+    {
+        var (configuration, client) = Initialize();
+        var from = configuration["SendFrom"]!;
+        var to = configuration["SendTo"]!;
+
+        var id = await client.SendAsync(configuration["SendFrom"]!, configuration["SendTo"]!, "Hi there!");
+
+        Assert.NotNull(id);
+        Assert.NotEmpty(id);
+
+        var reply = await client.ReplyAsync(
+            new ContentMessage(id,
+                new Service(from, from),
+                new User(to, to),
+                DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                new TextContent("Hi there!")),
+            "Reply here!");
+
+        Assert.NotNull(reply);
+        Assert.NotEmpty(reply);
+
+        Assert.NotEqual(id, reply);
     }
 
     [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
