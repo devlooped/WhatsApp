@@ -73,7 +73,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="message">The message to reply to.</param>
     /// <param name="reply">The text message to respond with.</param>
-    public static Task ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply)
+    /// <returns>The identifier of the reply.</returns>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply)
         => client.SendAsync(message.To.Id, new
         {
             messaging_product = "whatsapp",
@@ -98,7 +99,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="message">The message to reply to.</param>
     /// <param name="reply">The text message to respond with.</param>
     /// <param name="button">Interactive button for users to reply.</param>
-    public static Task ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button)
+    /// <returns>The identifier of the reply message.</returns>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button)
         => client.SendAsync(message.To.Id, new
         {
             messaging_product = "whatsapp",
@@ -135,7 +137,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="reply">The text message to respond with.</param>
     /// <param name="button1">Interactive button for a user choice.</param>
     /// <param name="button2">Interactive button for a user choice.</param>
-    public static Task ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button1, Button button2)
+    /// <returns>The identifier of the reply message.</returns>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button1, Button button2)
         => client.SendAsync(message.To.Id, new
         {
             messaging_product = "whatsapp",
@@ -174,7 +177,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="button1">Interactive button for a user choice.</param>
     /// <param name="button2">Interactive button for a user choice.</param>
     /// <param name="button3">Interactive button for a user choice.</param>
-    public static Task ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button1, Button button2, Button button3)
+    /// <returns>The identifier of the reply message.</returns>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button1, Button button2, Button button3)
         => client.SendAsync(message.To.Id, new
         {
             messaging_product = "whatsapp",
@@ -211,7 +215,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="reaction">The reaction from the user.</param>
     /// <param name="reply">The text message to respond with.</param>
-    public static Task ReplyAsync(this IWhatsAppClient client, ReactionMessage message, string reply)
+    /// <returns>The identifier of the reply message.</returns>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, ReactionMessage message, string reply)
         => client.SendAsync(message.To.Id, new
         {
             messaging_product = "whatsapp",
@@ -235,7 +240,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="to">The originating user to send a message to.</param>
     /// <param name="message">The text message to send.</param>
-    public static Task SendAsync(this IWhatsAppClient client, Message to, string message)
+    /// <returns>The identifier of the sent message.</returns>
+    public static Task<string?> SendAsync(this IWhatsAppClient client, Message to, string message)
         => SendAsync(client, to.To.Id, to.From.Number, message);
 
     /// <summary>
@@ -245,7 +251,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="to">The originating user to send a message to.</param>
     /// <param name="message">The text message to send.</param>
     /// <param name="button">Interactive button for users to reply.</param>
-    public static Task SendAsync(this IWhatsAppClient client, Message to, string message, Button button)
+    /// <returns>The identifier of the sent message.</returns>
+    public static Task<string?> SendAsync(this IWhatsAppClient client, Message to, string message, Button button)
         => SendAsync(client, to.To.Id, to.From.Number, message, button);
 
     /// <summary>
@@ -256,7 +263,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="message">The text message to send.</param>
     /// <param name="button1">Interactive button for a user choice.</param>
     /// <param name="button2">Interactive button for a user choice.</param>
-    public static Task SendAsync(this IWhatsAppClient client, Message to, string message, Button button1, Button button2)
+    /// <returns>The identifier of the sent message.</returns>
+    public static Task<string?> SendAsync(this IWhatsAppClient client, Message to, string message, Button button1, Button button2)
         => SendAsync(client, to.To.Id, to.From.Number, message, button1, button2);
 
     /// <summary>
@@ -268,7 +276,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="button1">Interactive button for a user choice.</param>
     /// <param name="button2">Interactive button for a user choice.</param>
     /// <param name="button3">Interactive button for a user choice.</param>
-    public static Task SendAsync(this IWhatsAppClient client, Message to, string message, Button button1, Button button2, Button button3)
+    /// <returns>The identifier of the sent message.</returns>
+    public static Task<string?> SendAsync(this IWhatsAppClient client, Message to, string message, Button button1, Button button2, Button button3)
         => SendAsync(client, to.To.Id, to.From.Number, message, button1, button2, button3);
 
     /// <summary>
@@ -278,7 +287,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="from">The service number to send the message through.</param>
     /// <param name="to">The user phone number to send the message to.</param>
     /// <param name="message">The text message to send.</param>
-    public static Task SendAsync(this IWhatsAppClient client, string from, string to, string message)
+    /// <returns>The identifier of the sent message.</returns>
+    public static Task<string?> SendAsync(this IWhatsAppClient client, string from, string to, string message)
         => client.SendAsync(from, new
         {
             messaging_product = "whatsapp",
@@ -300,7 +310,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="to">The user phone number to send the message to.</param>
     /// <param name="message">The text message to send.</param>
     /// <param name="button">Interactive button for users to reply.</param>
-    public static Task SendAsync(this IWhatsAppClient client, string from, string to, string message, Button button)
+    /// <returns>The identifier of the sent message.</returns>
+    public static Task<string?> SendAsync(this IWhatsAppClient client, string from, string to, string message, Button button)
         => client.SendAsync(from, new
         {
             messaging_product = "whatsapp",
@@ -334,7 +345,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="message">The text message to send.</param>
     /// <param name="button1">Interactive button for a user choice.</param>
     /// <param name="button2">Interactive button for a user choice.</param>
-    public static Task SendAsync(this IWhatsAppClient client, string from, string to, string message, Button button1, Button button2)
+    /// <returns>The identifier of the sent message.</returns>
+    public static Task<string?> SendAsync(this IWhatsAppClient client, string from, string to, string message, Button button1, Button button2)
         => client.SendAsync(from, new
         {
             messaging_product = "whatsapp",
@@ -370,7 +382,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="button1">Interactive button for a user choice.</param>
     /// <param name="button2">Interactive button for a user choice.</param>
     /// <param name="button3">Interactive button for a user choice.</param>
-    public static Task SendAsync(this IWhatsAppClient client, string from, string to, string message, Button button1, Button button2, Button button3)
+    /// <returns>The identifier of the sent message.</returns>
+    public static Task<string?> SendAsync(this IWhatsAppClient client, string from, string to, string message, Button button1, Button button2, Button button3)
         => client.SendAsync(from, new
         {
             messaging_product = "whatsapp",

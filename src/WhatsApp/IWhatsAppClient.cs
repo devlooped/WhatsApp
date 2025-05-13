@@ -22,10 +22,10 @@ public interface IWhatsAppClient
     /// </summary>
     /// <param name="numberId">The phone identifier to send the message from, which must be configured via <see cref="MetaOptions.Numbers"/>.</param>
     /// <param name="payload">The message payload.</param>
-    /// <returns>Whether the message was successfully sent.</returns>
+    /// <returns>The message id that was sent/reacted/marked, if any.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages"/>
     /// <exception cref="ArgumentException">The number <paramref name="numberId"/> is not registered in <see cref="MetaOptions"/>.</exception>
     /// <exception cref="HttpRequestException">The HTTP request failed. Exception message contains the error response body from WhatsApp.</exception>
     [Description(nameof(Devlooped) + nameof(WhatsApp) + nameof(IWhatsAppClient) + nameof(SendAsync))]
-    Task SendAsync(string numberId, object payload);
+    Task<string?> SendAsync(string numberId, object payload);
 }
