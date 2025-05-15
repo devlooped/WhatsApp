@@ -128,9 +128,9 @@
 	weak
 [file "src/Tests/Attributes.cs"]
 	url = https://github.com/devlooped/catbag/blob/main/Xunit/Attributes.cs
-	sha = 615c1e2521340dcd85132807b368a52ff53e4ba7
+	sha = 40914971d4d6b42d6f8a90923b131136f7e609a5
 
-	etag = ec1645067cc2319c2ce3304900c260eb8ec700d50b6d8d62285914a6c96e01f9
+	etag = c77e7b435ce1df06fb60a3b0e15a0833d8e45d4d19f366c6184140ebb4814b1a
 	weak
 [file ".github/actions/dotnet/action.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/actions/dotnet/action.yml
