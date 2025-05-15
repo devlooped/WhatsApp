@@ -126,14 +126,20 @@
 
 	etag = da7c0104131bd474b52fc9bc9f9bda6470e24ae38d4fb9f5c4f719bc01370ab5
 	weak
-[file "src/Tests/Attributes.cs"]
-	url = https://github.com/devlooped/catbag/blob/main/Xunit/Attributes.cs
-	sha = 615c1e2521340dcd85132807b368a52ff53e4ba7
-
-	etag = ec1645067cc2319c2ce3304900c260eb8ec700d50b6d8d62285914a6c96e01f9
-	weak
 [file ".github/actions/dotnet/action.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/actions/dotnet/action.yml
 	sha = f2b690ce307acb76c5b8d7faec1a5b971a93653e
 	etag = 27ea11baa2397b3ec9e643a935832da97719c4e44215cfd135c49cad4c29373f
 	weak
+[file "src/WhatsApp/Throw.cs"]
+	url = https://github.com/devlooped/catbag/blob/main/System/Throw.cs
+	sha = 48aeee281f63caabffeae14d7d84a6ece89e7907
+
+	etag = 1b3819a90c19d9de27b8c40e539934549aadd79ed1925cda8e8af6061eba3608
+	weak
+[file "src/Tests/Extensions/Attributes.cs"]
+	url = https://github.com/devlooped/catbag/blob/main/Xunit/Attributes.cs
+	etag = c77e7b435ce1df06fb60a3b0e15a0833d8e45d4d19f366c6184140ebb4814b1a
+	weak
+	sha = 40914971d4d6b42d6f8a90923b131136f7e609a5
+

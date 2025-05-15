@@ -32,7 +32,7 @@ builder.Services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.G
     WriteIndented = true
 });
 
-builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>, JsonSerializerOptions>(async (client, logger, options, message) =>
+builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>, JsonSerializerOptions>(async (client, logger, options, message, cancellation) =>
 {
     logger.LogInformation("💬 Received message: {Message}", message);
 

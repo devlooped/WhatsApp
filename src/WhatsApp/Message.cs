@@ -226,7 +226,7 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
 
         var jq = await Devlooped.JQ.ExecuteAsync(json, JQ);
         if (!string.IsNullOrEmpty(jq))
-            return JsonSerializer.Deserialize(jq, WhatsAppSerializerContext.Default.Message);
+            return JsonSerializer.Deserialize(jq, JsonContext.Default.Message);
 
         // NOTE: unsupported payloads would not generate a JQ output, so we can safely ignore them.
         return default;

@@ -40,12 +40,12 @@ partial class WhatsAppClientExtensions
         await response.Content.LoadIntoBufferAsync();
 
         if (!response.IsSuccessStatusCode &&
-            await response.Content.ReadFromJsonAsync(WhatsAppSerializerContext.Default.ErrorResponse, cancellation) is { } error)
+            await response.Content.ReadFromJsonAsync(JsonContext.Default.ErrorResponse, cancellation) is { } error)
             throw error.Error;
 
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync(WhatsAppSerializerContext.Default.MediaReference, cancellation) ??
+        return await response.Content.ReadFromJsonAsync(JsonContext.Default.MediaReference, cancellation) ??
             throw new InvalidOperationException("Failed to deserialize media reference.");
     }
 }
