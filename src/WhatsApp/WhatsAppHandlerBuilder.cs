@@ -66,7 +66,7 @@ public class WhatsAppHandlerBuilder
     {
         _ = Throw.IfNull(handlerFunc);
 
-        return Use((innerClient, _) => new AnonymousDelegatingHandler(innerClient, handlerFunc));
+        return Use((innerClient, _) => new AnonymousWhatsAppHandler(innerClient, handlerFunc));
     }
 
     class EmptyHandler : IWhatsAppHandler
