@@ -1,14 +1,17 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace Devlooped.WhatsApp;
 
-public class TestFunction
+public class TestFunction(HybridCache cache)
 {
     [Function("test")]
-    public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+    public async Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        return new OkObjectResult("Running OK");
+        var value = await cache.GetOrCreateAsync("test", entry => ValueTask.FromResult(Guid.NewGuid().ToString()));
+
+        return new OkObjectResult("Running: " + value);
     }
 }

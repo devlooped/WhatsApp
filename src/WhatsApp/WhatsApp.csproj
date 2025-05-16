@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
+    <PackageReference Include="DistributedCache.AzureTableStorage" Version="3.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
@@ -22,7 +23,7 @@
     <PackageReference Include="NuGetizer" Version="1.2.4" />
     <PackageReference Include="Devlooped.JQ" Version="1.7.1.8" PackExclude="contentFiles" />
     <PackageReference Include="PolySharp" Version="1.15.0" />
-    <PackageReference Include="System.Net.Http.Json" Version="8.0.1" />
+    <PackageReference Include="System.Net.Http.Json" Version="9.0.5" />
   </ItemGroup>
 
   <ItemGroup>

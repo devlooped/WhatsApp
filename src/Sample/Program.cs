@@ -95,4 +95,17 @@ builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>, JsonSerializerOptions>(as
     }
 });
 
+builder.Services.AddMemoryCache();
+builder.Services.AddDistributedAzureTableStorageCache(options =>
+{
+    options.PartitionKey = "SampleCache";
+    options.TableName = "SampleCache";
+    options.CreateTableIfNotExists = true;
+    options.ConnectionString = builder.Configuration["AzureWebJobsStorage"];
+});
+builder.Services.AddHybridCache(options =>
+{
+    options.DefaultEntryOptions = new() { Expiration = TimeSpan.FromDays(180) };
+});
+
 builder.Build().Run();
