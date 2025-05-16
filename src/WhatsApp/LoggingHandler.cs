@@ -14,19 +14,19 @@ public partial class LoggingHandler(IWhatsAppHandler innerHandler, ILogger logge
         set => options = Throw.IfNull(value);
     }
 
-    public override async Task HandleAsync(Message message, CancellationToken cancellation = default)
+    public override async Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default)
     {
         if (logger.IsEnabled(LogLevel.Debug))
         {
             if (logger.IsEnabled(LogLevel.Trace))
-                LogInvokedSensitive(nameof(HandleAsync), AsJson(message, options));
+                LogInvokedSensitive(nameof(HandleAsync), AsJson(messages, options));
             else
                 LogInvoked(nameof(HandleAsync));
         }
 
         try
         {
-            await base.HandleAsync(message, cancellation);
+            await base.HandleAsync(messages, cancellation);
             if (logger.IsEnabled(LogLevel.Debug))
                 LogCompleted(nameof(HandleAsync));
         }

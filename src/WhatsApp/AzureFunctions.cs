@@ -90,7 +90,7 @@ public class AzureFunctions(
                 return;
             }
 
-            await handler.HandleAsync(message);
+            await handler.HandleAsync([message]);
             await table.UpsertEntityAsync(new TableEntity(message.From.Number, message.Id));
             logger.LogInformation($"Completed work item: {message.Id}");
         }
