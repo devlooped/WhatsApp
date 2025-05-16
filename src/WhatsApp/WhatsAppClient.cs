@@ -60,7 +60,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
             throw new HttpRequestException(error, null, result.StatusCode);
         }
 
-        var response = await result.Content.ReadFromJsonAsync(JsonContext.Default.SendResponse);
+        var response = await result.Content.ReadFromJsonAsync(InternalJsonContext.Default.SendResponse);
 
         return response?.Messages?.FirstOrDefault()?.Id;
     }
