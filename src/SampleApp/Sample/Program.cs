@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
+builder.AddServiceDefaults();
 
 #if DEBUG
 builder.Environment.EnvironmentName = "Development";
@@ -33,8 +34,9 @@ builder.Services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.G
 });
 
 builder.Services
-    .AddWhatsApp<IWhatsAppClient, ILogger<Program>, JsonSerializerOptions>(async (client, logger, options, message, cancellation) =>
+    .AddWhatsApp<IWhatsAppClient, ILogger<Program>, JsonSerializerOptions>(async (client, logger, options, messages, cancellation) =>
     {
+        var message = messages.Last();
         logger.LogInformation("💬 Received message: {Message}", message);
 
         if (message is ErrorMessage error)
@@ -95,6 +97,8 @@ builder.Services
             return;
         }
     })
+    // Matches what we use in ConfigureOpenTelemetry
+    .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging();
 
 builder.Build().Run();

@@ -16,6 +16,8 @@
     "logLevel": {
       "default": "Warning",
       "Function": "Trace",
+      "Azure": "Warning",
+      "Azure.Core": "Error",
       "Microsoft": "Warning",
       "System": "Warning"
     }
