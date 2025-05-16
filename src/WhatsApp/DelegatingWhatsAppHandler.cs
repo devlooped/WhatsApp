@@ -7,13 +7,13 @@
 /// This is recommended as a base type when building handlers that can be chained around an underlying <see cref="IWhatsAppHandler"/>.
 /// The default implementation simply passes each call to the inner handler instance.
 /// </remarks>
-public class DelegatingHandler : IWhatsAppHandler, IDisposable
+public class DelegatingWhatsAppHandler : IWhatsAppHandler, IDisposable
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="DelegatingHandler"/> class.
+    /// Initializes a new instance of the <see cref="DelegatingWhatsAppHandler"/> class.
     /// </summary>
     /// <param name="innerHandler">The wrapped handler instance.</param>
-    public DelegatingHandler(IWhatsAppHandler innerHandler)
+    public DelegatingWhatsAppHandler(IWhatsAppHandler innerHandler)
         => InnerHandler = Throw.IfNull(innerHandler);
 
     /// <summary>Gets the inner <see cref="IWhatsAppHandler" />.</summary>

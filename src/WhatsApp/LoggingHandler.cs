@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Devlooped.WhatsApp;
 
-public partial class LoggingHandler(IWhatsAppHandler innerHandler, ILogger logger) : DelegatingHandler(innerHandler)
+public partial class LoggingHandler(IWhatsAppHandler innerHandler, ILogger logger) : DelegatingWhatsAppHandler(innerHandler)
 {
     JsonSerializerOptions options = JsonContext.DefaultOptions;
 
