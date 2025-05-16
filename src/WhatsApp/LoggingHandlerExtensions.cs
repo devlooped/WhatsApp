@@ -7,7 +7,7 @@ namespace Devlooped.WhatsApp;
 /// <summary>
 /// Provides extensions for configuring <see cref="LoggingHandler"/> instances.
 /// </summary>
-public static class LoggingHandlerBuilderExtensions
+public static class LoggingHandlerExtensions
 {
     /// <summary>
     /// Adds a logging handler to the pipeline.
