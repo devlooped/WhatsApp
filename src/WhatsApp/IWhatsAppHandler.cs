@@ -6,9 +6,9 @@
 public interface IWhatsAppHandler
 {
     /// <summary>
-    /// Handles the incoming message from WhatsApp.
+    /// Handles the incoming message(s) from WhatsApp.
     /// </summary>
-    /// <param name="message">The received message.</param>
+    /// <param name="messages">The received message(s).</param>
     /// <remarks>
     /// If this method throws, it will be retried up to the max dequeue count. The default 
     /// is 5, and can be configured in <c>host.json</c> as follows:
@@ -25,5 +25,5 @@ public interface IWhatsAppHandler
     /// After the max dequeue retries, the message will be moved to the <c>whatsapp-poison</c> 
     /// queue.
     /// </remarks>
-    Task HandleAsync(Message message, CancellationToken cancellation = default);
+    Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default);
 }

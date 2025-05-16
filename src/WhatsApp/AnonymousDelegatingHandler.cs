@@ -5,7 +5,7 @@ namespace Devlooped.WhatsApp;
 class AnonymousDelegatingHandler : DelegatingHandler
 {
     /// <summary>The delegate to use as the implementation of <see cref="Handle"/>.</summary>
-    readonly Func<Message, IWhatsAppHandler, CancellationToken, Task> handlerFunc;
+    readonly Func<IEnumerable<Message>, IWhatsAppHandler, CancellationToken, Task> handlerFunc;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AnonymousDelegatingChatClient"/> class.
@@ -14,9 +14,9 @@ class AnonymousDelegatingHandler : DelegatingHandler
     /// <param name="handlerFunc">A delegate that provides the implementation for <see cref="HandleAsync"/></param>
     public AnonymousDelegatingHandler(
         IWhatsAppHandler innerHandler,
-        Func<Message, IWhatsAppHandler, CancellationToken, Task> handlerFunc) : base(innerHandler)
+        Func<IEnumerable<Message>, IWhatsAppHandler, CancellationToken, Task> handlerFunc) : base(innerHandler)
         => this.handlerFunc = Throw.IfNull(handlerFunc);
 
-    public override Task HandleAsync(Message message, CancellationToken cancellation = default)
-        => handlerFunc(message, InnerHandler, cancellation);
+    public override Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default)
+        => handlerFunc(messages, InnerHandler, cancellation);
 }

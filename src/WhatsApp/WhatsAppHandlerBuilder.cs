@@ -62,7 +62,7 @@ public class WhatsAppHandlerBuilder
     /// need to interact with the results of the operation, which will come from the inner client.
     /// </remarks>
     /// <exception cref="ArgumentNullException"><paramref name="handlerFunc"/> is <see langword="null"/>.</exception>
-    public WhatsAppHandlerBuilder Use(Func<Message, IWhatsAppHandler, CancellationToken, Task> handlerFunc)
+    public WhatsAppHandlerBuilder Use(Func<IEnumerable<Message>, IWhatsAppHandler, CancellationToken, Task> handlerFunc)
     {
         _ = Throw.IfNull(handlerFunc);
 
@@ -75,7 +75,7 @@ public class WhatsAppHandlerBuilder
 
         EmptyHandler() { }
 
-        public Task HandleAsync(Message message, CancellationToken cancellation = default) => Task.CompletedTask;
+        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => Task.CompletedTask;
     }
 
     class EmptyServiceProvider : IServiceProvider

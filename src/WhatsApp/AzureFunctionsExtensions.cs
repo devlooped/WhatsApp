@@ -77,7 +77,7 @@ public static class AzureFunctionsExtensions
     /// <summary>
     /// Configure the WhatsApp handler for Azure Functions.
     /// </summary>
-    public static IFunctionsWorkerApplicationBuilder UseWhatsApp(this IFunctionsWorkerApplicationBuilder builder, Func<IServiceProvider, Message, CancellationToken, Task> handler)
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp(this IFunctionsWorkerApplicationBuilder builder, Func<IServiceProvider, IEnumerable<Message>, CancellationToken, Task> handler)
     {
         builder.Services.AddSingleton<IWhatsAppHandler>(services => new AnonymousWhatsAppHandler(services, handler));
         ConfigureServices(builder.Services);
@@ -87,7 +87,7 @@ public static class AzureFunctionsExtensions
     /// <summary>
     /// Configure the WhatsApp handler for Azure Functions.
     /// </summary>
-    public static IFunctionsWorkerApplicationBuilder UseWhatsApp(this IFunctionsWorkerApplicationBuilder builder, Func<Message, CancellationToken, Task> handler)
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp(this IFunctionsWorkerApplicationBuilder builder, Func<IEnumerable<Message>, CancellationToken, Task> handler)
     {
         builder.Services.AddSingleton<IWhatsAppHandler>(services => new SimpleAnonymousWhatsAppHandler(handler));
         ConfigureServices(builder.Services);
@@ -97,7 +97,7 @@ public static class AzureFunctionsExtensions
     /// <summary>
     /// Configure the WhatsApp handler for Azure Functions.
     /// </summary>
-    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService>(this IFunctionsWorkerApplicationBuilder builder, Func<TService, Message, CancellationToken, Task> handler)
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService>(this IFunctionsWorkerApplicationBuilder builder, Func<TService, IEnumerable<Message>, CancellationToken, Task> handler)
         where TService : notnull
     {
         builder.Services.AddSingleton<IWhatsAppHandler>(services => new AnonymousWhatsAppHandler<TService>(services.GetRequiredService<TService>(), handler));
@@ -108,7 +108,7 @@ public static class AzureFunctionsExtensions
     /// <summary>
     /// Configure the WhatsApp handler for Azure Functions.
     /// </summary>
-    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService1, TService2>(this IFunctionsWorkerApplicationBuilder builder, Func<TService1, TService2, Message, CancellationToken, Task> handler)
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService1, TService2>(this IFunctionsWorkerApplicationBuilder builder, Func<TService1, TService2, IEnumerable<Message>, CancellationToken, Task> handler)
         where TService1 : notnull
         where TService2 : notnull
     {
@@ -120,7 +120,7 @@ public static class AzureFunctionsExtensions
     /// <summary>
     /// Configure the WhatsApp handler for Azure Functions.
     /// </summary>
-    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService1, TService2, TService3>(this IFunctionsWorkerApplicationBuilder builder, Func<TService1, TService2, TService3, Message, CancellationToken, Task> handler)
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService1, TService2, TService3>(this IFunctionsWorkerApplicationBuilder builder, Func<TService1, TService2, TService3, IEnumerable<Message>, CancellationToken, Task> handler)
         where TService1 : notnull
         where TService2 : notnull
         where TService3 : notnull
@@ -133,7 +133,7 @@ public static class AzureFunctionsExtensions
     /// <summary>
     /// Configure the WhatsApp handler for Azure Functions.
     /// </summary>
-    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService1, TService2, TService3, TService4>(this IFunctionsWorkerApplicationBuilder builder, Func<TService1, TService2, TService3, TService4, Message, CancellationToken, Task> handler)
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService1, TService2, TService3, TService4>(this IFunctionsWorkerApplicationBuilder builder, Func<TService1, TService2, TService3, TService4, IEnumerable<Message>, CancellationToken, Task> handler)
         where TService1 : notnull
         where TService2 : notnull
         where TService3 : notnull
@@ -147,7 +147,7 @@ public static class AzureFunctionsExtensions
     /// <summary>
     /// Configure the WhatsApp handler for Azure Functions.
     /// </summary>
-    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService1, TService2, TService3, TService4, TService5>(this IFunctionsWorkerApplicationBuilder builder, Func<TService1, TService2, TService3, TService4, TService5, Message, CancellationToken, Task> handler)
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService1, TService2, TService3, TService4, TService5>(this IFunctionsWorkerApplicationBuilder builder, Func<TService1, TService2, TService3, TService4, TService5, IEnumerable<Message>, CancellationToken, Task> handler)
         where TService1 : notnull
         where TService2 : notnull
         where TService3 : notnull
@@ -162,7 +162,7 @@ public static class AzureFunctionsExtensions
     /// <summary>
     /// Configure the WhatsApp handler for Azure Functions.
     /// </summary>
-    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService1, TService2, TService3, TService4, TService5, TService6>(this IFunctionsWorkerApplicationBuilder builder, Func<TService1, TService2, TService3, TService4, TService5, TService6, Message, CancellationToken, Task> handler)
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp<TService1, TService2, TService3, TService4, TService5, TService6>(this IFunctionsWorkerApplicationBuilder builder, Func<TService1, TService2, TService3, TService4, TService5, TService6, IEnumerable<Message>, CancellationToken, Task> handler)
         where TService1 : notnull
         where TService2 : notnull
         where TService3 : notnull
@@ -175,43 +175,43 @@ public static class AzureFunctionsExtensions
         return builder;
     }
 
-    class SimpleAnonymousWhatsAppHandler(Func<Message, CancellationToken, Task> handler) : IWhatsAppHandler
+    class SimpleAnonymousWhatsAppHandler(Func<IEnumerable<Message>, CancellationToken, Task> handler) : IWhatsAppHandler
     {
-        public Task HandleAsync(Message message, CancellationToken cancellation = default) => handler(message, cancellation);
+        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => handler(messages, cancellation);
     }
 
-    class AnonymousWhatsAppHandler(IServiceProvider services, Func<IServiceProvider, Message, CancellationToken, Task> handler) : IWhatsAppHandler
+    class AnonymousWhatsAppHandler(IServiceProvider services, Func<IServiceProvider, IEnumerable<Message>, CancellationToken, Task> handler) : IWhatsAppHandler
     {
-        public Task HandleAsync(Message message, CancellationToken cancellation = default) => handler(services, message, cancellation);
+        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => handler(services, messages, cancellation);
     }
 
-    class AnonymousWhatsAppHandler<TService>(TService service, Func<TService, Message, CancellationToken, Task> handler) : IWhatsAppHandler
+    class AnonymousWhatsAppHandler<TService>(TService service, Func<TService, IEnumerable<Message>, CancellationToken, Task> handler) : IWhatsAppHandler
     {
-        public Task HandleAsync(Message message, CancellationToken cancellation = default) => handler(service, message, cancellation);
+        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => handler(service, messages, cancellation);
     }
 
-    class AnonymousWhatsAppHandler<TService1, TService2>(TService1 service1, TService2 service2, Func<TService1, TService2, Message, CancellationToken, Task> handler) : IWhatsAppHandler
+    class AnonymousWhatsAppHandler<TService1, TService2>(TService1 service1, TService2 service2, Func<TService1, TService2, IEnumerable<Message>, CancellationToken, Task> handler) : IWhatsAppHandler
     {
-        public Task HandleAsync(Message message, CancellationToken cancellation = default) => handler(service1, service2, message, cancellation);
+        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => handler(service1, service2, messages, cancellation);
     }
 
-    class AnonymousWhatsAppHandler<TService1, TService2, TService3>(TService1 service1, TService2 service2, TService3 service3, Func<TService1, TService2, TService3, Message, CancellationToken, Task> handler) : IWhatsAppHandler
+    class AnonymousWhatsAppHandler<TService1, TService2, TService3>(TService1 service1, TService2 service2, TService3 service3, Func<TService1, TService2, TService3, IEnumerable<Message>, CancellationToken, Task> handler) : IWhatsAppHandler
     {
-        public Task HandleAsync(Message message, CancellationToken cancellation = default) => handler(service1, service2, service3, message, cancellation);
+        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => handler(service1, service2, service3, messages, cancellation);
     }
 
-    class AnonymousWhatsAppHandler<TService1, TService2, TService3, TService4>(TService1 service1, TService2 service2, TService3 service3, TService4 service4, Func<TService1, TService2, TService3, TService4, Message, CancellationToken, Task> handler) : IWhatsAppHandler
+    class AnonymousWhatsAppHandler<TService1, TService2, TService3, TService4>(TService1 service1, TService2 service2, TService3 service3, TService4 service4, Func<TService1, TService2, TService3, TService4, IEnumerable<Message>, CancellationToken, Task> handler) : IWhatsAppHandler
     {
-        public Task HandleAsync(Message message, CancellationToken cancellation = default) => handler(service1, service2, service3, service4, message, cancellation);
+        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => handler(service1, service2, service3, service4, messages, cancellation);
     }
 
-    class AnonymousWhatsAppHandler<TService1, TService2, TService3, TService4, TService5>(TService1 service1, TService2 service2, TService3 service3, TService4 service4, TService5 service5, Func<TService1, TService2, TService3, TService4, TService5, Message, CancellationToken, Task> handler) : IWhatsAppHandler
+    class AnonymousWhatsAppHandler<TService1, TService2, TService3, TService4, TService5>(TService1 service1, TService2 service2, TService3 service3, TService4 service4, TService5 service5, Func<TService1, TService2, TService3, TService4, TService5, IEnumerable<Message>, CancellationToken, Task> handler) : IWhatsAppHandler
     {
-        public Task HandleAsync(Message message, CancellationToken cancellation = default) => handler(service1, service2, service3, service4, service5, message, cancellation);
+        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => handler(service1, service2, service3, service4, service5, messages, cancellation);
     }
 
-    class AnonymousWhatsAppHandler<TService1, TService2, TService3, TService4, TService5, TService6>(TService1 service1, TService2 service2, TService3 service3, TService4 service4, TService5 service5, TService6 service6, Func<TService1, TService2, TService3, TService4, TService5, TService6, Message, CancellationToken, Task> handler) : IWhatsAppHandler
+    class AnonymousWhatsAppHandler<TService1, TService2, TService3, TService4, TService5, TService6>(TService1 service1, TService2 service2, TService3 service3, TService4 service4, TService5 service5, TService6 service6, Func<TService1, TService2, TService3, TService4, TService5, TService6, IEnumerable<Message>, CancellationToken, Task> handler) : IWhatsAppHandler
     {
-        public Task HandleAsync(Message message, CancellationToken cancellation = default) => handler(service1, service2, service3, service4, service5, service6, message, cancellation);
+        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => handler(service1, service2, service3, service4, service5, service6, messages, cancellation);
     }
 }
