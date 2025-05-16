@@ -140,6 +140,36 @@ corresponding access token for it. To get a permanent access token for
 use, you'd need to create a [system user](https://business.facebook.com/latest/settings/system_users) 
 with full control permissions to the WhatsApp Business API (app).
 
+## Functionality pipelines
+
+`IWhatsAppHandler` instances can be layered to form a pipeline of components, each 
+contributing unique capabilities. These components may originate from `Devlooped.WhatsApp`, 
+external NuGet libraries, or custom implementations. This mechanism enables flexible 
+enhancement of the WhatsApp handler's functionality to suit specific requirements. 
+Below is an example that wraps a WhatsApp handler with logging and OpenTelemetry tracing:
+
+```csharp
+var builder = FunctionsApplication.CreateBuilder(args);
+builder.ConfigureFunctionsWebApplication();
+
+builder.Services.AddWhatsApp<MyWhatsAppHandler>()
+    .UseOpenTelemetry(builder.Environment.ApplicationName)
+    .UseLogging();
+
+builder.Build().Run();
+```
+
+### OpenTelemetry
+
+The configurable built-in support for OpenTelemetry shown above allows tracking 
+of key metrics such as message processing time and the number of messages processed.
+
+This is a rendering of the telemetry data in Aspire in the sample app provided in 
+this repository:
+
+![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/aspire.png)
+
+
 ## Scalability and Performance
 
 In order to quickly and efficiently process incoming messages, the library uses 

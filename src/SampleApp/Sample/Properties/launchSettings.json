@@ -3,6 +3,8 @@
     "Sample": {
       "commandName": "Project",
       "commandLineArgs": "--port 4242",
+      "applicationUrl": "http://localhost:4242",
+      "dotnetRunMessages": true,
       "launchBrowser": false
     }
   }

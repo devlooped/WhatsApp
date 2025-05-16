@@ -1,0 +1,5 @@
+processors:
+  filter/healthcheck:
+    traces:
+      span:
+        - 'attributes["http.target"] == "/healthcheck"'

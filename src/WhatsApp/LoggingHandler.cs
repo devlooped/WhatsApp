@@ -75,5 +75,4 @@ public partial class LoggingHandler(IWhatsAppHandler innerHandler, ILogger logge
 
     [LoggerMessage(LogLevel.Error, "{MethodName} failed.")]
     private partial void LogInvocationFailed(string methodName, Exception error);
-
 }
