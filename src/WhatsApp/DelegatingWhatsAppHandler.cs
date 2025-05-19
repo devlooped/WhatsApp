@@ -13,8 +13,7 @@ public class DelegatingWhatsAppHandler : IWhatsAppHandler, IDisposable
     /// Initializes a new instance of the <see cref="DelegatingWhatsAppHandler"/> class.
     /// </summary>
     /// <param name="innerHandler">The wrapped handler instance.</param>
-    public DelegatingWhatsAppHandler(IWhatsAppHandler innerHandler)
-        => InnerHandler = Throw.IfNull(innerHandler);
+    public DelegatingWhatsAppHandler(IWhatsAppHandler innerHandler) => InnerHandler = Throw.IfNull(innerHandler);
 
     /// <summary>Gets the inner <see cref="IWhatsAppHandler" />.</summary>
     protected IWhatsAppHandler InnerHandler { get; }

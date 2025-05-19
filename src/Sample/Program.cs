@@ -32,80 +32,69 @@ builder.Services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.G
     WriteIndented = true
 });
 
-builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>, JsonSerializerOptions>(async (client, logger, options, message, cancellation) =>
-{
-    logger.LogInformation("💬 Received message: {Message}", message);
-
-    if (message is ErrorMessage error)
+builder.Services
+    .AddWhatsApp<IWhatsAppClient, ILogger<Program>, JsonSerializerOptions>(async (client, logger, options, message, cancellation) =>
     {
-        // Reengagement error, we need to invite the user.
-        if (error.Error.Code == 131047)
+        logger.LogInformation("💬 Received message: {Message}", message);
+
+        if (message is ErrorMessage error)
         {
-            await client.SendAsync(error.To.Id, new
+            // Reengagement error, we need to invite the user.
+            if (error.Error.Code == 131047)
             {
-                messaging_product = "whatsapp",
-                to = error.From.Number,
-                type = "template",
-                template = new
+                await client.SendAsync(error.To.Id, new
                 {
-                    name = "reengagement",
-                    language = new
+                    messaging_product = "whatsapp",
+                    to = error.From.Number,
+                    type = "template",
+                    template = new
                     {
-                        code = "es_AR"
+                        name = "reengagement",
+                        language = new
+                        {
+                            code = "es_AR"
+                        }
                     }
-                }
-            });
+                });
+            }
+            else
+            {
+                logger.LogWarning("⚠️ Unknown error message received: {Error}", message);
+            }
+            return;
         }
-        else
+        else if (message is InteractiveMessage interactive)
         {
-            logger.LogWarning("⚠️ Unknown error message received: {Error}", message);
+            logger.LogWarning("👤 chose {Button} ({Title})", interactive.Button.Id, interactive.Button.Title);
+            await client.ReplyAsync(interactive, $"👤 chose: {interactive.Button.Title} ({interactive.Button.Id})");
+            return;
         }
-        return;
-    }
-    else if (message is InteractiveMessage interactive)
-    {
-        logger.LogWarning("👤 chose {Button} ({Title})", interactive.Button.Id, interactive.Button.Title);
-        await client.ReplyAsync(interactive, $"👤 chose: {interactive.Button.Title} ({interactive.Button.Id})");
-        return;
-    }
-    else if (message is ReactionMessage reaction)
-    {
-        logger.LogInformation("👤 reaction: {Reaction}", reaction.Emoji);
-        await client.ReplyAsync(reaction, $"👤 reaction: {reaction.Emoji}");
-        return;
-    }
-    else if (message is StatusMessage status)
-    {
-        logger.LogInformation("☑️ status: {Status}", status.Status);
-        return;
-    }
-    else if (message is ContentMessage content)
-    {
-        await client.ReactAsync(content, "🧠");
-        // simulate some hard work at hand, like doing some LLM-stuff :)
-        //await Task.Delay(2000);
-        await client.ReplyAsync(content, $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}",
-            new Button("btn_good", "👍"),
-            new Button("btn_bad", "👎"));
-    }
-    else if (message is UnsupportedMessage unsupported)
-    {
-        logger.LogWarning("⚠️ {Message}", unsupported);
-        return;
-    }
-});
-
-builder.Services.AddMemoryCache();
-builder.Services.AddDistributedAzureTableStorageCache(options =>
-{
-    options.PartitionKey = "SampleCache";
-    options.TableName = "SampleCache";
-    options.CreateTableIfNotExists = true;
-    options.ConnectionString = builder.Configuration["AzureWebJobsStorage"];
-});
-builder.Services.AddHybridCache(options =>
-{
-    options.DefaultEntryOptions = new() { Expiration = TimeSpan.FromDays(180) };
-});
+        else if (message is ReactionMessage reaction)
+        {
+            logger.LogInformation("👤 reaction: {Reaction}", reaction.Emoji);
+            await client.ReplyAsync(reaction, $"👤 reaction: {reaction.Emoji}");
+            return;
+        }
+        else if (message is StatusMessage status)
+        {
+            logger.LogInformation("☑️ status: {Status}", status.Status);
+            return;
+        }
+        else if (message is ContentMessage content)
+        {
+            await client.ReactAsync(content, "🧠");
+            // simulate some hard work at hand, like doing some LLM-stuff :)
+            //await Task.Delay(2000);
+            await client.ReplyAsync(content, $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}",
+                new Button("btn_good", "👍"),
+                new Button("btn_bad", "👎"));
+        }
+        else if (message is UnsupportedMessage unsupported)
+        {
+            logger.LogWarning("⚠️ {Message}", unsupported);
+            return;
+        }
+    })
+    .UseLogging();
 
 builder.Build().Run();
