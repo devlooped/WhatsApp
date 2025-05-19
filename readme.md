@@ -16,7 +16,7 @@ Create agents for WhatsApp using Azure Functions.
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
-builder.UseWhatsApp<MyWhatsAppHandler>();
+builder.Services.AddWhatsApp<MyWhatsAppHandler>();
 
 builder.Build().Run();
 ```
@@ -25,7 +25,7 @@ Instead of providing an `IWhatsAppHandler` implementation, you can also
 register an inline handler using minimal API style:
 
 ```csharp
-builder.UseWhatsApp(message =>
+builder.Services.AddWhatsApp(message =>
 {
     // MessageType: Content | Error | Interactive | Status
     Console.WriteLine($"Got message type {message.Type}"); 
@@ -53,7 +53,7 @@ If the handler needs additional services, they can be provided directly
 as generic parameters of the `UseWhatsApp` method, such as:
 
 ```csharp
-builder.UseWhatsApp<IWhatsAppClient, ILogger<Program>>(async (client, logger, message) =>
+builder.Services.AddWhatsApp<IWhatsAppClient, ILogger<Program>>(async (client, logger, message) =>
 {
     logger.LogInformation($"Got message type {message.Type}");
     // Reply to an incoming content message, for example.
@@ -66,7 +66,7 @@ You can also specify the parameter types in the delegate itself and avoid the
 generic parameters:
 
 ```csharp
-builder.UseWhatsApp(async (IWhatsAppClient client, ILogger<Program> logger, Message message) =>
+builder.Services.AddWhatsApp(async (IWhatsAppClient client, ILogger<Program> logger, Message message) =>
 ```
 
 The provided `IWhatsAppClient` provides a very thin abstraction allowing you to send 

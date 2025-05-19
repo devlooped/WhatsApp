@@ -1,25 +1,41 @@
 ﻿namespace Devlooped.WhatsApp;
 
+/// <summary>
+/// Creates the handler pipeline using the given <paramref name="innerHandler"/> 
+/// as the target (final) handler. 
+/// </summary>
+/// <param name="innerHandler">The handler that provides the target implementation.</param>
 public class WhatsAppHandlerBuilder
 {
-    readonly IWhatsAppHandler inner = EmptyHandler.Default;
+    readonly Func<IServiceProvider, IWhatsAppHandler> handlerFactory;
     List<Func<IWhatsAppHandler, IServiceProvider, IWhatsAppHandler>>? factories;
+
+    public WhatsAppHandlerBuilder() : this(_ => NullWhatsAppHandler.Default)
+    {
+    }
+
+    public WhatsAppHandlerBuilder(Func<IServiceProvider, IWhatsAppHandler> handlerFactory)
+    {
+        Throw.IfNull(handlerFactory);
+        this.handlerFactory = handlerFactory;
+    }
 
     public IWhatsAppHandler Build(IServiceProvider? services = default)
     {
-        services ??= EmptyServiceProvider.Default;
-        var handler = inner;
+        services ??= NullServiceProvider.Default;
+        var handler = handlerFactory(services);
 
         // Matches behavior of M.E.AI chat client builder
+        // Apply the factories in reverse order, so that the first factory added is the outermost.
         if (factories is not null)
         {
-            foreach (var factory in factories)
+            for (var i = factories.Count - 1; i >= 0; i--)
             {
-                handler = factory(handler!, services);
+                handler = factories[i](handler!, services);
                 if (handler is null)
                 {
                     Throw.InvalidOperationException(
-                        $"The {nameof(WhatsAppHandlerBuilder)} entry at index {factories.IndexOf(factory)} returned null. " +
+                        $"The {nameof(WhatsAppHandlerBuilder)} entry at index {i} returned null. " +
                         $"Ensure that the callbacks passed to {nameof(Use)} return non-null {nameof(IWhatsAppHandler)} instances.");
                 }
             }
@@ -66,22 +82,6 @@ public class WhatsAppHandlerBuilder
     {
         _ = Throw.IfNull(handlerFunc);
 
-        return Use((innerClient, _) => new AnonymousWhatsAppHandler(innerClient, handlerFunc));
-    }
-
-    class EmptyHandler : IWhatsAppHandler
-    {
-        public static IWhatsAppHandler Default { get; } = new EmptyHandler();
-
-        EmptyHandler() { }
-
-        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => Task.CompletedTask;
-    }
-
-    class EmptyServiceProvider : IServiceProvider
-    {
-        public static IServiceProvider Default { get; } = new EmptyServiceProvider();
-        EmptyServiceProvider() { }
-        public object? GetService(Type serviceType) => null;
+        return Use((innerClient, _) => new AnonymousDelegatingWhatsAppHandler(innerClient, handlerFunc));
     }
 }

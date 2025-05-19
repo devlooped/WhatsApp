@@ -38,25 +38,35 @@ public class PipelineTests(ITestOutputHelper output)
     {
         var after = false;
         var before = false;
+        var target = true;
 
-        var pipeline = new WhatsAppHandlerBuilder()
-            .Use((message, inner, cancellation) =>
+        var pipeline = new WhatsAppHandlerBuilder(
+            services => AnonymousWhatsAppHandler.Create(services, (messages, cancellation) =>
             {
-                after = true;
                 Assert.True(before);
-                return inner.HandleAsync(message, cancellation);
-            })
-            .UseLogging(output.AsLoggerFactory())
+                Assert.True(target);
+                target = true;
+                return Task.CompletedTask;
+            }))
             .Use((message, inner, cancellation) =>
             {
                 before = true;
                 Assert.False(after);
                 return inner.HandleAsync(message, cancellation);
             })
+            .UseLogging(output.AsLoggerFactory())
+            .Use((message, inner, cancellation) =>
+            {
+                Assert.True(before);
+                after = true;
+                return inner.HandleAsync(message, cancellation);
+            })
             .Build();
 
         await pipeline.HandleAsync(new ReactionMessage("1234", service, user, 0, "🗽"));
 
+        Assert.True(before);
         Assert.True(after);
+        Assert.True(target);
     }
 }
