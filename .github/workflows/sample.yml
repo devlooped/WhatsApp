@@ -10,8 +10,8 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './src/Sample'
-  DOTNET_VERSION: '8.x'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './src/SampleApp/Sample'
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
   build-and-deploy:
@@ -25,9 +25,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: ⚙ dotnet
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+        uses: ./.github/actions/dotnet
 
       - name: 🙏 build
         shell: bash
