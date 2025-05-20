@@ -10,7 +10,6 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './src/SampleApp/Sample'
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
@@ -27,13 +26,6 @@ jobs:
       - name: ⚙ dotnet
         uses: ./.github/actions/dotnet
 
-      - name: 🙏 build
-        shell: bash
-        run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output ./output
-          popd
-      
       - name: 🔓 login
         uses: azure/login@v2
         with:
@@ -41,10 +33,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_08449B8A3C6E4F18B37203B67E099362 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F97F119894404180A100F53C19B8D1B7 }}
 
+      - name: ⚙ func 4.x
+        run: npm i -g azure-functions-core-tools@4 --unsafe-perm true  
+
       - name: 🚀 deploy
-        uses: Azure/functions-action@v1
-        with:
-          app-name: 'devlooped-whatsapp'
-          slot-name: 'Production'
-          package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-          
+        working-directory: src/SampleApp/Sample
+        run: func azure functionapp publish devlooped-whatsapp --dotnet-isolated
