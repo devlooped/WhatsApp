@@ -25,5 +25,5 @@ public interface IWhatsAppHandler
     /// After the max dequeue retries, the message will be moved to the <c>whatsapp-poison</c> 
     /// queue.
     /// </remarks>
-    Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default);
+    IAsyncEnumerable<Response> HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default);
 }

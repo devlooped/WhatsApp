@@ -3,7 +3,7 @@
 /// <summary>
 /// Usability extensions for common messaging scenarios for WhatsApp.
 /// </summary>
-public static partial class WhatsAppClientExtensions
+static partial class WhatsAppClientExtensions
 {
     /// <summary>
     /// Creates an authenticated HTTP client for the given service number.
@@ -42,8 +42,8 @@ public static partial class WhatsAppClientExtensions
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="message">The message to react to.</param>
     /// <param name="emoji">The reaction emoji.</param>
-    public static Task ReactAsync(this IWhatsAppClient client, UserMessage message, string emoji)
-        => ReactAsync(client, message.To.Id, message.From.Number, message.Id, emoji);
+    public static Task ReactAsync(this IWhatsAppClient client, UserMessage message, string emoji, CancellationToken cancellationToken = default)
+        => ReactAsync(client, message.To.Id, message.From.Number, message.Id, emoji, cancellationToken);
 
     /// <summary>
     /// Reacts to a message.
@@ -53,7 +53,7 @@ public static partial class WhatsAppClientExtensions
     /// <param name="to">The user phone number to send the reaction to.</param>
     /// <param name="messageId">The message identifier to react to.</param>
     /// <param name="emoji">The reaction emoji.</param>
-    public static Task ReactAsync(this IWhatsAppClient client, string from, string to, string messageId, string emoji)
+    public static Task ReactAsync(this IWhatsAppClient client, string from, string to, string messageId, string emoji, CancellationToken cancellationToken = default)
         => client.SendAsync(from, new
         {
             messaging_product = "whatsapp",
@@ -65,6 +65,30 @@ public static partial class WhatsAppClientExtensions
                 message_id = messageId,
                 emoji
             }
+        }, cancellationToken);
+
+    /// <summary>
+    /// Reacts to a message.
+    /// </summary>
+    /// <param name="client">The WhatsApp client.</param>
+    /// <param name="from">The service number to send the reaction through.</param>
+    /// <param name="to">The user phone number to send the reaction to.</param>
+    /// <param name="messageId">The message identifier to react to.</param>
+    /// <param name="emoji">The reaction emoji.</param>
+    public static Task SendTemplateAsync(this IWhatsAppClient client, string from, string to, string templateName, string code, CancellationToken cancellationToken = default)
+        => client.SendAsync(from, new
+        {
+            messaging_product = "whatsapp",
+            to = NormalizeNumber(to),
+            type = "template",
+            template = new
+            {
+                name = templateName,
+                language = new
+                {
+                    code = code
+                }
+            }
         });
 
     /// <summary>
@@ -74,7 +98,7 @@ public static partial class WhatsAppClientExtensions
     /// <param name="message">The message to reply to.</param>
     /// <param name="reply">The text message to respond with.</param>
     /// <returns>The identifier of the reply.</returns>
-    public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply)
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, Message message, string reply)
         => client.SendAsync(message.To.Id, new
         {
             messaging_product = "whatsapp",
@@ -100,7 +124,7 @@ public static partial class WhatsAppClientExtensions
     /// <param name="reply">The text message to respond with.</param>
     /// <param name="button">Interactive button for users to reply.</param>
     /// <returns>The identifier of the reply message.</returns>
-    public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button)
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, Message message, string reply, Button button)
         => client.SendAsync(message.To.Id, new
         {
             messaging_product = "whatsapp",
@@ -138,7 +162,7 @@ public static partial class WhatsAppClientExtensions
     /// <param name="button1">Interactive button for a user choice.</param>
     /// <param name="button2">Interactive button for a user choice.</param>
     /// <returns>The identifier of the reply message.</returns>
-    public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button1, Button button2)
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, Message message, string reply, Button button1, Button button2)
         => client.SendAsync(message.To.Id, new
         {
             messaging_product = "whatsapp",

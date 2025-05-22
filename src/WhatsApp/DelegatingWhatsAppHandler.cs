@@ -26,7 +26,7 @@ public class DelegatingWhatsAppHandler : IWhatsAppHandler, IDisposable
     }
 
     /// <inheritdoc />
-    public virtual Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => InnerHandler.HandleAsync(messages, cancellation);
+    public virtual IAsyncEnumerable<Response> HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => InnerHandler.HandleAsync(messages, cancellation);
 
     /// <summary>Provides a mechanism for releasing unmanaged resources.</summary>
     /// <param name="disposing"><see langword="true"/> if being called from <see cref="Dispose()"/>; otherwise, <see langword="false"/>.</param>

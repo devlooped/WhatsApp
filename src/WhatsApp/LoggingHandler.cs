@@ -14,7 +14,7 @@ public partial class LoggingHandler(IWhatsAppHandler innerHandler, ILogger logge
         set => options = Throw.IfNull(value);
     }
 
-    public override async Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default)
+    public override IAsyncEnumerable<Response> HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default)
     {
         if (logger.IsEnabled(LogLevel.Debug))
         {
@@ -24,22 +24,16 @@ public partial class LoggingHandler(IWhatsAppHandler innerHandler, ILogger logge
                 LogInvoked(nameof(HandleAsync));
         }
 
-        try
-        {
-            await base.HandleAsync(messages, cancellation);
-            if (logger.IsEnabled(LogLevel.Debug))
-                LogCompleted(nameof(HandleAsync));
-        }
-        catch (OperationCanceledException)
-        {
-            LogInvocationCanceled(nameof(HandleAsync));
-            throw;
-        }
-        catch (Exception ex)
-        {
-            LogInvocationFailed(nameof(HandleAsync), ex);
-            throw;
-        }
+        return base.HandleAsync(messages, cancellation).WithErrorHandlingAsync(
+            errorCallback: ex =>
+            {
+                if (ex is OperationCanceledException)
+                    LogInvocationCanceled(nameof(HandleAsync));
+                else
+                    LogInvocationFailed(nameof(HandleAsync), ex);
+            },
+            completionCallback: logger.IsEnabled(LogLevel.Debug) ? () => LogCompleted(nameof(HandleAsync)) : null,
+            cancellation: cancellation);
     }
 
     /// <summary>Serializes <paramref name="value"/> as JSON for logging purposes.</summary>

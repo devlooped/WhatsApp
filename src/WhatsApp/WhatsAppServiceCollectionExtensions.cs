@@ -73,7 +73,7 @@ public static class WhatsAppServiceCollectionExtensions
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp(
         this IServiceCollection collection,
-        Func<IServiceProvider, IEnumerable<Message>, CancellationToken, Task> handler,
+        Func<IServiceProvider, IEnumerable<Message>, CancellationToken, IAsyncEnumerable<Response>> handler,
         ServiceLifetime lifetime = ServiceLifetime.Singleton)
     {
         return collection.AddWhatsApp(
@@ -85,7 +85,7 @@ public static class WhatsAppServiceCollectionExtensions
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp(
         this IServiceCollection collection,
-        Func<IEnumerable<Message>, CancellationToken, Task> handler,
+        Func<IEnumerable<Message>, CancellationToken, IAsyncEnumerable<Response>> handler,
         ServiceLifetime lifetime = ServiceLifetime.Singleton)
     {
         return collection.AddWhatsApp(
@@ -97,7 +97,7 @@ public static class WhatsAppServiceCollectionExtensions
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService>(
         this IServiceCollection collection,
-        Func<TService, IEnumerable<Message>, CancellationToken, Task> handler,
+        Func<TService, IEnumerable<Message>, CancellationToken, IAsyncEnumerable<Response>> handler,
         ServiceLifetime lifetime = ServiceLifetime.Singleton)
         where TService : notnull
     {
@@ -110,7 +110,7 @@ public static class WhatsAppServiceCollectionExtensions
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2>(
         this IServiceCollection collection,
-        Func<TService1, TService2, IEnumerable<Message>, CancellationToken, Task> handler,
+        Func<TService1, TService2, IEnumerable<Message>, CancellationToken, IAsyncEnumerable<Response>> handler,
         ServiceLifetime lifetime = ServiceLifetime.Singleton)
         where TService1 : notnull
         where TService2 : notnull
@@ -127,7 +127,7 @@ public static class WhatsAppServiceCollectionExtensions
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3>(
         this IServiceCollection collection,
-        Func<TService1, TService2, TService3, IEnumerable<Message>, CancellationToken, Task> handler,
+        Func<TService1, TService2, TService3, IEnumerable<Message>, CancellationToken, IAsyncEnumerable<Response>> handler,
         ServiceLifetime lifetime = ServiceLifetime.Singleton)
         where TService1 : notnull
         where TService2 : notnull
@@ -146,7 +146,7 @@ public static class WhatsAppServiceCollectionExtensions
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3, TService4>(
         this IServiceCollection collection,
-        Func<TService1, TService2, TService3, TService4, IEnumerable<Message>, CancellationToken, Task> handler,
+        Func<TService1, TService2, TService3, TService4, IEnumerable<Message>, CancellationToken, IAsyncEnumerable<Response>> handler,
         ServiceLifetime lifetime = ServiceLifetime.Singleton)
         where TService1 : notnull
         where TService2 : notnull
@@ -167,7 +167,7 @@ public static class WhatsAppServiceCollectionExtensions
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3, TService4, TService5>(
         this IServiceCollection collection,
-        Func<TService1, TService2, TService3, TService4, TService5, IEnumerable<Message>, CancellationToken, Task> handler,
+        Func<TService1, TService2, TService3, TService4, TService5, IEnumerable<Message>, CancellationToken, IAsyncEnumerable<Response>> handler,
         ServiceLifetime lifetime = ServiceLifetime.Singleton)
         where TService1 : notnull
         where TService2 : notnull
@@ -190,7 +190,7 @@ public static class WhatsAppServiceCollectionExtensions
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3, TService4, TService5, TService6>(
         this IServiceCollection collection,
-        Func<TService1, TService2, TService3, TService4, TService5, TService6, IEnumerable<Message>, CancellationToken, Task> handler,
+        Func<TService1, TService2, TService3, TService4, TService5, TService6, IEnumerable<Message>, CancellationToken, IAsyncEnumerable<Response>> handler,
         ServiceLifetime lifetime = ServiceLifetime.Singleton)
         where TService1 : notnull
         where TService2 : notnull
