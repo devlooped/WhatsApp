@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Metrics;
+using System.Reflection.Metadata.Ecma335;
+using Microsoft.Extensions.Logging;
 
 namespace Devlooped.WhatsApp;
 
@@ -67,49 +69,45 @@ public class OpenTelemetryHandler : DelegatingWhatsAppHandler
     /// </remarks>
     public bool EnableSensitiveData { get; set; }
 
-    public override async Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default)
+    public override IAsyncEnumerable<Response> HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default)
     {
         // In a conversation, the last message is the most recent one sent by the user.
         // This is just in case the handler is not configured as the first in the pipeline.
         var message = messages.LastOrDefault();
         if (message is null)
         {
-            await base.HandleAsync(messages, cancellation);
-            return;
+            return base.HandleAsync(messages, cancellation);
         }
+        else
+        {
+            using var span = activitySource.StartActivity("whatsapp process", ActivityKind.Consumer);
+            if (span != null)
+            {
+                span.SetTag("messaging.system", "whatsapp");
+                span.SetTag("messaging.destination", "whatsapp");
+                span.SetTag("messaging.operation", "process");
+                span.SetTag("messaging.message.id", message.Id);
+                if (message.Context is string { } conversationId)
+                    span.SetTag("messaging.message.conversation_id", conversationId);
+            }
 
-        using var span = activitySource.StartActivity("whatsapp process", ActivityKind.Consumer);
-        if (span != null)
-        {
-            span.SetTag("messaging.system", "whatsapp");
-            span.SetTag("messaging.destination", "whatsapp");
-            span.SetTag("messaging.operation", "process");
-            span.SetTag("messaging.message.id", message.Id);
-            if (message.Context is string { } conversationId)
-                span.SetTag("messaging.message.conversation_id", conversationId);
-        }
+            var startTime = Stopwatch.GetTimestamp();
+            var tags = new TagList
+            {
+                { "messaging.system", "whatsapp" },
+                { "messaging.operation", "process" },
+            };
 
-        var startTime = Stopwatch.GetTimestamp();
-        var tags = new TagList
-        {
-            { "messaging.system", "whatsapp" },
-            { "messaging.operation", "process" },
-        };
 
-        try
-        {
-            await base.HandleAsync(messages, cancellation);
-            messagesProcessed.Add(1, tags);
-        }
-        catch (Exception ex)
-        {
-            messagesProcessed.Add(1, span.RecordException(ex, EnableSensitiveData, tags));
-            throw;
-        }
-        finally
-        {
-            var duration = Stopwatch.GetElapsedTime(startTime).TotalSeconds;
-            processDuration.Record(duration, tags);
+            return base.HandleAsync(messages, cancellation).WithErrorHandlingAsync(
+                errorCallback: ex => messagesProcessed.Add(1, span.RecordException(ex, EnableSensitiveData, tags)),
+                completionCallback: () => messagesProcessed.Add(1, tags),
+                finallyCallback: () =>
+                {
+                    var duration = Stopwatch.GetElapsedTime(startTime).TotalSeconds;
+                    processDuration.Record(duration, tags);
+                },
+                cancellation);
         }
     }
 }

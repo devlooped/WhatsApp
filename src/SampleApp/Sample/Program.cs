@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Devlooped.WhatsApp;
 using Microsoft.Azure.Functions.Worker.Builder;
@@ -34,71 +35,63 @@ builder.Services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.G
 });
 
 builder.Services
-    .AddWhatsApp<IWhatsAppClient, ILogger<Program>, JsonSerializerOptions>(async (client, logger, options, messages, cancellation) =>
-    {
-        var message = messages.Last();
-        logger.LogInformation("💬 Received message: {Message}", message);
-
-        if (message is ErrorMessage error)
-        {
-            // Reengagement error, we need to invite the user.
-            if (error.Error.Code == 131047)
-            {
-                await client.SendAsync(error.To.Id, new
-                {
-                    messaging_product = "whatsapp",
-                    to = error.From.Number,
-                    type = "template",
-                    template = new
-                    {
-                        name = "reengagement",
-                        language = new
-                        {
-                            code = "es_AR"
-                        }
-                    }
-                });
-            }
-            else
-            {
-                logger.LogWarning("⚠️ Unknown error message received: {Error}", message);
-            }
-            return;
-        }
-        else if (message is InteractiveMessage interactive)
-        {
-            logger.LogWarning("👤 chose {Button} ({Title})", interactive.Button.Id, interactive.Button.Title);
-            await client.ReplyAsync(interactive, $"👤 chose: {interactive.Button.Title} ({interactive.Button.Id})");
-            return;
-        }
-        else if (message is ReactionMessage reaction)
-        {
-            logger.LogInformation("👤 reaction: {Reaction}", reaction.Emoji);
-            await client.ReplyAsync(reaction, $"👤 reaction: {reaction.Emoji}");
-            return;
-        }
-        else if (message is StatusMessage status)
-        {
-            logger.LogInformation("☑️ status: {Status}", status.Status);
-            return;
-        }
-        else if (message is ContentMessage content)
-        {
-            await client.ReactAsync(content, "🧠");
-            // simulate some hard work at hand, like doing some LLM-stuff :)
-            //await Task.Delay(2000);
-            await client.ReplyAsync(content, $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}",
-                new Button("btn_good", "👍"),
-                new Button("btn_bad", "👎"));
-        }
-        else if (message is UnsupportedMessage unsupported)
-        {
-            logger.LogWarning("⚠️ {Message}", unsupported);
-            return;
-        }
-    })
+    .AddWhatsApp<ILogger<Program>, JsonSerializerOptions>(ProcessMessagesAsync)
     // Matches what we use in ConfigureOpenTelemetry
     .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging();
 
 builder.Build().Run();
+
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+static async IAsyncEnumerable<Response> ProcessMessagesAsync(
+    ILogger<Program> logger,
+    JsonSerializerOptions options,
+    IEnumerable<Message> messages,
+    [EnumeratorCancellation] CancellationToken cancellationToken)
+{
+    var message = messages.Last();
+    logger.LogInformation("💬 Received message: {Message}", message);
+
+    if (message is ErrorMessage error)
+    {
+        // Reengagement error, we need to invite the user.
+        if (error.Error.Code == 131047)
+        {
+            yield return error.Reengage();
+        }
+        else
+        {
+            logger.LogWarning("⚠️ Unknown error message received: {Error}", message);
+        }
+    }
+    else if (message is InteractiveMessage interactive)
+    {
+        logger.LogWarning("👤 chose {Button} ({Title})", interactive.Button.Id, interactive.Button.Title);
+        yield return interactive.Text($"👤 chose: {interactive.Button.Title} ({interactive.Button.Id})");
+    }
+    else if (message is ReactionMessage reaction)
+    {
+        logger.LogInformation("👤 reaction: {Reaction}", reaction.Emoji);
+        yield return reaction.Text($"👤 reaction: {reaction.Emoji}");
+    }
+    else if (message is StatusMessage status)
+    {
+        logger.LogInformation("☑️ status: {Status}", status.Status);
+    }
+    else if (message is ContentMessage content)
+    {
+        yield return content.React("🧠");
+
+        // simulate some hard work at hand, like doing some LLM-stuff :)
+        //await Task.Delay(2000);
+        yield return content.TextWithButtons(
+            $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}",
+            new Button("btn_good", "👍"),
+            new Button("btn_bad", "👎"));
+    }
+    else if (message is UnsupportedMessage unsupported)
+    {
+        logger.LogWarning("⚠️ {Message}", unsupported);
+    }
+}
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously

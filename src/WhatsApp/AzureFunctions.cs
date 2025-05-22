@@ -90,7 +90,12 @@ public class AzureFunctions(
                 return;
             }
 
-            await handler.HandleAsync([message]);
+            // Send responses
+            await foreach (var response in handler.HandleAsync([message]))
+            {
+                await response.SendAsync(whatsapp);
+            }
+
             await table.UpsertEntityAsync(new TableEntity(message.From.Number, message.Id));
             logger.LogInformation($"Completed work item: {message.Id}");
         }

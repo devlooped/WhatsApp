@@ -46,7 +46,8 @@ public class PipelineTests(ITestOutputHelper output)
                 Assert.True(before);
                 Assert.True(target);
                 target = true;
-                return Task.CompletedTask;
+
+                return AsyncEnumerable.Empty<Response>();
             }))
             .Use((message, inner, cancellation) =>
             {

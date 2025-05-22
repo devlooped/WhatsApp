@@ -41,7 +41,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
     }
 
     /// <inheritdoc />
-    public async Task<string?> SendAsync(string numberId, object payload)
+    public async Task<string?> SendAsync(string numberId, object payload, CancellationToken cancellationToken = default)
     {
         if (!options.Numbers.TryGetValue(numberId, out var token))
             throw new ArgumentException($"The number '{numberId}' is not registered in the options.", nameof(numberId));
@@ -51,7 +51,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
         http.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {token}");
         http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        var result = await http.PostAsJsonAsync($"https://graph.facebook.com/{options.ApiVersion}/{numberId}/messages", payload);
+        var result = await http.PostAsJsonAsync($"https://graph.facebook.com/{options.ApiVersion}/{numberId}/messages", payload, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {
@@ -60,7 +60,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
             throw new HttpRequestException(error, null, result.StatusCode);
         }
 
-        var response = await result.Content.ReadFromJsonAsync(InternalJsonContext.Default.SendResponse);
+        var response = await result.Content.ReadFromJsonAsync(InternalJsonContext.Default.SendResponse, cancellationToken);
 
         return response?.Messages?.FirstOrDefault()?.Id;
     }

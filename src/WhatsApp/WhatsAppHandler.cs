@@ -12,6 +12,7 @@ public static class WhatsAppHandler
 
     class EmptyWhatsAppHandler : IWhatsAppHandler
     {
-        public Task HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default) => Task.CompletedTask;
+        public IAsyncEnumerable<Response> HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default)
+            => AsyncEnumerable.Empty<Response>();
     }
 }
