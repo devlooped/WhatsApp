@@ -10,7 +10,7 @@ public class WhatsAppHandlerBuilder
     readonly Func<IServiceProvider, IWhatsAppHandler> handlerFactory;
     List<Func<IWhatsAppHandler, IServiceProvider, IWhatsAppHandler>>? factories;
 
-    public WhatsAppHandlerBuilder() : this(_ => NullWhatsAppHandler.Default)
+    public WhatsAppHandlerBuilder() : this(_ => WhatsAppHandler.Empty)
     {
     }
 
@@ -22,7 +22,7 @@ public class WhatsAppHandlerBuilder
 
     public IWhatsAppHandler Build(IServiceProvider? services = default)
     {
-        services ??= NullServiceProvider.Default;
+        services ??= ServiceProvider.Empty;
         var handler = handlerFactory(services);
 
         // Matches behavior of M.E.AI chat client builder
@@ -83,5 +83,12 @@ public class WhatsAppHandlerBuilder
         _ = Throw.IfNull(handlerFunc);
 
         return Use((innerClient, _) => new AnonymousDelegatingWhatsAppHandler(innerClient, handlerFunc));
+    }
+
+    class ServiceProvider : IServiceProvider
+    {
+        public static IServiceProvider Empty { get; } = new ServiceProvider();
+        ServiceProvider() { }
+        public object? GetService(Type serviceType) => null;
     }
 }
