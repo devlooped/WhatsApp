@@ -42,13 +42,15 @@ builder.Services
 
 builder.Build().Run();
 
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 static async IAsyncEnumerable<Response> ProcessMessagesAsync(
     ILogger<Program> logger,
     JsonSerializerOptions options,
     IEnumerable<Message> messages,
     [EnumeratorCancellation] CancellationToken cancellationToken)
 {
+    // Avoid warning CS1998 // Async method lacks 'await' operators and will run synchronously
+    await Task.CompletedTask;
+
     var message = messages.Last();
     logger.LogInformation("💬 Received message: {Message}", message);
 
@@ -94,4 +96,3 @@ static async IAsyncEnumerable<Response> ProcessMessagesAsync(
         logger.LogWarning("⚠️ {Message}", unsupported);
     }
 }
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
