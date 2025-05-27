@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/SampleApp/">
+    <Project Path="src/SampleApp/Dashboard/Dashboard.csproj" />
+    <Project Path="src/SampleApp/Sample/Sample.csproj" />
+  </Folder>
+  <Project Path="src/CodeAnalysis/CodeAnalysis.csproj" />
+  <Project Path="src/Tests/Tests.csproj" />
+  <Project Path="src/WhatsApp/WhatsApp.csproj" />
+</Solution>
