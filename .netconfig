@@ -41,9 +41,9 @@
 	weak
 [file ".github/workflows/build.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/build.yml
-	sha = 08c70776943839f73dbea2e65355108747468508
+	sha = 56c2b8532c2f86235a0f5bd00ba6eba126f199cf
 
-	etag = fb2e91cdc9fb7a4d3e8f698e525816c5d8febb35b005c278eecca8056e78f809
+	etag = bf99c19427f4372ecfe38ec56aa8c411058684fb717da5661f17ac00388b3602
 	weak
 [file ".github/workflows/changelog.config"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/changelog.config
@@ -71,9 +71,9 @@
 	weak
 [file ".github/workflows/publish.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/publish.yml
-	sha = 08c70776943839f73dbea2e65355108747468508
+	sha = 56c2b8532c2f86235a0f5bd00ba6eba126f199cf
 
-	etag = 722a2c7cb3a42bc24ca7fb48d2e9a336641ed0599418239e24efbafccf64bd50
+	etag = 2ef43521627aa3a91dd55bdc2856ec0c6a93b42485d4fe9d6b181f9ee42c8e18
 	weak
 [file ".github/workflows/triage.yml"]
 	url = https://github.com/devlooped/oss/blob/main/.github/workflows/triage.yml
