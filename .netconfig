@@ -143,3 +143,8 @@
 	weak
 	sha = 40914971d4d6b42d6f8a90923b131136f7e609a5
 
+[file ".github/workflows/dotnet-env.yml"]
+	url = https://github.com/devlooped/oss/blob/main/.github/workflows/dotnet-env.yml
+	sha = d5cf5e1e49f9873d53405a9ff6c508caecc01e91
+	etag = 4ad2e9155747f67e92bafeb36d7f1fa4e4a7b4c218e6922e4722cab23c84b0a9
+	weak
