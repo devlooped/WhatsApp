@@ -5,7 +5,7 @@
 /// </summary>
 /// <param name="UserMessage">The message this reaction applies to.</param>
 /// <param name="Emoji">The emoji of the reaction.</param>
-public record ReactionResponse(UserMessage UserMessage, string Emoji) : Response
+public record ReactionResponse(UserMessage UserMessage, string Emoji) : Response(UserMessage)
 {
     /// <inheritdoc/>
     internal override Task SendAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)

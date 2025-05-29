@@ -1,4 +1,6 @@
-﻿namespace Devlooped.WhatsApp;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// Creates the handler pipeline using the given <paramref name="innerHandler"/> 
@@ -14,11 +16,15 @@ public class WhatsAppHandlerBuilder
     {
     }
 
-    public WhatsAppHandlerBuilder(Func<IServiceProvider, IWhatsAppHandler> handlerFactory)
+    public WhatsAppHandlerBuilder(Func<IServiceProvider, IWhatsAppHandler> handlerFactory, IServiceCollection? serviceCollection = default)
     {
         Throw.IfNull(handlerFactory);
         this.handlerFactory = handlerFactory;
+
+        Services = serviceCollection ?? new ServiceCollection();
     }
+
+    public IServiceCollection Services { get; }
 
     public IWhatsAppHandler Build(IServiceProvider? services = default)
     {

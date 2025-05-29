@@ -28,5 +28,5 @@ public enum MessageType
     /// <summary>
     /// Message type is not supported by the WhatsApp for Business service.
     /// </summary>
-    Unsupported,
+    Unsupported
 }

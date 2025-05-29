@@ -90,11 +90,9 @@ public class AzureFunctions(
                 return;
             }
 
-            // Send responses
-            await foreach (var response in handler.HandleAsync([message]))
-            {
-                await response.SendAsync(whatsapp);
-            }
+            // Await all responses
+            // No action needed, just make sure all items are processed
+            await handler.HandleAsync([message]).ToArrayAsync();
 
             await table.UpsertEntityAsync(new TableEntity(message.From.Number, message.Id));
             logger.LogInformation($"Completed work item: {message.Id}");

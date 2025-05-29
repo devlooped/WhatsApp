@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Devlooped;
 using Devlooped.WhatsApp;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
@@ -34,11 +35,18 @@ builder.Services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.G
     WriteIndented = true
 });
 
+builder.Services.AddSingleton(services => builder.Environment.IsDevelopment() ?
+    CloudStorageAccount.DevelopmentStorageAccount :
+    CloudStorageAccount.TryParse(builder.Configuration["App:Storage"] ?? "", out var storage) ?
+    storage :
+    throw new InvalidOperationException("Missing required App:Storage connection string."));
+
 builder.Services
     .AddWhatsApp<ILogger<Program>, JsonSerializerOptions>(ProcessMessagesAsync)
     // Matches what we use in ConfigureOpenTelemetry
     .UseOpenTelemetry(builder.Environment.ApplicationName)
-    .UseLogging();
+    .UseLogging()
+    .UseStorage();
 
 builder.Build().Run();
 

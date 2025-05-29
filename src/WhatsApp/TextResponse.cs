@@ -1,23 +1,31 @@
 ﻿namespace Devlooped.WhatsApp;
 
 /// <summary>
-/// A simple text response to a user message.
+/// Represents a response containing text and optional interactive buttons,  which can be sent as a reply to a message. 
 /// </summary>
-/// <param name="Message">The message this reaction applies to.</param>
-/// <param name="Text">The text of the response.</param>
-public record TextResponse(Message Message, string Text, Button? Button1 = default, Button? Button2 = default) : Response
+/// <remarks>This response type allows sending a text message with up to two optional buttons  for user
+/// interaction. If no buttons are provided, the response will consist of  only the text message.</remarks>
+/// <param name="Message">The message to which this response is a reply.</param>
+/// <param name="Text">The text content of the response message.</param>
+/// <param name="Button1">An optional button to include in the response for user interaction.</param>
+/// <param name="Button2">An optional second button to include in the response for user interaction.</param>
+public record TextResponse(Message Message, string Text, Button? Button1 = default, Button? Button2 = default) : Response(Message)
 {
     /// <inheritdoc/>
-    internal override Task SendAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
+    internal async override Task SendAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
     {
         if (Button1 != null)
         {
-            return Button2 == null ?
+            Id = await (Button2 == null ?
                 client.ReplyAsync(Message, Text, Button1) :
-                client.ReplyAsync(Message, Text, Button1, Button2);
-
+                client.ReplyAsync(Message, Text, Button1, Button2));
         }
-
-        return client.ReplyAsync(Message, Text);
+        else
+        {
+            Id = await client.ReplyAsync(Message, Text);
+        }
     }
+
+    /// <inheritdoc/>
+    protected override string GetResponseText() => Text;
 }
