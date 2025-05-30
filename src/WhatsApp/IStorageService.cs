@@ -6,7 +6,7 @@
 /// <remarks>This interface provides functionality to retrieve messages associated with a specific identifier and
 /// to save messages or responses to the storage. Implementations of this interface should ensure thread safety and
 /// proper handling of cancellation tokens for asynchronous operations.</remarks>
-interface IStorageService
+public interface IStorageService
 {
     /// <summary>
     /// Retrieves a stream of messages associated with the specified phone number.
