@@ -6,7 +6,7 @@
 /// <remarks>This abstract record serves as a base type for specific response implementations. It encapsulates the
 /// message being sent and provides functionality for sending the response asynchronously using a WhatsApp
 /// client.</remarks>
-/// <param name="Message"></param>
+/// <param name="Message">The message this response is created for</param>
 public abstract partial record Response(Message Message) : IMessage
 {
     /// <inheritdoc/>

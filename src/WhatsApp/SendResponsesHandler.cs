@@ -19,7 +19,7 @@ class SendResponsesHandler : DelegatingWhatsAppHandler
     {
         await foreach (var response in InnerHandler.HandleAsync(messages))
         {
-            await response.SendAsync(client);
+            await response.SendAsync(client, cancellation);
 
             yield return response;
         }
