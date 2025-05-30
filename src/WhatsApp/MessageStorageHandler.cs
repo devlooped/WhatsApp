@@ -19,7 +19,7 @@ class MessageStorageHandler : DelegatingWhatsAppHandler
     {
         // Save the incoming user messages only. Avoid system messages, etc
         // TODO: Fire and forget? Do we really need to wait for the messages to be fully saved here?
-        await storageService.SaveAsync(messages.OfType<UserMessage>(), cancellation);
+        await storageService.SaveAsync(messages, cancellation);
 
         await foreach (var response in base.HandleAsync(messages, cancellation))
         {
