@@ -12,7 +12,7 @@ public static class StorageHandlerExtensions
         _ = Throw.IfNull(builder);
 
         // By adding the storage service, the incoming and outgoing handlers will be automatically added to the pipeline
-        builder.Services.AddSingleton(services => new StorageService(services.GetRequiredService<CloudStorageAccount>()));
+        builder.Services.AddSingleton<IStorageService, StorageService>(services => new StorageService(services.GetRequiredService<CloudStorageAccount>()));
 
         return builder;
     }

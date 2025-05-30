@@ -54,7 +54,7 @@ public static class WhatsAppServiceCollectionExtensions
         builder.Use((inner, services) =>
         {
             // Check if the storage capability was enabled by getting the storage service
-            if (services.GetService<StorageService>() is StorageService storageService)
+            if (services.GetService<IStorageService>() is IStorageService storageService)
             {
                 return new ResponseStorageHandler(inner, storageService);
             }
@@ -69,7 +69,7 @@ public static class WhatsAppServiceCollectionExtensions
         builder.Use((inner, services) =>
         {
             // Check if the storage capability was enabled by getting the storage service
-            if (services.GetService<StorageService>() is StorageService storageService)
+            if (services.GetService<IStorageService>() is IStorageService storageService)
             {
                 return new MessageStorageHandler(inner, storageService);
             }
