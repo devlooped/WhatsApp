@@ -44,7 +44,40 @@ public static class WhatsAppServiceCollectionExtensions
         _ = Throw.IfNull(collection);
         _ = Throw.IfNull(handlerFactory);
 
-        return ConfigureServices(collection, new WhatsAppHandlerBuilder(handlerFactory), lifetime);
+        // Create builder
+        var builder = new WhatsAppHandlerBuilder(handlerFactory, collection);
+
+        // Configure default services
+        ConfigureServices(collection, builder, lifetime);
+
+        // Add storage handler for response messages (it needs to be added before the send handler to get the generated id)
+        builder.Use((inner, services) =>
+        {
+            // Check if the storage capability was enabled by getting the storage service
+            if (services.GetService<IStorageService>() is IStorageService storageService)
+            {
+                return new ResponseStorageHandler(inner, storageService);
+            }
+
+            return WhatsAppHandler.Empty;
+        });
+
+        // Add the handler for sending responses
+        builder.Use((inner, services) => new SendResponsesHandler(inner, services.GetRequiredService<IWhatsAppClient>()));
+
+        // Add storage handler for incoming messages
+        builder.Use((inner, services) =>
+        {
+            // Check if the storage capability was enabled by getting the storage service
+            if (services.GetService<IStorageService>() is IStorageService storageService)
+            {
+                return new MessageStorageHandler(inner, storageService);
+            }
+
+            return WhatsAppHandler.Empty;
+        });
+
+        return builder;
     }
 
     /// <summary>

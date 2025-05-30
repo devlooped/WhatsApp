@@ -17,7 +17,7 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(ReactionMessage), "reaction")]
 [JsonDerivedType(typeof(StatusMessage), "status")]
 [JsonDerivedType(typeof(UnsupportedMessage), "unsupported")]
-public abstract partial record Message(string Id, Service To, User From, long Timestamp)
+public abstract partial record Message(string Id, Service To, User From, long Timestamp) : IMessage
 {
     /// <summary>
     /// Optional related message identifier, such as message being replied 
@@ -237,4 +237,7 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
     /// </summary>
     [JsonIgnore]
     public abstract MessageType Type { get; }
+
+    /// <inheritdoc/>
+    public string Number => From.Number;
 }
