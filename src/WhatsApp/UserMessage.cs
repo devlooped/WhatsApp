@@ -1,4 +1,4 @@
-﻿    namespace Devlooped.WhatsApp;
+﻿namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// Base message class for messages the user can interact with.
