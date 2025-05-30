@@ -18,14 +18,11 @@ public record TextResponse(Message Message, string Text, Button? Button1 = defau
         {
             Id = await (Button2 == null ?
                 client.ReplyAsync(Message, Text, Button1) :
-                client.ReplyAsync(Message, Text, Button1, Button2));
+                client.ReplyAsync(Message, Text, Button1, Button2)) ?? string.Empty;
         }
         else
         {
-            Id = await client.ReplyAsync(Message, Text);
+            Id = await client.ReplyAsync(Message, Text) ?? string.Empty;
         }
     }
-
-    /// <inheritdoc/>
-    protected override string GetResponseText() => Text;
 }

@@ -19,7 +19,7 @@ class ResponseStorageHandler : DelegatingWhatsAppHandler
     {
         await foreach (var response in InnerHandler.HandleAsync(messages, cancellation))
         {
-            await storageService.SaveAsync(response, cancellation);
+            await storageService.SaveAsync([response], cancellation);
 
             yield return response;
         }

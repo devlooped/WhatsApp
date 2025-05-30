@@ -7,12 +7,13 @@
 /// message being sent and provides functionality for sending the response asynchronously using a WhatsApp
 /// client.</remarks>
 /// <param name="Message"></param>
-public abstract partial record Response(Message Message)
+public abstract partial record Response(Message Message) : IMessage
 {
-    /// <summary>
-    /// Gets the unique identifier for this instance.
-    /// </summary>
-    public string? Id { get; set; }
+    /// <inheritdoc/>
+    public string Id { get; set; } = string.Empty;
+
+    /// <inheritdoc/>
+    public string Number => Message.From.Number;
 
     /// <summary>
     /// Sends a request asynchronously using the specified WhatsApp client.
@@ -25,16 +26,4 @@ public abstract partial record Response(Message Message)
     /// cref="CancellationToken.None"/>.</param>
     /// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
     internal abstract Task SendAsync(IWhatsAppClient client, CancellationToken cancellation = default);
-
-    /// <summary>
-    /// Converts the current response content into a <see cref="ResponseContentMessage"/> object.
-    /// </summary>
-    public ResponseContentMessage? AsMessage() => Id != null ? new ResponseContentMessage(Id, Message.To, Message.From, new TextContent(GetResponseText())) : null;
-
-    /// <summary>
-    /// Retrieves the response text associated with the current response.
-    /// </summary>
-    /// <remarks>This method can be overridden in a derived class to provide a custom response text.</remarks>
-    /// <returns>A <see cref="string"/> containing the response text. Returns an empty string if no response text is available.</returns>
-    protected virtual string GetResponseText() => string.Empty;
 }

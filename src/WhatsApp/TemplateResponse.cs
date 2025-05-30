@@ -1,6 +1,4 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-
-namespace Devlooped.WhatsApp;
+﻿namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// Represents a response containing a template message to be sent via a WhatsApp client.
@@ -16,7 +14,4 @@ public record TemplateResponse(Message Message, string Name, string Code) : Resp
     /// <inheritdoc/>
     internal override Task SendAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
         => client.SendTemplateAsync(Message.To.Id, Message.From.Number, Name, Code, cancellationToken);
-
-    /// <inheritdoc/>
-    protected override string GetResponseText() => "Template: " + Name;
 }
