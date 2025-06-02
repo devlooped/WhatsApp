@@ -30,4 +30,15 @@ public interface IStorageService
     /// langword="default"/>.</param>
     /// <returns>A <see cref="Task"/> that represents the asynchronous save operation.</returns>
     Task SaveAsync(IEnumerable<IMessage> messages, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Asynchronously saves a collection of messages to the underlying storage.    
+    /// </summary>
+    /// <remarks>If the operation is canceled via the <paramref name="cancellationToken"/>, the returned task
+    /// will be in a canceled state.</remarks>
+    /// <param name="message">The <see cref="Message"/> object to be saved. Cannot be null or empty.</param>
+    /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the save operation. The default value is <see
+    /// langword="default"/>.</param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous save operation.</returns>
+    Task SaveAsync(IMessage message, CancellationToken cancellationToken = default);
 }

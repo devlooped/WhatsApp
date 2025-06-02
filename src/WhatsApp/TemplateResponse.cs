@@ -1,17 +1,23 @@
 ﻿namespace Devlooped.WhatsApp;
 
 /// <summary>
-/// Represents a response containing a template message to be sent via a WhatsApp client.
+/// Represents a response that sends a pre-defined template message to a recipient via a specified service.
 /// </summary>
-/// <remarks>This response encapsulates the details required to send a template message, including the recipient,
-/// sender, template name, and template code. It is used in conjunction with a WhatsApp client to facilitate the
-/// delivery of template-based messages.</remarks>
-/// <param name="Message">The message details, including sender and recipient information.</param>
-/// <param name="Name">The name of the template to be sent. This must match a pre-configured template in the WhatsApp system.</param>
-/// <param name="Code">The code associated with the template, used to identify the specific template version or configuration.</param>
-public record TemplateResponse(Message Message, string Name, string Code) : Response(Message)
+/// <remarks>This response is used to send a template message to a recipient's number using the specified service.
+/// The template is identified by its name and code. The <see cref="SendCoreAsync"/> method handles the actual sending
+/// of the template message.</remarks>
+/// <param name="Number">The phone number of the recipient in international format.</param>
+/// <param name="ServiceId">The identifier of the service handling the message.</param>
+/// <param name="ReplyTo">The unique identifier of the message to which the reaction is being sent.</param>
+/// <param name="Name">The template name</param>
+/// <param name="Code">The template lang code</param>
+public record TemplateResponse(string Number, string Service, string ReplyTo, string? ConversationId, string Name, string Code) : Response(Number, Service, ReplyTo, ConversationId)
 {
     /// <inheritdoc/>
-    internal override Task SendAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
-        => client.SendTemplateAsync(Message.To.Id, Message.From.Number, Name, Code, cancellationToken);
+    protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
+    {
+        await client.SendTemplateAsync(Service, Number, Name, Code, cancellationToken);
+
+        return Ulid.NewUlid().ToString();
+    }
 }

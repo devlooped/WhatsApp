@@ -30,4 +30,14 @@ public interface IMessage
     /// Gets the message id.
     /// </summary>
     string Id { get; }
+
+    /// <summary>
+    /// Gets the timestamp representing the number of milliseconds since the Unix epoch (January 1, 1970, 00:00:00 UTC).
+    /// </summary>
+    long Timestamp { get; }
+
+    /// <summary>
+    /// Gets the unique identifier for the current conversation where this message was included
+    /// </summary>
+    string? ConversationId { get; }
 }

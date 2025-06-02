@@ -14,7 +14,7 @@ public partial class LoggingHandler(IWhatsAppHandler innerHandler, ILogger logge
         set => options = Throw.IfNull(value);
     }
 
-    public override IAsyncEnumerable<Response> HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default)
+    public override IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, CancellationToken cancellation = default)
     {
         if (logger.IsEnabled(LogLevel.Debug))
         {

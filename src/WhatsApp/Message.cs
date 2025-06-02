@@ -34,6 +34,9 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
     [JsonPropertyName("notification")]
     internal string? NotificationId { get; init; }
 
+    /// <inheritdoc/>
+    public string? ConversationId { get; init; }
+
     const string JQ =
         """
         (
@@ -69,7 +72,7 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
               {
                 "$type": "reaction",
                 "notification": $notification,
-                "id": $msg.id,                    
+                "id": "",                    
                 "context": $context,              
                 "timestamp": $msg.timestamp | tonumber,
                 "to": {
@@ -143,7 +146,7 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
               {
                 "$type": "unsupported",
                 "notification": $notification,
-                "id": $msg.id,
+                "id": "",
                 "context": $context,
                 "timestamp": $msg.timestamp | tonumber,
                 "to": {
@@ -173,7 +176,7 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
              {
                "$type": "error",
                "notification": $notification,
-               "id": $status.id,
+               "id": "",
                "timestamp": $status.timestamp | tonumber,
                "to": {
                  "id": $phone.phone_number_id,
@@ -192,7 +195,7 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
              {
                "$type": "status",
                "notification": $notification,
-               "id": $status.id,
+               "id": "",
                "context": $status.id,
                "timestamp": $status.timestamp | tonumber,
                "to": {
@@ -226,7 +229,17 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
 
         var jq = await Devlooped.JQ.ExecuteAsync(json, JQ);
         if (!string.IsNullOrEmpty(jq))
-            return JsonSerializer.Deserialize(jq, JsonContext.Default.Message);
+        {
+            var message = JsonSerializer.Deserialize(jq, JsonContext.Default.Message);
+
+            // Fix empty id for system messages
+            if (message is not null && string.IsNullOrEmpty(message.Id))
+            {
+                message = message with { Id = Ulid.NewUlid().ToString() };
+            }
+
+            return message;
+        }
 
         // NOTE: unsupported payloads would not generate a JQ output, so we can safely ignore them.
         return default;

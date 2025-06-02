@@ -12,12 +12,12 @@ public class WhatsAppModelTests(ITestOutputHelper output)
     [InlineData(nameof(ContentType.Location), "813920475601234", "wamid.HBgNMTIwMjk4NzQ1NjM1NhUCABIYFjE5RDhGMzQ2NEJDOTg3RUY2NDg5RTFEMTIzQzVFRAA==")]
     [InlineData(nameof(ContentType.Text), "813920475102346", "wamid.HBgNMTIwMjk4NzQ1NjM1NhUCABIYFjQ5RjE4QzJEMzU2ODk3QTJFMUY3RDEyMjNBNkI5QwA==", "wamid.HBgNNTQ5MTE1OTL4ODI4MhUCBBEYEjUxNDI3NkMzRkI1ODVCRTgwOAA=")]
     [InlineData(nameof(ContentType.Video), "813927405162374", "wamid.HBgNMTIwMjU1NTk4NzY1NhUCABIYFjE4QTlDMzU2MkJDOTg3RUY2NDg5RTFEMTIzQzVFRAA==")]
-    [InlineData(nameof(MessageType.Unsupported), "837625914708254", "wamid.HBgNNTQ5MzcyNjEwNDg1OVUCABIYFjJCRDM5RTg0QkY3OEQxMjM2RkE0QjcA")]
-    [InlineData(nameof(MessageType.Error), "729104583621947", "wamid.XYZgMDEyMzQ1Njc4OTA5MRUCABEYEjU5NkM3ODlFQjAxMjM0NTY7OA==")]
+    [InlineData(nameof(MessageType.Unsupported), "837625914708254", "")]
+    [InlineData(nameof(MessageType.Error), "729104583621947", "")]
     [InlineData(nameof(MessageType.Interactive), "123456789012345", "wamid.RandomMessageID", "wamid.RandomContextID")]
-    [InlineData(nameof(MessageType.Reaction), "123456789012345", "wamid.HBgNMTIzNDU2Nzg5MDEyMzQ1MhUCABEYEkY5QzQxNDNBQjgyRkVENEIzMQA=", "wamid.HBgNMTIzNDU2Nzg5MDEyMzQ1MhUCABEYEkY5QzQxNDNBQjgyRkVENEIzMQA=")]
+    [InlineData(nameof(MessageType.Reaction), "123456789012345", "", "wamid.HBgNMTIzNDU2Nzg5MDEyMzQ1MhUCABEYEkY5QzQxNDNBQjgyRkVENEIzMQA=")]
     // For consistency, status message ID == status context ID.
-    [InlineData(nameof(MessageType.Status), "987654321098765", "wamid.HBgNNTQ5OTg3NjU0MzIxMDlUCABEYEkLMNVzNDU2Nzg5MAA=", "wamid.HBgNNTQ5OTg3NjU0MzIxMDlUCABEYEkLMNVzNDU2Nzg5MAA=")]
+    [InlineData(nameof(MessageType.Status), "987654321098765", "", "wamid.HBgNNTQ5OTg3NjU0MzIxMDlUCABEYEkLMNVzNDU2Nzg5MAA=")]
     public async Task DeserializeMessage(string type, string notification, string id, string? context = default)
     {
         var json = await File.ReadAllTextAsync($"Content/WhatsApp/{type}.json");
@@ -25,7 +25,15 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         Assert.NotNull(message);
         Assert.Equal(notification, message.NotificationId);
-        Assert.Equal(id, message.Id);
+        // If id was empty, it should be automatically fixed and generated
+        if (id == string.Empty)
+        {
+            Assert.False(string.IsNullOrEmpty(message.Id));
+        }
+        else
+        {
+            Assert.Equal(id, message.Id);
+        }
         Assert.Equal(context, message.Context);
         Assert.NotNull(message.To);
         Assert.NotNull(message.From);

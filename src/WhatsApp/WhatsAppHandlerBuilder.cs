@@ -84,7 +84,7 @@ public class WhatsAppHandlerBuilder
     /// need to interact with the results of the operation, which will come from the inner client.
     /// </remarks>
     /// <exception cref="ArgumentNullException"><paramref name="handlerFunc"/> is <see langword="null"/>.</exception>
-    public WhatsAppHandlerBuilder Use(Func<IEnumerable<Message>, IWhatsAppHandler, CancellationToken, IAsyncEnumerable<Response>> handlerFunc)
+    public WhatsAppHandlerBuilder Use(Func<IEnumerable<IMessage>, IWhatsAppHandler, CancellationToken, IAsyncEnumerable<Response>> handlerFunc)
     {
         _ = Throw.IfNull(handlerFunc);
 

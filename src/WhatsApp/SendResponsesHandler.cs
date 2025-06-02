@@ -15,13 +15,11 @@ class SendResponsesHandler : DelegatingWhatsAppHandler
         this.client = client;
     }
 
-    public async override IAsyncEnumerable<Response> HandleAsync(IEnumerable<Message> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
+    public async override IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         await foreach (var response in InnerHandler.HandleAsync(messages, cancellation))
         {
-            await response.SendAsync(client, cancellation);
-
-            yield return response;
+            yield return await response.SendAsync(client, cancellation);
         }
     }
 }
