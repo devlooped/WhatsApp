@@ -1,4 +1,6 @@
-﻿namespace Devlooped.WhatsApp;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// Usability extensions for creating responses for user messages.
@@ -9,23 +11,52 @@ public static partial class MessageExtensions
     /// Creates a reaction response for the user message.
     /// </summary>
     public static ReactionResponse React(this UserMessage message, string emoji)
-        => new ReactionResponse(message, emoji);
+        => new ReactionResponse(message.From.Number, message.To.Id, message.Id, message.ConversationId, emoji);
 
     /// <summary>
     /// Creates a reengagement response for the error message.
     /// </summary>
     public static TemplateResponse Reengage(this ErrorMessage message)
-        => new TemplateResponse(message, "reengagement", "es_AR");
+        => new TemplateResponse(message.From.Number, message.To.Id, message.Id, message.ConversationId, "reengagement", "es_AR");
 
     /// <summary>
     /// Creates a text response for the message.
     /// </summary>
     public static TextResponse Text(this Message message, string text)
-        => new TextResponse(message, text);
+        => new TextResponse(message.From.Number, message.To.Id, message.Id, message.ConversationId, text);
 
     /// <summary>
     /// Creates a text response with buttons for the message.
     /// </summary>
     public static TextResponse TextWithButtons(this Message message, string text, Button button1, Button? button2 = default)
-        => new TextResponse(message, text, button1, button2);
+        => new TextResponse(message.From.Number, message.To.Id, message.Id, message.ConversationId, text, button1, button2);
+
+    /// <summary>
+    /// Attempts to retrieve a single message from the specified collection.
+    /// </summary>
+    /// <remarks>This method checks whether the provided collection contains exactly one message. If so, the
+    /// message is assigned to the <paramref name="message"/> parameter. If the collection is empty, contains more than
+    /// one message, or is null, the method returns <see langword="false"/> and <paramref name="message"/> is set to
+    /// <see langword="null"/>.</remarks>
+    /// <param name="messages">The collection of messages to evaluate. Must not be null.</param>
+    /// <param name="message">When this method returns <see langword="true"/>, contains the single message from the collection. When this
+    /// method returns <see langword="false"/>, contains <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the collection contains exactly one message; otherwise, <see langword="false"/>.</returns>
+    public static bool TrySingle(this IEnumerable<IMessage> messages, [NotNullWhen(true)] out IMessage? message)
+    {
+        if (messages is IList<IMessage> list && list.Count == 1)
+        {
+            message = list[0];
+        }
+        else if (messages is IMessage[] array && array.Length == 1)
+        {
+            message = array[0];
+        }
+        else
+        {
+            message = null;
+        }
+
+        return message != null;
+    }
 }

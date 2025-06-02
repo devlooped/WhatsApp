@@ -58,11 +58,9 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         Assert.NotEmpty(id);
 
         var reply = await client.ReplyAsync(
-            new ContentMessage(id,
-                new Service(from, from),
-                new User(to, to),
-                DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                new TextContent("Hi there!")),
+            to,
+            from,
+            id,
             "Reply here!");
 
         Assert.NotNull(reply);

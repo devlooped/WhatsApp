@@ -46,14 +46,15 @@ builder.Services
     // Matches what we use in ConfigureOpenTelemetry
     .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging()
-    .UseStorage();
+    .UseStorage()
+    .UseConversation();
 
 builder.Build().Run();
 
 static async IAsyncEnumerable<Response> ProcessMessagesAsync(
     ILogger<Program> logger,
     JsonSerializerOptions options,
-    IEnumerable<Message> messages,
+    IEnumerable<IMessage> messages,
     [EnumeratorCancellation] CancellationToken cancellationToken)
 {
     // Avoid warning CS1998 // Async method lacks 'await' operators and will run synchronously

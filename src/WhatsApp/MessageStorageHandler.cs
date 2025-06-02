@@ -15,7 +15,7 @@ class MessageStorageHandler : DelegatingWhatsAppHandler
         this.storageService = storageService;
     }
 
-    public override async IAsyncEnumerable<Response> HandleAsync(IEnumerable<Message> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
+    public override async IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         // Save the incoming user messages only. Avoid system messages, etc
         // TODO: Fire and forget? Do we really need to wait for the messages to be fully saved here?

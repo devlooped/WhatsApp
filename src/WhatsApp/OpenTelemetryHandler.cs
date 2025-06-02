@@ -69,7 +69,7 @@ public class OpenTelemetryHandler : DelegatingWhatsAppHandler
     /// </remarks>
     public bool EnableSensitiveData { get; set; }
 
-    public override IAsyncEnumerable<Response> HandleAsync(IEnumerable<Message> messages, CancellationToken cancellation = default)
+    public override IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, CancellationToken cancellation = default)
     {
         // In a conversation, the last message is the most recent one sent by the user.
         // This is just in case the handler is not configured as the first in the pipeline.
@@ -87,7 +87,7 @@ public class OpenTelemetryHandler : DelegatingWhatsAppHandler
                 span.SetTag("messaging.destination", "whatsapp");
                 span.SetTag("messaging.operation", "process");
                 span.SetTag("messaging.message.id", message.Id);
-                if (message.Context is string { } conversationId)
+                if (message.ConversationId is string conversationId)
                     span.SetTag("messaging.message.conversation_id", conversationId);
             }
 

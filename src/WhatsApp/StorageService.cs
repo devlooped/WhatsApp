@@ -12,15 +12,12 @@ class StorageService(CloudStorageAccount storage) : IStorageService
             x => x.Id));
 
     /// <inheritdoc/>
-    public async Task SaveAsync(IEnumerable<IMessage> messages, CancellationToken cancellationToken = default)
-    {
-        var repository = messagesRepository.Value;
+    public Task SaveAsync(IMessage message, CancellationToken cancellationToken = default)
+        => messagesRepository.Value.PutAsync(message, cancellationToken);
 
-        foreach (var message in messages.Where(x => !string.IsNullOrEmpty(x.Id)))
-        {
-            await repository.PutAsync(message, cancellationToken);
-        }
-    }
+    /// <inheritdoc/>
+    public Task SaveAsync(IEnumerable<IMessage> messages, CancellationToken cancellationToken = default)
+        => messagesRepository.Value.PutAsync(messages, cancellationToken);
 
     /// <inheritdoc/>
     public IAsyncEnumerable<IMessage> GetMessagesAsync(string number, CancellationToken cancellationToken = default)

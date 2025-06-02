@@ -15,11 +15,14 @@ class ResponseStorageHandler : DelegatingWhatsAppHandler
         this.storageService = storageService;
     }
 
-    public async override IAsyncEnumerable<Response> HandleAsync(IEnumerable<Message> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
+    public async override IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         await foreach (var response in InnerHandler.HandleAsync(messages, cancellation))
         {
-            await storageService.SaveAsync([response], cancellation);
+            if (!string.IsNullOrEmpty(response.Id))
+            {
+                await storageService.SaveAsync(response, cancellation);
+            }
 
             yield return response;
         }

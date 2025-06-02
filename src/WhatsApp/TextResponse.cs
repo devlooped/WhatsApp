@@ -5,24 +5,26 @@
 /// </summary>
 /// <remarks>This response type allows sending a text message with up to two optional buttons  for user
 /// interaction. If no buttons are provided, the response will consist of  only the text message.</remarks>
-/// <param name="Message">The message to which this response is a reply.</param>
+/// <param name="Number">The phone number of the recipient in international format.</param>
+/// <param name="ServiceId">The identifier of the service handling the message.</param>
+/// <param name="ReplyTo">The unique identifier of the message to which the reaction is being sent.</param>
 /// <param name="Text">The text content of the response message.</param>
 /// <param name="Button1">An optional button to include in the response for user interaction.</param>
 /// <param name="Button2">An optional second button to include in the response for user interaction.</param>
-public record TextResponse(Message Message, string Text, Button? Button1 = default, Button? Button2 = default) : Response(Message)
+public record TextResponse(string Number, string Service, string ReplyTo, string? ConversationId, string Text, Button? Button1 = default, Button? Button2 = default) : Response(Number, Service, ReplyTo, ConversationId)
 {
     /// <inheritdoc/>
-    internal async override Task SendAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
+    protected override Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
     {
         if (Button1 != null)
         {
-            Id = await (Button2 == null ?
-                client.ReplyAsync(Message, Text, Button1) :
-                client.ReplyAsync(Message, Text, Button1, Button2)) ?? string.Empty;
+            return (Button2 == null ?
+                client.ReplyAsync(Number, Service, ReplyTo, Text, Button1) :
+                client.ReplyAsync(Number, Service, ReplyTo, Text, Button1, Button2));
         }
         else
         {
-            Id = await client.ReplyAsync(Message, Text) ?? string.Empty;
+            return client.ReplyAsync(Number, Service, ReplyTo, Text);
         }
     }
 }
