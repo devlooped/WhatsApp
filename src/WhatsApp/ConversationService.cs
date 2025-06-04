@@ -1,9 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
-using Microsoft.Extensions.Logging;
 
 namespace Devlooped.WhatsApp;
 
-class ConversationService(IStorageService storageService, ILogger<ConversationService> logger) : IConversationService
+class ConversationService(IStorageService storageService) : IConversationService
 {
     /// <inheritdoc/>
     public async IAsyncEnumerable<IMessage> GetConversationAsync(IMessage message, [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -59,8 +58,6 @@ class ConversationService(IStorageService storageService, ILogger<ConversationSe
         if (result == null)
         {
             result = Ulid.NewUlid().ToString();
-
-            logger.LogDebug("Created Conversation Id: {Id}", result);
         }
 
         return result;
