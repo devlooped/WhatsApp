@@ -95,7 +95,7 @@ static async IAsyncEnumerable<Response> ProcessMessagesAsync(
 
         // simulate some hard work at hand, like doing some LLM-stuff :)
         //await Task.Delay(2000);
-        yield return content.TextWithButtons(
+        yield return content.Text(
             $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}",
             new Button("btn_good", "👍"),
             new Button("btn_bad", "👎"));

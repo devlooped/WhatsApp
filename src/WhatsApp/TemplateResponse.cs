@@ -7,7 +7,7 @@
 /// The template is identified by its name and code. The <see cref="SendCoreAsync"/> method handles the actual sending
 /// of the template message.</remarks>
 /// <param name="Number">The phone number of the recipient in international format.</param>
-/// <param name="ServiceId">The identifier of the service handling the message.</param>
+/// <param name="Service">The identifier of the service handling the message.</param>
 /// <param name="Context">The unique identifier of the message to which the reaction is being sent.</param>
 /// <param name="Name">The template name</param>
 /// <param name="Code">The template lang code</param>
