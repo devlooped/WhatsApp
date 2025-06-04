@@ -4,13 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 namespace Devlooped.WhatsApp;
 
 /// <summary>
-/// Represents a response sent via WhatsApp, containing the associated message and response metadata.
+/// Represents a response message or command that can be sent using a WhatsApp client.
 /// </summary>
-/// <remarks>This abstract record serves as a base type for specific response implementations. It encapsulates the
-/// message being sent and provides functionality for sending the response asynchronously using a WhatsApp
-/// client.</remarks>
-/// <param name="Message">The message this response is created for</param>
-public abstract partial record Response(string Number, string Service, string ReplyTo, string? ConversationId) : IMessage
+/// <remarks>This abstract record serves as a base type for defining specific response messages or commands that
+/// can be sent to a WhatsApp client. It provides common properties such as <see cref="Number"/>, <see cref="Service"/>,
+/// <see cref="Context"/>, and <see cref="ConversationId"/>, as well as methods for sending the response
+/// asynchronously.</remarks>
+/// <param name="Number">The phone number of the recipient in international format.</param>
+/// <param name="ServiceId">The identifier of the service handling the message.</param>
+/// <param name="Context">The unique identifier of the message to which the reaction is being sent.</param>
+/// <param name="ConversationId">The conversation id where this response was generated</param>
+public abstract partial record Response(string Number, string Service, string Context, string? ConversationId) : IMessage
 {
     /// <inheritdoc/>
     public string Id { get; init; } = string.Empty;

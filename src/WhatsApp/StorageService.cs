@@ -20,6 +20,10 @@ class StorageService(CloudStorageAccount storage) : IStorageService
         => messagesRepository.Value.PutAsync(messages, cancellationToken);
 
     /// <inheritdoc/>
+    public Task<IMessage?> GetMessageAsync(string number, string id, CancellationToken cancellationToken = default)
+        => messagesRepository.Value.GetAsync(number, id, cancellationToken);
+
+    /// <inheritdoc/>
     public IAsyncEnumerable<IMessage> GetMessagesAsync(string number, CancellationToken cancellationToken = default)
         => messagesRepository.Value.EnumerateAsync(number, cancellationToken);
 }

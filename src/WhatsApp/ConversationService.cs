@@ -36,6 +36,17 @@ class ConversationService(IStorageService storageService, ILogger<ConversationSe
         if (!string.IsNullOrEmpty(message.ConversationId))
             return message.ConversationId;
 
+        // If the user is explicitly replying to a given message
+        // We should try to use that conversion first
+        // Even if the timeout is expired
+        if (!string.IsNullOrEmpty(message.Context))
+        {
+            var contextMsg = await storageService.GetMessageAsync(message.Number, message.Context, cancellationToken);
+
+            if (contextMsg?.ConversationId is string contextConversationId && !string.IsNullOrEmpty(contextConversationId))
+                return contextConversationId;
+        }
+
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - seconds;
 
         // Use the conversation id for a message processed in the last ConversationWindowInSeconds seconds

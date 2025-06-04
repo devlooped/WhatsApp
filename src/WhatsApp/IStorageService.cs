@@ -9,6 +9,19 @@
 public interface IStorageService
 {
     /// <summary>
+    /// Retrieves a message by its unique identifier for a specified number.
+    /// </summary>
+    /// <remarks>This method performs an asynchronous operation to retrieve a message. Ensure that the
+    /// provided number and ID are valid and correspond  to an existing message. The operation can be canceled by
+    /// passing a cancellation token.</remarks>
+    /// <param name="number">The phone number associated with the message. Cannot be null or empty.</param>
+    /// <param name="id">The unique identifier of the message to retrieve. Cannot be null or empty.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the message associated with the
+    /// specified number and ID,  or <see langword="null"/> if no matching message is found.</returns>
+    Task<IMessage?> GetMessageAsync(string number, string id, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Retrieves a stream of messages associated with the specified phone number.
     /// </summary>
     /// <remarks>This method uses asynchronous streaming to retrieve messages, allowing the caller to process
