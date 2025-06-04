@@ -1,7 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Mvc;
-
-namespace Devlooped.WhatsApp;
+﻿namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// Represents a response message or command that can be sent using a WhatsApp client.
@@ -11,7 +8,7 @@ namespace Devlooped.WhatsApp;
 /// <see cref="Context"/>, and <see cref="ConversationId"/>, as well as methods for sending the response
 /// asynchronously.</remarks>
 /// <param name="Number">The phone number of the recipient in international format.</param>
-/// <param name="ServiceId">The identifier of the service handling the message.</param>
+/// <param name="Service">The identifier of the service handling the message.</param>
 /// <param name="Context">The unique identifier of the message to which the reaction is being sent.</param>
 /// <param name="ConversationId">The conversation id where this response was generated</param>
 public abstract partial record Response(string Number, string Service, string Context, string? ConversationId) : IMessage

@@ -11,25 +11,25 @@ public static partial class MessageExtensions
     /// Creates a reaction response for the user message.
     /// </summary>
     public static ReactionResponse React(this UserMessage message, string emoji)
-        => new ReactionResponse(message.From.Number, message.To.Id, message.Id, message.ConversationId, emoji);
+        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, emoji);
 
     /// <summary>
     /// Creates a reengagement response for the error message.
     /// </summary>
     public static TemplateResponse Reengage(this ErrorMessage message)
-        => new TemplateResponse(message.From.Number, message.To.Id, message.Id, message.ConversationId, "reengagement", "es_AR");
+        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, "reengagement", "es_AR");
 
     /// <summary>
     /// Creates a text response for the message.
     /// </summary>
     public static TextResponse Text(this Message message, string text)
-        => new TextResponse(message.From.Number, message.To.Id, message.Id, message.ConversationId, text);
+        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, text);
 
     /// <summary>
     /// Creates a text response with buttons for the message.
     /// </summary>
-    public static TextResponse TextWithButtons(this Message message, string text, Button button1, Button? button2 = default)
-        => new TextResponse(message.From.Number, message.To.Id, message.Id, message.ConversationId, text, button1, button2);
+    public static TextResponse Text(this Message message, string text, Button button1, Button? button2 = default)
+        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, text, button1, button2);
 
     /// <summary>
     /// Attempts to retrieve a single message from the specified collection.
@@ -42,7 +42,7 @@ public static partial class MessageExtensions
     /// <param name="message">When this method returns <see langword="true"/>, contains the single message from the collection. When this
     /// method returns <see langword="false"/>, contains <see langword="null"/>.</param>
     /// <returns><see langword="true"/> if the collection contains exactly one message; otherwise, <see langword="false"/>.</returns>
-    public static bool TrySingle(this IEnumerable<IMessage> messages, [NotNullWhen(true)] out IMessage? message)
+    internal static bool TrySingle(this IEnumerable<IMessage> messages, [NotNullWhen(true)] out IMessage? message)
     {
         if (messages is IList<IMessage> list && list.Count == 1)
         {
