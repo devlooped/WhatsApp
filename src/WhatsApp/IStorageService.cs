@@ -38,20 +38,33 @@ public interface IStorageService
     /// </summary>
     /// <remarks>If the operation is canceled via the <paramref name="cancellationToken"/>, the returned task
     /// will be in a canceled state.</remarks>
-    /// <param name="messages">The collection of <see cref="Message"/> objects to be saved. Cannot be null or empty.</param>
-    /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the save operation. The default value is <see
-    /// langword="default"/>.</param>
-    /// <returns>A <see cref="Task"/> that represents the asynchronous save operation.</returns>
-    Task SaveAsync(IEnumerable<IMessage> messages, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Asynchronously saves a collection of messages to the underlying storage.    
-    /// </summary>
-    /// <remarks>If the operation is canceled via the <paramref name="cancellationToken"/>, the returned task
-    /// will be in a canceled state.</remarks>
     /// <param name="message">The <see cref="Message"/> object to be saved. Cannot be null or empty.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> that can be used to cancel the save operation. The default value is <see
     /// langword="default"/>.</param>
     /// <returns>A <see cref="Task"/> that represents the asynchronous save operation.</returns>
     Task SaveAsync(IMessage message, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves a stream of messages for a specified conversation.
+    /// </summary>
+    /// <remarks>This method uses asynchronous streaming to retrieve messages, allowing the caller to process
+    /// them as they are received. Ensure proper handling of the <paramref name="cancellationToken"/> to cancel the
+    /// operation if needed.</remarks>
+    /// <param name="number">The phone number associated with the conversation. This parameter cannot be null or empty.</param>
+    /// <param name="conversationId">The unique identifier of the conversation. This parameter cannot be null or empty.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. The default value is <see langword="default"/>.</param>
+    /// <returns>An asynchronous stream of <see cref="IMessage"/> objects representing the messages in the specified
+    /// conversation. The stream will be empty if no messages are found.</returns>
+    IAsyncEnumerable<IMessage> GetMessagesAsync(string number, string conversationId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves the active conversation ID associated with the specified phone number.
+    /// </summary>
+    /// <remarks>This method performs an asynchronous operation to retrieve the active conversation ID.  If no
+    /// active conversation is found for the given phone number, the method returns <see langword="null"/>.</remarks>
+    /// <param name="number">The phone number for which to retrieve the active conversation ID.  This parameter cannot be null or empty.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests. The operation will be canceled if the token is triggered.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the active conversation as a
+    /// <see cref="Conversation">, or <see langword="null"/> if no active conversation exists for the specified phone number.</returns>
+    Task<Conversation?> GetActiveConversationAsync(string number, CancellationToken cancellationToken = default);
 }

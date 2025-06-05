@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.FeatureManagement;
 
 namespace Devlooped.WhatsApp;
 
@@ -15,7 +16,8 @@ public static class StorageHandlerExtensions
         if (builder.Services.FirstOrDefault(x => x.ServiceType == typeof(StorageService)) == null)
         {
             // By adding the storage service, the incoming and outgoing handlers will be automatically added to the pipeline
-            builder.Services.AddSingleton<IStorageService, StorageService>(services => new StorageService(services.GetRequiredService<CloudStorageAccount>()));
+            builder.Services.AddSingleton<IStorageService, StorageService>(services
+                => new StorageService(services.GetRequiredService<CloudStorageAccount>(), services.GetRequiredService<IFeatureManager>()));
         }
 
         return builder;

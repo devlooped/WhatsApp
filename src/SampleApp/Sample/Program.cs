@@ -42,7 +42,7 @@ builder.Services.AddSingleton(services => builder.Environment.IsDevelopment() ?
     throw new InvalidOperationException("Missing required App:Storage connection string."));
 
 builder.Services
-    .AddWhatsApp<ILogger<Program>, JsonSerializerOptions>(ProcessMessagesAsync)
+    .AddWhatsApp<ILogger<Program>, JsonSerializerOptions>(builder.Configuration, ProcessMessagesAsync)
     // Matches what we use in ConfigureOpenTelemetry
     .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging()

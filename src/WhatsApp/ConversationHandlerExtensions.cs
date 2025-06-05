@@ -11,9 +11,13 @@ public static class ConversationHandlerExtensions
         // This handle requires the storage dependency
         builder.UseStorage();
 
-        // By adding the conversation service, the conversation handlers will be automatically added to the pipeline
-        builder.Services.AddSingleton<IConversationService, ConversationService>(services
+        // Make sure the storage was not already configured
+        if (builder.Services.FirstOrDefault(x => x.ServiceType == typeof(ConversationService)) == null)
+        {
+            // By adding the conversation service, the conversation handlers will be automatically added to the pipeline
+            builder.Services.AddSingleton<IConversationService, ConversationService>(services
             => new ConversationService(services.GetRequiredService<IStorageService>()));
+        }
 
         return builder;
     }
