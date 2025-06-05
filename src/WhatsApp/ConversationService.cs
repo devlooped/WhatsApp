@@ -2,7 +2,7 @@
 
 namespace Devlooped.WhatsApp;
 
-class ConversationService(IStorageService storageService) : IConversationService
+class ConversationService(IStorageService storage) : IConversationService
 {
     /// <inheritdoc/>
     public async IAsyncEnumerable<IMessage> GetConversationAsync(IMessage message, [EnumeratorCancellation] CancellationToken cancellationToken = default)
@@ -11,9 +11,8 @@ class ConversationService(IStorageService storageService) : IConversationService
 
         if (!string.IsNullOrEmpty(message.ConversationId))
         {
-            var conversation = storageService
-                    .GetMessagesAsync(message.Number, cancellationToken)
-                    .Where(x => x.ConversationId == message.ConversationId)
+            var conversation = storage
+                    .GetMessagesAsync(message.Number, message.ConversationId, cancellationToken)
                     .OrderBy(x => x.Timestamp);
 
             await foreach (var conversationMessage in conversation)
@@ -40,7 +39,7 @@ class ConversationService(IStorageService storageService) : IConversationService
         // Even if the timeout is expired
         if (!string.IsNullOrEmpty(message.Context))
         {
-            var contextMsg = await storageService.GetMessageAsync(message.Number, message.Context, cancellationToken);
+            var contextMsg = await storage.GetMessageAsync(message.Number, message.Context, cancellationToken);
 
             if (contextMsg?.ConversationId is string contextConversationId && !string.IsNullOrEmpty(contextConversationId))
                 return contextConversationId;
@@ -49,17 +48,14 @@ class ConversationService(IStorageService storageService) : IConversationService
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - seconds;
 
         // Use the conversation id for a message processed in the last ConversationWindowInSeconds seconds
-        var result = (await storageService
-            .GetMessagesAsync(message.Number, cancellationToken)
-            .Where(x => x.ConversationId != null && x.Timestamp > timestamp)
-            .OrderBy(x => x.Timestamp)
-            .LastOrDefaultAsync())?.ConversationId;
+        var conversation = await storage.GetActiveConversationAsync(message.Number, cancellationToken);
+        var conversationId = conversation?.Id;
 
-        if (result == null)
+        if (conversationId == null || conversation?.Timestamp < timestamp)
         {
-            result = Ulid.NewUlid().ToString();
+            conversationId = Ulid.NewUlid().ToString();
         }
 
-        return result;
+        return conversationId;
     }
 }
