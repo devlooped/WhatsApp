@@ -22,12 +22,12 @@
 
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
     <PackageReference Include="Devlooped.JQ" Version="1.7.1.8" PackExclude="contentFiles" />
-    <PackageReference Include="Devlooped.TableStorage" Version="5.2.2" />
+    <PackageReference Include="Devlooped.TableStorage" Version="5.3.0" />
 
     <PackageReference Include="NuGetizer" Version="1.2.4" />
     <PackageReference Include="PolySharp" Version="1.15.0" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-    <PackageReference Include="ThisAssembly.AssemblyInfo" Version="2.0.14" PrivateAssets="all"/>
+    <PackageReference Include="ThisAssembly.AssemblyInfo" Version="2.0.14" PrivateAssets="all" />
     <PackageReference Include="Ulid " Version="1.3.4" />
   </ItemGroup>
 
