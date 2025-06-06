@@ -208,6 +208,20 @@ tier or above per developer, which grants you a commercial license for
 the duration of the sponsorship. You can sponsor through each individual 
 developer's account or through your GitHub organization.
 
+## Dogfooding
+
+[![CI Version](https://img.shields.io/endpoint?url=https://shields.kzu.app/vpre/Devlooped.WhatsApp/main&label=nuget.ci&color=brightgreen)](https://pkg.kzu.app/index.json)
+[![Build](https://github.com/devlooped/WhatsApp/workflows/build/badge.svg?branch=main)](https://github.com/devlooped/WhatsApp/actions)
+
+We also produce CI packages from branches and pull requests so you can dogfood builds as quickly as they are produced. 
+
+The CI feed is `https://pkg.kzu.app/index.json`. 
+
+The versioning scheme for packages is:
+
+- PR builds: *42.42.42-pr*`[NUMBER]`
+- Branch builds: *42.42.42-*`[BRANCH]`.`[COMMITS]`
+
 <!-- #content -->
 <!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
 # Sponsors 
