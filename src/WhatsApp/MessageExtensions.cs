@@ -11,13 +11,13 @@ public static partial class MessageExtensions
     /// Creates a reaction response for the user message.
     /// </summary>
     public static ReactionResponse React(this UserMessage message, string emoji)
-        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, emoji);
+        => new(message.User.Number, message.Service.Id, message.Id, message.ConversationId, emoji);
 
     /// <summary>
     /// Creates a simple template response for the message.
     /// </summary>
     public static TemplateResponse Template(this Message message, string name, string language)
-        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, name, language);
+        => new(message.User.Number, message.Service.Id, message.Id, message.ConversationId, name, language);
 
     /// <summary>
     /// Creates a complex template response for the message.
@@ -28,19 +28,19 @@ public static partial class MessageExtensions
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
     public static TemplateResponse Template(this Message message, object template)
-        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, template);
+        => new(message.User.Number, message.Service.Id, message.Id, message.ConversationId, template);
 
     /// <summary>
     /// Creates a text response for the message.
     /// </summary>
     public static TextResponse Reply(this Message message, string text)
-        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, text);
+        => new(message.User.Number, message.Service.Id, message.Id, message.ConversationId, text);
 
     /// <summary>
     /// Creates a text response with buttons for the message.
     /// </summary>
     public static TextResponse Reply(this Message message, string text, Button button1, Button? button2 = default)
-        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, text, button1, button2);
+        => new(message.User.Number, message.Service.Id, message.Id, message.ConversationId, text, button1, button2);
 
     /// <summary>
     /// Attempts to retrieve a single message from the specified collection.

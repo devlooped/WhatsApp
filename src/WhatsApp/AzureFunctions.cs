@@ -37,7 +37,7 @@ public class AzureFunctions(
             // Ensure idempotent processing
             var table = tableClient.GetTableClient("whatsapp");
             await table.CreateIfNotExistsAsync();
-            if (await table.GetEntityIfExistsAsync<TableEntity>(message.From.Number, message.NotificationId) is { HasValue: true } existing)
+            if (await table.GetEntityIfExistsAsync<TableEntity>(message.User.Number, message.NotificationId) is { HasValue: true } existing)
             {
                 logger.LogInformation("Skipping already handled message {Id}", message.Id);
                 return new OkResult();
@@ -56,7 +56,7 @@ public class AzureFunctions(
                 {
                     // Best-effort to mark as read. This might be an old message callback, 
                     // or the message might have been deleted.
-                    await whatsapp.MarkReadAsync(message.To.Id, message.Id);
+                    await whatsapp.MarkReadAsync(message.Service.Id, message.Id);
                 }
                 catch (HttpRequestException e)
                 {
@@ -84,7 +84,7 @@ public class AzureFunctions(
             // happening (and therefore we didn't save the entity yet).
             var table = tableClient.GetTableClient("whatsapp");
             await table.CreateIfNotExistsAsync();
-            if (await table.GetEntityIfExistsAsync<TableEntity>(message.From.Number, message.NotificationId) is { HasValue: true } existing)
+            if (await table.GetEntityIfExistsAsync<TableEntity>(message.User.Number, message.NotificationId) is { HasValue: true } existing)
             {
                 logger.LogInformation("Skipping already handled message {Id}", message.Id);
                 return;
@@ -94,7 +94,7 @@ public class AzureFunctions(
             // No action needed, just make sure all items are processed
             await handler.HandleAsync([message]).ToArrayAsync();
 
-            await table.UpsertEntityAsync(new TableEntity(message.From.Number, message.Id));
+            await table.UpsertEntityAsync(new TableEntity(message.User.Number, message.Id));
             logger.LogInformation($"Completed work item: {message.Id}");
         }
         else

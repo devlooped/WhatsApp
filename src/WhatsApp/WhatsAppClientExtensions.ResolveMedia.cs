@@ -19,7 +19,7 @@ partial class WhatsAppClientExtensions
         if (message.Content is not MediaContent media)
             throw new NotSupportedException("Message does not contain media.");
 
-        return await ResolveMediaAsync(client, message.To.Id, media.Id, cancellation);
+        return await ResolveMediaAsync(client, message.Service.Id, media.Id, cancellation);
     }
 
     /// <summary>
