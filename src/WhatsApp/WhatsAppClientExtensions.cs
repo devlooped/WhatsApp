@@ -3,7 +3,7 @@
 /// <summary>
 /// Usability extensions for common messaging scenarios for WhatsApp.
 /// </summary>
-static partial class WhatsAppClientExtensions
+public static partial class WhatsAppClientExtensions
 {
     /// <summary>
     /// Creates an authenticated HTTP client for the given service number.
