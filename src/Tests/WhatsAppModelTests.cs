@@ -35,8 +35,8 @@ public class WhatsAppModelTests(ITestOutputHelper output)
             Assert.Equal(id, message.Id);
         }
         Assert.Equal(context, message.Context);
-        Assert.NotNull(message.To);
-        Assert.NotNull(message.From);
+        Assert.NotNull(message.Service);
+        Assert.NotNull(message.User);
     }
 
     [Theory]
@@ -56,8 +56,8 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         Assert.NotNull(message);
         Assert.NotNull(message.NotificationId);
-        Assert.NotNull(message.To);
-        Assert.NotNull(message.From);
+        Assert.NotNull(message.Service);
+        Assert.NotNull(message.User);
         Assert.NotNull(content.Content);
         Assert.Equal(type, content.Content.Type);
     }
@@ -72,8 +72,8 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         Assert.NotNull(message);
         Assert.NotNull(message.NotificationId);
-        Assert.NotNull(message.To);
-        Assert.NotNull(message.From);
+        Assert.NotNull(message.Service);
+        Assert.NotNull(message.User);
         Assert.NotNull(error.Error);
         Assert.Equal(470, error.Error.Code);
     }
@@ -88,8 +88,8 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         Assert.NotNull(message);
         Assert.NotNull(message.NotificationId);
-        Assert.NotNull(message.To);
-        Assert.NotNull(message.From);
+        Assert.NotNull(message.Service);
+        Assert.NotNull(message.User);
         Assert.Equal(Status.Delivered, status.Status);
     }
 
@@ -103,8 +103,8 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         Assert.NotNull(message);
         Assert.NotNull(message.NotificationId);
-        Assert.NotNull(message.To);
-        Assert.NotNull(message.From);
+        Assert.NotNull(message.Service);
+        Assert.NotNull(message.User);
         Assert.Equal("btn_yes", interactive.Button.Id);
         Assert.Equal("Yes", interactive.Button.Title);
     }
@@ -119,8 +119,8 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         Assert.NotNull(message);
         Assert.NotNull(message.NotificationId);
-        Assert.NotNull(message.To);
-        Assert.NotNull(message.From);
+        Assert.NotNull(message.Service);
+        Assert.NotNull(message.User);
     }
 
     [Fact]
@@ -133,8 +133,8 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         Assert.NotNull(message);
         Assert.NotNull(message.NotificationId);
-        Assert.NotNull(message.To);
-        Assert.NotNull(message.From);
+        Assert.NotNull(message.Service);
+        Assert.NotNull(message.User);
         Assert.Equal("😊", reaction.Emoji);
     }
 }

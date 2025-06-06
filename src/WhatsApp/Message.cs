@@ -7,8 +7,8 @@ namespace Devlooped.WhatsApp;
 /// Base class for WhatsApp Cloud API messages.
 /// </summary>
 /// <param name="Id">The message identifier.</param>
-/// <param name="To">The service that received the message from the Cloud API.</param>
-/// <param name="From">The user that sent the message.</param>
+/// <param name="Service">The service that received the message from the Cloud API.</param>
+/// <param name="User">The user that sent the message.</param>
 /// <param name="Timestamp">Timestamp of the message.</param>
 [JsonPolymorphic]
 [JsonDerivedType(typeof(ContentMessage), "content")]
@@ -17,7 +17,7 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(ReactionMessage), "reaction")]
 [JsonDerivedType(typeof(StatusMessage), "status")]
 [JsonDerivedType(typeof(UnsupportedMessage), "unsupported")]
-public abstract partial record Message(string Id, Service To, User From, long Timestamp) : IMessage
+public abstract partial record Message(string Id, Service Service, User User, long Timestamp) : IMessage
 {
     /// <summary>
     /// Optional related message identifier, such as message being replied 
@@ -58,12 +58,12 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
                 "id": $msg.id,
                 "context": $context,
                 "timestamp": $msg.timestamp | tonumber,
-                "to": {
+                "service": {
                   "id": $phone.phone_number_id,
                   "number": $phone.display_phone_number
                 },
-                "from": {
-                  "name": ($user.profile.name // "Unknown"),
+                "user": {
+                  "name": ($user.profile.name // ""),
                   "number": $msg.from
                 },
                 "button": $msg.interactive.button_reply
@@ -75,12 +75,12 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
                 "id": "",                    
                 "context": $context,              
                 "timestamp": $msg.timestamp | tonumber,
-                "to": {
+                "service": {
                   "id": $phone.phone_number_id,
                   "number": $phone.display_phone_number
                 },
-                "from": {
-                  "name": ($user.profile.name // "Unknown"),
+                "user": {
+                  "name": ($user.profile.name // ""),
                   "number": $msg.from
                 },
                 "emoji": $msg.reaction.emoji
@@ -92,12 +92,12 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
                 "id": $msg.id,
                 "context": $context,
                 "timestamp": $msg.timestamp | tonumber,
-                "to": {
+                "service": {
                   "id": $phone.phone_number_id,
                   "number": $phone.display_phone_number
                 },
-                "from": {
-                  "name": ($user.profile.name // "Unknown"),
+                "user": {
+                  "name": ($user.profile.name // ""),
                   "number": $msg.from
                 },
                 "content": (
@@ -149,12 +149,12 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
                 "id": "",
                 "context": $context,
                 "timestamp": $msg.timestamp | tonumber,
-                "to": {
+                "service": {
                   "id": $phone.phone_number_id,
                   "number": $phone.display_phone_number
                 },
-                "from": {
-                  "name": ($user.profile.name // "Unknown"),
+                "user": {
+                  "name": ($user.profile.name // ""),
                   "number": $msg.from
                 },
                 "raw": $msg
@@ -178,12 +178,12 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
                "notification": $notification,
                "id": "",
                "timestamp": $status.timestamp | tonumber,
-               "to": {
+               "service": {
                  "id": $phone.phone_number_id,
                  "number": $phone.display_phone_number
                },
-               "from": {
-                 "name": $status.recipient_id,
+               "user": {
+                 "name": "",
                  "number": $status.recipient_id
                },
                "error": {
@@ -198,12 +198,12 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
                "id": "",
                "context": $status.id,
                "timestamp": $status.timestamp | tonumber,
-               "to": {
+               "service": {
                  "id": $phone.phone_number_id,
                  "number": $phone.display_phone_number
                },
-               "from": {
-                 "name": $status.recipient_id,
+               "user": {
+                 "name": "",
                  "number": $status.recipient_id
                },
                "status": $status.status
@@ -252,5 +252,5 @@ public abstract partial record Message(string Id, Service To, User From, long Ti
     public abstract MessageType Type { get; }
 
     /// <inheritdoc/>
-    public string Number => From.Number;
+    public string Number => User.Number;
 }
