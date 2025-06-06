@@ -14,10 +14,21 @@ public static partial class MessageExtensions
         => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, emoji);
 
     /// <summary>
-    /// Creates a reengagement response for the error message.
+    /// Creates a simple template response for the message.
     /// </summary>
-    public static TemplateResponse Reengage(this ErrorMessage message)
-        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, "reengagement", "es_AR");
+    public static TemplateResponse Template(this Message message, string name, string language)
+        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, name, language);
+
+    /// <summary>
+    /// Creates a complex template response for the message.
+    /// </summary>
+    /// <param name="message">The message to respond to.</param>
+    /// <param name="template">The full template object as supported by the WhatsApp for Business API.</param>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/api/messages/message-templates#supported-languages"/>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
+    public static TemplateResponse Template(this Message message, object template)
+        => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, template);
 
     /// <summary>
     /// Creates a text response for the message.

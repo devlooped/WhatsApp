@@ -68,7 +68,8 @@ static async IAsyncEnumerable<Response> ProcessMessagesAsync(
         // Reengagement error, we need to invite the user.
         if (error.Error.Code == 131047)
         {
-            yield return error.Reengage();
+            // Showcases how to use a pre-declared template response to reengage the user.
+            yield return error.Template("reengagement", "es_AR");
         }
         else
         {
