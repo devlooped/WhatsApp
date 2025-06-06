@@ -22,13 +22,13 @@ public static partial class MessageExtensions
     /// <summary>
     /// Creates a text response for the message.
     /// </summary>
-    public static TextResponse Text(this Message message, string text)
+    public static TextResponse Reply(this Message message, string text)
         => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, text);
 
     /// <summary>
     /// Creates a text response with buttons for the message.
     /// </summary>
-    public static TextResponse Text(this Message message, string text, Button button1, Button? button2 = default)
+    public static TextResponse Reply(this Message message, string text, Button button1, Button? button2 = default)
         => new(message.From.Number, message.To.Id, message.Id, message.ConversationId, text, button1, button2);
 
     /// <summary>

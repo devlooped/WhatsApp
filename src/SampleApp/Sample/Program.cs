@@ -78,12 +78,12 @@ static async IAsyncEnumerable<Response> ProcessMessagesAsync(
     else if (message is InteractiveMessage interactive)
     {
         logger.LogWarning("👤 chose {Button} ({Title})", interactive.Button.Id, interactive.Button.Title);
-        yield return interactive.Text($"👤 chose: {interactive.Button.Title} ({interactive.Button.Id})");
+        yield return interactive.Reply($"👤 chose: {interactive.Button.Title} ({interactive.Button.Id})");
     }
     else if (message is ReactionMessage reaction)
     {
         logger.LogInformation("👤 reaction: {Reaction}", reaction.Emoji);
-        yield return reaction.Text($"👤 reaction: {reaction.Emoji}");
+        yield return reaction.Reply($"👤 reaction: {reaction.Emoji}");
     }
     else if (message is StatusMessage status)
     {
@@ -95,7 +95,7 @@ static async IAsyncEnumerable<Response> ProcessMessagesAsync(
 
         // simulate some hard work at hand, like doing some LLM-stuff :)
         //await Task.Delay(2000);
-        yield return content.Text(
+        yield return content.Reply(
             $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}",
             new Button("btn_good", "👍"),
             new Button("btn_bad", "👎"));
