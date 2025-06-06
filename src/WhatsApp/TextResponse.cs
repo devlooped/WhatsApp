@@ -7,7 +7,7 @@
 /// interaction. If no buttons are provided, the response will consist of  only the text message.</remarks>
 /// <param name="Number">The phone number of the recipient in international format.</param>
 /// <param name="Service">The identifier of the service handling the message.</param>
-/// <param name="Context">The unique identifier of the message to which the reaction is being sent.</param>
+/// <param name="Context">The unique identifier of the message to which this response is a reply to .</param>
 /// <param name="Text">The text content of the response message.</param>
 /// <param name="Button1">An optional button to include in the response for user interaction.</param>
 /// <param name="Button2">An optional second button to include in the response for user interaction.</param>
