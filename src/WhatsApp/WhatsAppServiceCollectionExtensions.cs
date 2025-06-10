@@ -126,9 +126,12 @@ public static class WhatsAppServiceCollectionExtensions
         ServiceLifetime lifetime = ServiceLifetime.Singleton)
         where THandler : class, IWhatsAppHandler
     {
-        collection.Add(new ServiceDescriptor(typeof(IWhatsAppHandler), services => services.GetRequiredService<THandler>(), lifetime));
+        if (collection.FirstOrDefault(x => x.ServiceType == typeof(THandler)) == null)
+        {
+            collection.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
+        }
 
-        return collection.AddWhatsApp(configuration, services => services.GetRequiredService<IWhatsAppHandler>(), lifetime);
+        return collection.AddWhatsApp(configuration, services => services.GetRequiredService<THandler>(), lifetime);
     }
 
     /// <summary>
