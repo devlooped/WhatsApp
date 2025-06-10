@@ -62,7 +62,7 @@ public static class WhatsAppServiceCollectionExtensions
                 return new ResponseStorageHandler(inner, storageService);
             }
 
-            return WhatsAppHandler.Empty;
+            return new DelegatingWhatsAppHandler(inner);
         });
 
         // Add the handler for sending responses
@@ -78,7 +78,7 @@ public static class WhatsAppServiceCollectionExtensions
                 return new SetConversationHandler(inner, conversationService);
             }
 
-            return WhatsAppHandler.Empty;
+            return new DelegatingWhatsAppHandler(inner);
         });
 
         // Add storage handler for incoming messages
@@ -90,7 +90,7 @@ public static class WhatsAppServiceCollectionExtensions
                 return new MessageStorageHandler(inner, storageService);
             }
 
-            return WhatsAppHandler.Empty;
+            return new DelegatingWhatsAppHandler(inner);
         });
 
         // Add conversation handler for restoring conversation message
@@ -102,7 +102,7 @@ public static class WhatsAppServiceCollectionExtensions
                 return new RestoreConversationMessagesHandler(inner, conversationService);
             }
 
-            return WhatsAppHandler.Empty;
+            return new DelegatingWhatsAppHandler(inner);
         });
 
         return builder;
