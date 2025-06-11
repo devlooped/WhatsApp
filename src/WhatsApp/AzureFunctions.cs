@@ -35,7 +35,7 @@ public class AzureFunctions(
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
         {
             // Ensure idempotent processing
-            var table = tableClient.GetTableClient("whatsapp");
+            var table = tableClient.GetTableClient("WhatsAppWebhook");
             await table.CreateIfNotExistsAsync();
             if (await table.GetEntityIfExistsAsync<TableEntity>(message.User.Number, message.NotificationId) is { HasValue: true } existing)
             {
@@ -44,7 +44,7 @@ public class AzureFunctions(
             }
 
             // Otherwise, queue the new message
-            var queue = queueClient.GetQueueClient("whatsapp");
+            var queue = queueClient.GetQueueClient("whatsappwebhook");
             await queue.CreateIfNotExistsAsync();
             await queue.SendMessageAsync(json);
 
@@ -73,7 +73,7 @@ public class AzureFunctions(
     }
 
     [Function("whatsapp_process")]
-    public async Task Process([QueueTrigger("whatsapp", Connection = "AzureWebJobsStorage")] string json)
+    public async Task Process([QueueTrigger("whatsappwebhook", Connection = "AzureWebJobsStorage")] string json)
     {
         logger.LogDebug("Processing WhatsApp message: {Message}", json);
 
@@ -82,7 +82,7 @@ public class AzureFunctions(
             // Ensure idempotent processing at dequeue time, since we might have been called 
             // multiple times for the same message by WhatsApp (Message method) while processing was still 
             // happening (and therefore we didn't save the entity yet).
-            var table = tableClient.GetTableClient("whatsapp");
+            var table = tableClient.GetTableClient("WhatsAppWebhook");
             await table.CreateIfNotExistsAsync();
             if (await table.GetEntityIfExistsAsync<TableEntity>(message.User.Number, message.NotificationId) is { HasValue: true } existing)
             {
