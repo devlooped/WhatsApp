@@ -7,9 +7,8 @@ class StorageService(CloudStorageAccount storage, IFeatureManager featureManager
 {
     readonly List<IMessage> EmptyList = new();
 
-    const string MessagesTableName = "messages";
-    const string ConversationsTableName = "conversations";
-    const string ActiveConversationTableName = "conversation";
+    const string MessagesTableName = "WhatsAppMessages";
+    const string ConversationsTableName = "WhatsAppConversations";
 
     Lazy<IDocumentRepository<IMessage>> messagesRepository = new(() =>
         DocumentRepository.Create<IMessage>(
@@ -28,9 +27,11 @@ class StorageService(CloudStorageAccount storage, IFeatureManager featureManager
     Lazy<IDocumentRepository<Conversation>> activeConversationRepository = new(() =>
         DocumentRepository.Create<Conversation>(
             storage,
-            ActiveConversationTableName,
+            ConversationsTableName,
             x => x.Number,
             // We only have one active conversation by number
+            // NOTE: we can use the same table name since no conversation will 
+            // ever have the ID 'active'
             x => "active"));
 
     /// <inheritdoc/>
