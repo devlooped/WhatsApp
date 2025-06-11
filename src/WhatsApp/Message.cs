@@ -253,4 +253,7 @@ public abstract partial record Message(string Id, Service Service, User User, lo
 
     /// <inheritdoc/>
     public string Number => User.Number;
+
+    /// <inheritdoc/>
+    public string ServiceId => Service.Id;
 }

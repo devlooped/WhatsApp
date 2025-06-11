@@ -99,7 +99,7 @@ public static class WhatsAppServiceCollectionExtensions
             // Check if the conversation capability was enabled by getting the conversation service
             if (services.GetService<IConversationService>() is IConversationService conversationService)
             {
-                return new RestoreConversationMessagesHandler(inner, conversationService);
+                return new RestoreConversationMessagesHandler(inner, conversationService, services.GetService<ConversationOptions>() ?? new ());
             }
 
             return new DelegatingWhatsAppHandler(inner);
