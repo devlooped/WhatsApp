@@ -29,12 +29,12 @@ public interface IMessage
     /// <summary>
     /// Gets the phone number associated with the message sender.
     /// </summary>
-    string Number { get; }
+    string UserNumber { get; }
 
     /// <summary>
     /// Gets the unique identifier for the service.
     /// </summary>
-    string ServiceId { get; }    
+    string ServiceId { get; }
 
     /// <summary>
     /// Gets the timestamp representing the number of milliseconds since the Unix epoch (January 1, 1970, 00:00:00 UTC).

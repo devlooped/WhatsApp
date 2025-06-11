@@ -15,7 +15,7 @@ class StorageService(CloudStorageAccount storage, IFeatureManager featureManager
         DocumentRepository.Create<IMessage>(
             storage,
             MessagesTableName,
-            x => x.Number,
+            x => x.UserNumber,
             x => x.Id));
 
     Lazy<IDocumentRepository<Conversation>> conversationsRepository = new(() =>
@@ -38,8 +38,8 @@ class StorageService(CloudStorageAccount storage, IFeatureManager featureManager
     {
         if (!string.IsNullOrEmpty(message.ConversationId) && await featureManager.IsEnabledAsync(FeatureFlags.Conversation))
         {
-            var conversation = await conversationsRepository.Value.GetAsync(message.Number, message.ConversationId, cancellationToken) ??
-                new(message.Number, message.ConversationId, new(), message.Timestamp);
+            var conversation = await conversationsRepository.Value.GetAsync(message.UserNumber, message.ConversationId, cancellationToken) ??
+                new(message.UserNumber, message.ConversationId, new(), message.Timestamp);
 
             conversation.Messages.Add(message);
 
