@@ -133,9 +133,9 @@
 	weak
 [file "src/WhatsApp/Throw.cs"]
 	url = https://github.com/devlooped/catbag/blob/main/System/Throw.cs
-	sha = 48aeee281f63caabffeae14d7d84a6ece89e7907
+	sha = 3012d56be7554c483e5c5d277144c063969cada9
 
-	etag = 1b3819a90c19d9de27b8c40e539934549aadd79ed1925cda8e8af6061eba3608
+	etag = 43c81c6c6dcdf5baee40a9e3edc5e871e473e6c954c901b82bb87a3a48888ea0
 	weak
 [file "src/Tests/Extensions/Attributes.cs"]
 	url = https://github.com/devlooped/catbag/blob/main/Xunit/Attributes.cs

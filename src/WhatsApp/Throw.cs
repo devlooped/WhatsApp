@@ -29,7 +29,7 @@ namespace System;
 [ExcludeFromCodeCoverage]
 #endif
 
-internal static partial class Throw
+static partial class Throw
 {
     #region For Object
 
