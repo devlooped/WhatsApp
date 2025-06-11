@@ -12,7 +12,7 @@ class ConversationService(IStorageService storage) : IConversationService
         if (!string.IsNullOrEmpty(message.ConversationId))
         {
             var conversation = storage
-                    .GetMessagesAsync(message.Number, message.ConversationId, cancellationToken)
+                    .GetMessagesAsync(message.UserNumber, message.ConversationId, cancellationToken)
                     .OrderBy(x => x.Timestamp);
 
             await foreach (var conversationMessage in conversation)
@@ -39,7 +39,7 @@ class ConversationService(IStorageService storage) : IConversationService
         // Even if the timeout is expired
         if (!string.IsNullOrEmpty(message.Context))
         {
-            var contextMsg = await storage.GetMessageAsync(message.Number, message.Context, cancellationToken);
+            var contextMsg = await storage.GetMessageAsync(message.UserNumber, message.Context, cancellationToken);
 
             if (contextMsg?.ConversationId is string contextConversationId && !string.IsNullOrEmpty(contextConversationId))
                 return contextConversationId;
@@ -48,7 +48,7 @@ class ConversationService(IStorageService storage) : IConversationService
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - seconds;
 
         // Use the conversation id for a message processed in the last ConversationWindowInSeconds seconds
-        var conversation = await storage.GetActiveConversationAsync(message.Number, cancellationToken);
+        var conversation = await storage.GetActiveConversationAsync(message.UserNumber, cancellationToken);
         var conversationId = conversation?.Id;
 
         if (conversationId == null || conversation?.Timestamp < timestamp)

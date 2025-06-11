@@ -252,8 +252,8 @@ public abstract partial record Message(string Id, Service Service, User User, lo
     public abstract MessageType Type { get; }
 
     /// <inheritdoc/>
-    public string Number => User.Number;
+    string IMessage.UserNumber => User.Number;
 
     /// <inheritdoc/>
-    public string ServiceId => Service.Id;
+    string IMessage.ServiceId => Service.Id;
 }
