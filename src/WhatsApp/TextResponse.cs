@@ -19,12 +19,12 @@ public record TextResponse(string Number, string Service, string Context, string
         if (Button1 != null)
         {
             return (Button2 == null ?
-                client.ReplyAsync(Number, Service, Context, Text, Button1) :
-                client.ReplyAsync(Number, Service, Context, Text, Button1, Button2));
+                client.ReplyAsync(Number, ServiceId, Context, Text, Button1) :
+                client.ReplyAsync(Number, ServiceId, Context, Text, Button1, Button2));
         }
         else
         {
-            return client.ReplyAsync(Number, Service, Context, Text);
+            return client.ReplyAsync(Number, ServiceId, Context, Text);
         }
     }
 }

@@ -23,7 +23,7 @@ public record TemplateResponse(string Number, string Service, string Context, st
     /// <inheritdoc/>
     protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
     {
-        await client.SendTemplateAsync(Service, Number, Template, cancellationToken);
+        await client.SendTemplateAsync(ServiceId, Number, Template, cancellationToken);
 
         return Ulid.NewUlid().ToString();
     }

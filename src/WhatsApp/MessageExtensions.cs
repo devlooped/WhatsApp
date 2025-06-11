@@ -10,14 +10,14 @@ public static partial class MessageExtensions
     /// <summary>
     /// Creates a reaction response for the user message.
     /// </summary>
-    public static ReactionResponse React(this UserMessage message, string emoji)
-        => new(message.User.Number, message.Service.Id, message.Id, message.ConversationId, emoji);
+    public static ReactionResponse React(this IMessage message, string emoji)
+        => new(message.Number, message.ServiceId, message.Id, message.ConversationId, emoji);
 
     /// <summary>
     /// Creates a simple template response for the message.
     /// </summary>
-    public static TemplateResponse Template(this Message message, string name, string language)
-        => new(message.User.Number, message.Service.Id, message.Id, message.ConversationId, name, language);
+    public static TemplateResponse Template(this IMessage message, string name, string language)
+        => new(message.Number, message.Id, message.Id, message.ConversationId, name, language);
 
     /// <summary>
     /// Creates a complex template response for the message.
@@ -27,20 +27,20 @@ public static partial class MessageExtensions
     /// <see cref="https://developers.facebook.com/docs/whatsapp/api/messages/message-templates#supported-languages"/>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
-    public static TemplateResponse Template(this Message message, object template)
-        => new(message.User.Number, message.Service.Id, message.Id, message.ConversationId, template);
+    public static TemplateResponse Template(this IMessage message, object template)
+        => new(message.Number, message.ServiceId, message.Id, message.ConversationId, template);
 
     /// <summary>
     /// Creates a text response for the message.
     /// </summary>
-    public static TextResponse Reply(this Message message, string text)
-        => new(message.User.Number, message.Service.Id, message.Id, message.ConversationId, text);
+    public static TextResponse Reply(this IMessage message, string text)
+        => new(message.Number, message.ServiceId, message.Id, message.ConversationId, text);
 
     /// <summary>
     /// Creates a text response with buttons for the message.
     /// </summary>
-    public static TextResponse Reply(this Message message, string text, Button button1, Button? button2 = default)
-        => new(message.User.Number, message.Service.Id, message.Id, message.ConversationId, text, button1, button2);
+    public static TextResponse Reply(this IMessage message, string text, Button button1, Button? button2 = default)
+        => new(message.Number, message.ServiceId, message.Id, message.ConversationId, text, button1, button2);
 
     /// <summary>
     /// Attempts to retrieve a single message from the specified collection.
