@@ -14,7 +14,7 @@ public record ReactionResponse(string Number, string Service, string Context, st
     /// <inheritdoc/>
     protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
     {
-        await client.ReactAsync(Service, Number, Context, Emoji);
+        await client.ReactAsync(ServiceId, Number, Context, Emoji);
 
         return Ulid.NewUlid().ToString();
     }

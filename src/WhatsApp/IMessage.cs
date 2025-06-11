@@ -22,14 +22,19 @@ namespace Devlooped.WhatsApp;
 public interface IMessage
 {
     /// <summary>
+    /// Gets the message id.
+    /// </summary>
+    string Id { get; }
+
+    /// <summary>
     /// Gets the phone number associated with the message sender.
     /// </summary>
     string Number { get; }
 
     /// <summary>
-    /// Gets the message id.
+    /// Gets the unique identifier for the service.
     /// </summary>
-    string Id { get; }
+    string ServiceId { get; }    
 
     /// <summary>
     /// Gets the timestamp representing the number of milliseconds since the Unix epoch (January 1, 1970, 00:00:00 UTC).
