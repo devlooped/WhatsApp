@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -15,6 +16,15 @@ namespace Devlooped.WhatsApp;
 /// <param name="logger">A logger for messages.</param>
 public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions> options, ILogger<WhatsAppClient> logger) : IWhatsAppClient
 {
+    static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        DefaultIgnoreCondition =
+            System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault |
+            System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true,
+    };
+
     readonly MetaOptions options = options.Value;
 
     /// <summary>
@@ -55,7 +65,11 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
 
         if (!result.IsSuccessStatusCode)
         {
-            var error = JsonNode.Parse(await result.Content.ReadAsStringAsync())?.ToJsonString(new() { WriteIndented = true });
+            var error = JsonSerializer.Serialize(new
+            {
+                payload,
+                error = JsonNode.Parse(await result.Content.ReadAsStringAsync())
+            }, jsonOptions);
             logger.LogError("Failed to send WhatsApp message from {From}: {Error}", numberId, error);
             throw new HttpRequestException(error, null, result.StatusCode);
         }
