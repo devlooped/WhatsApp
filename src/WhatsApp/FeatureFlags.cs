@@ -7,7 +7,7 @@ namespace Devlooped.WhatsApp;
 /// </summary>
 /// <remarks>Feature flags are used to control the availability of specific features within the application. Use
 /// this enumeration to specify which features are being targeted for configuration or runtime checks.</remarks>
-public enum FeatureFlags
+enum FeatureFlags
 {
     Storage,
     Conversation

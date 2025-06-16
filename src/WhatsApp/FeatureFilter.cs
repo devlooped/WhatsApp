@@ -11,9 +11,11 @@ namespace Devlooped.WhatsApp;
 /// application's dependency injection container. It supports evaluating features such as <see
 /// cref="FeatureFlags.Storage"/> and <see cref="FeatureFlags.Conversation"/>.</remarks>
 /// <param name="serviceProvider"></param>
-[FilterAlias(nameof(FeatureFilter))]
+[FilterAlias(Alias)]
 public class FeatureFilter(IServiceProvider serviceProvider) : IFeatureFilter
 {
+    public const string Alias = "whatsapp_features";
+
     public Task<bool> EvaluateAsync(FeatureFilterEvaluationContext context)
     {
         var result = default(bool);
@@ -36,8 +38,8 @@ static class FeatureFilterExtensions
             .AddConfiguration(configuration)
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                    { $"FeatureManagement:{FeatureFlags.Storage.ToString()}:EnabledFor:0:Name", nameof(FeatureFilter) },
-                    { $"FeatureManagement:{FeatureFlags.Conversation.ToString()}:EnabledFor:0:Name", nameof(FeatureFilter) }
+                    { $"FeatureManagement:{FeatureFlags.Storage}:EnabledFor:0:Name", FeatureFilter.Alias },
+                    { $"FeatureManagement:{FeatureFlags.Conversation}:EnabledFor:0:Name", FeatureFilter.Alias }
             })
             .Build();
 
