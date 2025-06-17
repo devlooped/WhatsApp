@@ -54,7 +54,20 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
     public async Task<string?> SendAsync(string numberId, object payload, CancellationToken cancellationToken = default)
     {
         if (!options.Numbers.TryGetValue(numberId, out var token))
+        {
+            // Try to reply to the debug console
+            if (numberId.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase) &&
+                Uri.TryCreate(numberId, UriKind.Absolute, out var uri))
+            {
+                using var httpClient = httpFactory.CreateClient();
+
+                await httpClient.PostAsJsonAsync(uri, payload, cancellationToken);
+
+                return Ulid.NewUlid().ToString();
+            }
+
             throw new ArgumentException($"The number '{numberId}' is not registered in the options.", nameof(numberId));
+        }
 
         using var http = httpFactory.CreateClient("whatsapp");
 

@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using Azure.Data.Tables;
 using Azure.Storage.Queues;
 using Microsoft.AspNetCore.Http;
@@ -63,6 +64,28 @@ public class AzureFunctions(
                     logger.LogWarning("Failed to mark message as read: {Id}\r\n{Payload}", message.Id, e.Message);
                 }
             }
+        }
+        else
+        {
+            logger.LogWarning("Unsupported message type received: \r\n{Payload}", json);
+        }
+
+        return new OkResult();
+    }
+
+    [Function("whatsapp_message_console")]
+    public async Task<IActionResult> MessageConsole([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "console")] HttpRequest req)
+    {
+        using var reader = new StreamReader(req.Body, Encoding.UTF8);
+        var json = await reader.ReadToEndAsync();
+        logger.LogDebug("Received WhatsApp message: {Message}.", json);
+
+        // Try to deserialize the message sent by the debug console
+        if (JsonSerializer.Deserialize(json, JsonContext.Default.Message) is Message message)
+        {
+            // Await all responses
+            // No action needed, just make sure all items are processed
+            await handler.HandleAsync([message]).ToArrayAsync();
         }
         else
         {
