@@ -1,8 +1,6 @@
-﻿using System.Net.Http.Json;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Xunit.Abstractions;
 
 namespace Devlooped.WhatsApp;
 
@@ -101,12 +99,12 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         });
     }
 
-    [SecretsFact("Meta:VerifyToken", "MediaTo")]
+    [SecretsFact("Meta:VerifyToken", "MediaTo", Skip = "Media attachments are deleted if user deletes them, so skip.")]
     public async Task ResolvesMediaIdFromHttpClient()
     {
         var (configuration, client) = Initialize();
 
-        var media = await client.ResolveMediaAsync(configuration["MediaTo"]!, "4075001832719300");
+        var media = await client.ResolveMediaAsync(configuration["MediaTo"]!, "734245612619207");
 
         Assert.NotNull(media);
 
