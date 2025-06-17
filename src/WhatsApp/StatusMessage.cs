@@ -6,11 +6,11 @@ namespace Devlooped.WhatsApp;
 /// A status update about a message.
 /// </summary>
 /// <param name="Id">The identifier of the message this status update relates to.</param>
-/// <param name="To">The service that received the message from the Cloud API.</param>
-/// <param name="From">The user that sent the message.</param>
+/// <param name="Service">The service that received the message from the Cloud API.</param>
+/// <param name="User">The user that sent the message.</param>
 /// <param name="Timestamp">Timestamp of the message.</param>
 /// <param name="Status">The message status.</param>
-public record StatusMessage(string Id, Service To, User From, long Timestamp, Status Status) : SystemMessage(Id, To, From, Timestamp)
+public record StatusMessage(string Id, Service Service, User User, long Timestamp, Status Status) : SystemMessage(Id, Service, User, Timestamp)
 {
     /// <inheritdoc/>
     [JsonIgnore]
