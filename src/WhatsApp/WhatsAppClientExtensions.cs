@@ -52,7 +52,7 @@ public static partial class WhatsAppClientExtensions
     /// <param name="cancellation">The cancellation token.</param>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#reaction-object"/>
     public static Task ReactAsync(this IWhatsAppClient client, UserMessage message, string emoji, CancellationToken cancellation = default)
-        => ReactAsync(client, message.Service.Id, message.From.Number, message.Id, emoji, cancellation);
+        => ReactAsync(client, message.Service.Id, message.User.Number, message.Id, emoji, cancellation);
 
     /// <summary>
     /// Reacts to a message.

@@ -6,11 +6,11 @@ namespace Devlooped.WhatsApp;
 /// A <see cref="Message"/> containing <see cref="Content"/>.
 /// </summary>
 /// <param name="Id">The message identifier.</param>
-/// <param name="To">The service that received the message from the Cloud API.</param>
-/// <param name="From">The user that sent the message.</param>
+/// <param name="Service">The service that received the message from the Cloud API.</param>
+/// <param name="User">The user that sent the message.</param>
 /// <param name="Timestamp">Timestamp of the message.</param>
 /// <param name="Content">Message content.</param>
-public record ContentMessage(string Id, Service To, User From, long Timestamp, Content Content) : UserMessage(Id, To, From, Timestamp)
+public record ContentMessage(string Id, Service Service, User User, long Timestamp, Content Content) : UserMessage(Id, Service, User, Timestamp)
 {
     /// <inheritdoc/>
     [JsonIgnore]
