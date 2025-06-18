@@ -33,6 +33,11 @@ jobs:
       - name: 🙏 build
         run: dotnet build -m:1 -bl:build.binlog
 
+      - name: ⚙ azurite
+        run: |
+          npm install azurite
+          npx azurite &
+
       - name: 🧪 test
         run: |
           dotnet tool update -g dotnet-retest
