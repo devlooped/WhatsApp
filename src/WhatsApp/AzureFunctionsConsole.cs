@@ -26,7 +26,7 @@ public class AzureFunctionsConsole(
 
         if (req.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
         {
-            // Return a simple HTML page to allow sending messages from the debug console
+            // Return a simple HTML page so we can verify from the console that the service endpoint URL is reachable
             return new ContentResult
             {
                 ContentType = "text/html",
@@ -47,7 +47,7 @@ public class AzureFunctionsConsole(
         var json = await reader.ReadToEndAsync();
         logger.LogDebug("Received WhatsApp message: {Message}.", json);
 
-        // Try to deserialize the message sent by the debug console
+        // Try to deserialize the message sent by the console
         if (JsonSerializer.Deserialize(json, JsonContext.Default.Message) is Message message)
         {
             // Await all responses

@@ -4,7 +4,6 @@ using Azure.Storage.Queues;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -24,8 +23,7 @@ public class AzureFunctions(
     IWhatsAppClient whatsapp,
     IWhatsAppHandler handler,
     IOptions<MetaOptions> options,
-    ILogger<AzureFunctions> logger,
-    IHostEnvironment environment)
+    ILogger<AzureFunctions> logger)
 {
     [Function("whatsapp_message")]
     public async Task<IActionResult> Message([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp")] HttpRequest req)
