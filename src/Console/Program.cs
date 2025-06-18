@@ -24,6 +24,9 @@ var host = Host.CreateApplicationBuilder(args);
 host.Configuration.AddDotNetConfig();
 host.Configuration.AddUserSecrets<Program>();
 
+host.Services.AddHttpClient("whatsapp")
+    .AddStandardResilienceHandler();
+
 var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (s, e) => cts.Cancel();
 host.Services.AddSingleton(cts);

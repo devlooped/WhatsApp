@@ -61,7 +61,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
             {
                 using var httpClient = httpFactory.CreateClient();
 
-                await httpClient.PostAsJsonAsync(uri, payload, cancellationToken);
+                await httpClient.PostAsJsonAsync(uri, payload, JsonContext.DefaultOptions, cancellationToken);
 
                 return Ulid.NewUlid().ToString();
             }

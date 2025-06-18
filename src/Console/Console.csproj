@@ -25,6 +25,9 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.1.0" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
     <PackageReference Include="Spectre.Console.Json" Version="0.50.0" />
     <PackageReference Include="ThisAssembly.Git" Version="2.0.14" PrivateAssets="all" />
     <PackageReference Include="ThisAssembly.Project" Version="2.0.14" PrivateAssets="all" />
@@ -45,6 +48,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WhatsApp\WhatsApp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
