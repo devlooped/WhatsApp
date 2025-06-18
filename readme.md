@@ -16,7 +16,7 @@ Create agents for WhatsApp using Azure Functions.
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
-builder.Services.AddWhatsApp<MyWhatsAppHandler>();
+builder.Services.AddWhatsApp<MyWhatsAppHandler>(builder.Configuration);
 
 builder.Build().Run();
 ```
@@ -25,40 +25,44 @@ Instead of providing an `IWhatsAppHandler` implementation, you can also
 register an inline handler using minimal API style:
 
 ```csharp
-builder.Services.AddWhatsApp(message =>
+builder.Services.AddWhatsApp(builder.Configuration, (messages, cancellation) =>
 {
-    // MessageType: Content | Error | Interactive | Status
-    Console.WriteLine($"Got message type {message.Type}"); 
-    switch (message)
+    foreach (var message in messages)
     {
-        case ContentMessage content:
-            // ContentType = Text | Contact | Document | Image | Audio | Video | Location | Unknown (raw JSON)
-            Console.WriteLine($"Got content type {content.Content.Type}"); 
-            break;
-        case ErrorMessage error:
-            Console.WriteLine($"Error: {error.Error.Message} ({error.Error.Code})");
-            break;
-        case InteractiveMessage interactive:
-            Console.WriteLine($"Interactive: {interactive.Button.Title} ({interactive.Button.Id})");
-            break;
-        case StatusMessage status:
-            Console.WriteLine($"Status: {status.Status}");
-            break;
+        // MessageType: Content | Error | Interactive | Reaction | Status
+        Console.WriteLine($"Got message type {message.Type}");
+        switch (message)
+        {
+            case ContentMessage content:
+                // ContentType = Text | Contact | Document | Image | Audio | Video | Location | Unknown (raw JSON)
+                Console.WriteLine($"Got content type {content.Content.Type}");
+                break;
+            case ErrorMessage error:
+                Console.WriteLine($"Error: {error.Error.Message} ({error.Error.Code})");
+                break;
+            case InteractiveMessage interactive:
+                Console.WriteLine($"Interactive: {interactive.Button.Title} ({interactive.Button.Id})");
+                break;
+            case StatusMessage status:
+                Console.WriteLine($"Status: {status.Status}");
+                break;
+        }
     }
-    return Task.CompletedTask;
-});
-```
+
+    return AsyncEnumerable.Empty<Response>();
+});```
 
 If the handler needs additional services, they can be provided directly 
 as generic parameters of the `UseWhatsApp` method, such as:
 
 ```csharp
-builder.Services.AddWhatsApp<IWhatsAppClient, ILogger<Program>>(async (client, logger, message) =>
+builder.Services.AddWhatsApp<ILogger<Program>>(builder.Configuration, (logger, message, cancellation) =>
 {
-    logger.LogInformation($"Got message type {message.Type}");
-    // Reply to an incoming content message, for example.
-    if (message is ContentMessage content)
-        await client.ReplyAsync(message, $"☑️ Got your {content.Content.Type}");
+    logger.LogInformation($"Got messages!");
+
+    return messages.OfType<ContentMessage>()
+        .Select(content => content.Reply($"☑️ Got your {content.Content.Type}"))
+        .ToAsyncEnumerable();
 }
 ```
 
@@ -66,11 +70,30 @@ You can also specify the parameter types in the delegate itself and avoid the
 generic parameters:
 
 ```csharp
-builder.Services.AddWhatsApp(async (IWhatsAppClient client, ILogger<Program> logger, Message message) =>
+builder.Services.AddWhatsApp(async (ILogger<Program> logger, IEnumerable<Message> messages, CancellationToken cancellation) =>
 ```
 
-The provided `IWhatsAppClient` provides a very thin abstraction allowing you to send 
-arbitrary payloads to WhatsApp for Business:
+Handlers generate responses by returning an `IAsyncEnumerable<Response>`, and the 
+responses are typically created by calling extension methods on the incoming messages, 
+such as `Reply` or `React`:
+
+```csharp
+if (message is ContentMessage content)
+{
+    yield return message.React(message, "🧠");
+    // simulate some hard work at hand, like doing some LLM-stuff :)
+    await Task.Delay(2000);
+    var json = JsonSerializer.Serialize(content, options);
+    yield return message.Reply($"☑️ Got your {content.Content.Type}:\r\n{json}");
+}
+```
+
+This allows the handler to remain decoupled from the actual sending of messages, making it 
+easier to unit test. 
+
+If sending messages outside the handler pipeline is needed, you can use the provided 
+`IWhatsAppClient`, which is a very thin abstraction allowing you to send arbitrary payloads 
+to WhatsApp for Business:
 
 ```csharp
 public interface IWhatsAppClient
@@ -146,15 +169,18 @@ with full control permissions to the WhatsApp Business API (app).
 contributing unique capabilities. These components may originate from `Devlooped.WhatsApp`, 
 external NuGet libraries, or custom implementations. This mechanism enables flexible 
 enhancement of the WhatsApp handler's functionality to suit specific requirements. 
-Below is an example that wraps a WhatsApp handler with logging and OpenTelemetry tracing:
+Below is an example that wraps a WhatsApp handler with logging, OpenTelemetry tracing, 
+message storage and conversation management:
 
 ```csharp
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
-builder.Services.AddWhatsApp<MyWhatsAppHandler>()
+builder.Services.AddWhatsApp<MyWhatsAppHandler>(builder.Configuration)
     .UseOpenTelemetry(builder.Environment.ApplicationName)
-    .UseLogging();
+    .UseLogging()
+    .UseStorage()
+    .UseConversation();
 
 builder.Build().Run();
 ```
