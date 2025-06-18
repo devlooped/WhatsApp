@@ -208,6 +208,29 @@ tier or above per developer, which grants you a commercial license for
 the duration of the sponsorship. You can sponsor through each individual 
 developer's account or through your GitHub organization.
 
+<!-- #content -->
+
+## WhatsApp CLI
+
+[![Version](https://img.shields.io/nuget/vpre/dotnet-whatsapp.svg?color=royalblue)](https://www.nuget.org/packages/dotnet-whatsapp)
+[![Downloads](https://img.shields.io/nuget/dt/dotnet-whatsapp.svg?color=green)](https://www.nuget.org/packages/dotnet-whatsapp)
+
+<!-- #cli -->
+
+Provides a command-line interface for the [WhatsApp](https://nuget.org/packages/Devlooped.WhatsApp) 
+library and its backend functions. This allows you to interact with your WhatsApp pipeline without 
+having to set up your WhatsApp for Business app for local development. 
+
+The backend functions are only enabled if the hosting environment is set to `Development` so that 
+in production, the CLI endpoint is not available. Example:
+
+![](https://raw.githubusercontent.com/devlooped/WhatsApp/dev/console/assets/img/cli.png)
+
+The console will automatically remember the last used WhatsApp endpoint, and uses YAML if possible 
+to render the responses since it provides a more readable format than JSON.
+
+<!-- #cli -->
+
 ## Dogfooding
 
 [![CI Version](https://img.shields.io/endpoint?url=https://shields.kzu.app/vpre/Devlooped.WhatsApp/main&label=nuget.ci&color=brightgreen)](https://pkg.kzu.app/index.json)
@@ -222,7 +245,6 @@ The versioning scheme for packages is:
 - PR builds: *42.42.42-pr*`[NUMBER]`
 - Branch builds: *42.42.42-*`[BRANCH]`.`[COMMITS]`
 
-<!-- #content -->
 <!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
 # Sponsors 
 
