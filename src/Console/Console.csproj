@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <PackageId>dotnet-whatsapp</PackageId>
+    <Description>A WhatsApp simulator client that complements Devlooped.WhatsApp.</Description>
+    <ToolCommandName>whatsapp</ToolCommandName>
+    <PackageTags>dotnet-tool whatsapp</PackageTags>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+
+    <BuildDate>$([System.DateTime]::Now.ToString("yyyy-MM-dd"))</BuildDate>
+    <BuildRef>$(GITHUB_REF_NAME)</BuildRef>
+    <NoWarn>$(NoWarn);CS0436;CS9107</NoWarn>
+    <!-- CS9107: (primary ctor base() call): Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well. -->
+
+    <!-- Run app with -p:NoHelp=true to avoid the help generation which might conflict/error and prevent debugging -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DotNetConfig.Configuration" Version="1.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.6" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
+    <PackageReference Include="Spectre.Console.Json" Version="0.50.0" />
+    <PackageReference Include="ThisAssembly.Git" Version="2.0.14" PrivateAssets="all" />
+    <PackageReference Include="ThisAssembly.Project" Version="2.0.14" PrivateAssets="all" />
+    <PackageReference Include="Devlooped.Extensions.DependencyInjection" Version="2.1.0" PrivateAssets="all" />
+    <PackageReference Include="NuGet.Protocol" Version="6.14.0" />
+    <PackageReference Include="NuGetizer" Version="1.2.4" PrivateAssets="all" />
+    <PackageReference Include="DotNetConfig" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectProperty Include="ToolCommandName" />
+    <ProjectProperty Include="BuildDate" />
+    <ProjectProperty Include="BuildRef" />
+    <ProjectProperty Include="PackageId" />
+    <ProjectProperty Include="PackageVersion" />
+    <ProjectProperty Include="SLEET_FEED_URL" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WhatsApp\WhatsApp.csproj" />
+  </ItemGroup>
+
+</Project>
