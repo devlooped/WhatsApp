@@ -120,6 +120,8 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                     requestBody = await reader.ReadToEndAsync();
                 }
 
+                AnsiConsole.WriteLine();
+
                 // Try to deserialize the request so we can render it nicely in the console using YAML
                 if (DictionaryConverter.Parse(requestBody) is { } dictionary &&
                     DictionaryConverter.ToYaml(dictionary) is { Length: > 0 } payload)
@@ -130,6 +132,8 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                 {
                     AnsiConsole.Write(new Panel(new JsonText(requestBody)));
                 }
+
+                AnsiConsole.Markup($":person_beard: ");
 
                 var buffer = Encoding.UTF8.GetBytes("OK");
                 response.ContentLength64 = buffer.Length;
