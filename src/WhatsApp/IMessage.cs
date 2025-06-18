@@ -52,4 +52,9 @@ public interface IMessage
     /// selection is a response to.
     /// </summary>
     string? Context { get; }
+
+    /// <summary>
+    /// Gets the type of the message.
+    /// </summary>
+    MessageType Type { get; }
 }

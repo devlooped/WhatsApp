@@ -1,7 +1,7 @@
 ﻿namespace Devlooped.WhatsApp;
 
 /// <summary>
-/// Type of message received by the service.
+/// Type of message.
 /// </summary>
 public enum MessageType
 {
@@ -25,6 +25,10 @@ public enum MessageType
     /// Message contains a status update.
     /// </summary>
     Status,
+    /// <summary>
+    /// Message is a response from the service, rather than an incoming message.
+    /// </summary>
+    Response,
     /// <summary>
     /// Message type is not supported by the WhatsApp for Business service.
     /// </summary>

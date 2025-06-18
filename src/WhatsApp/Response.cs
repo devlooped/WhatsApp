@@ -19,6 +19,9 @@ public abstract partial record Response(string UserNumber, string ServiceId, str
     /// <inheritdoc/>
     public long Timestamp { get; init; }
 
+    /// <inheritdoc/>
+    public MessageType Type => MessageType.Response;
+
     /// <summary>
     /// Sends a request asynchronously using the specified WhatsApp client.
     /// </summary>
