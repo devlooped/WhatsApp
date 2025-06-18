@@ -4,6 +4,7 @@
     <Project Path="src/SampleApp/Sample/Sample.csproj" />
   </Folder>
   <Project Path="src/CodeAnalysis/CodeAnalysis.csproj" />
+  <Project Path="src/Console/Console.csproj" Id="9b6aa258-0564-43f2-84ed-bd2dabe9d690" />
   <Project Path="src/Tests/Tests.csproj" />
   <Project Path="src/WhatsApp/WhatsApp.csproj" />
 </Solution>
