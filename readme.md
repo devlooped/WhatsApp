@@ -224,7 +224,7 @@ having to set up your WhatsApp for Business app for local development.
 The backend functions are only enabled if the hosting environment is set to `Development` so that 
 in production, the CLI endpoint is not available. Example:
 
-![](https://raw.githubusercontent.com/devlooped/WhatsApp/dev/console/assets/img/cli.png)
+![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/cli.png)
 
 The console will automatically remember the last used WhatsApp endpoint, and uses YAML if possible 
 to render the responses since it provides a more readable format than JSON.
