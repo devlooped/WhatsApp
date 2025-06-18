@@ -8,7 +8,7 @@ class ProcessHandler(ILogger<Program> logger, JsonSerializerOptions options) : I
     public async IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         // Avoid warning CS1998 // Async method lacks 'await' operators and will run synchronously
-        await Task.CompletedTask;
+        await Task.Yield();
 
         var message = messages.Last();
         logger.LogInformation("💬 Received message: {Message}", message);
