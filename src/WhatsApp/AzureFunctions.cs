@@ -4,6 +4,7 @@ using Azure.Storage.Queues;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -23,7 +24,8 @@ public class AzureFunctions(
     IWhatsAppClient whatsapp,
     IWhatsAppHandler handler,
     IOptions<MetaOptions> options,
-    ILogger<AzureFunctions> logger)
+    ILogger<AzureFunctions> logger,
+    IHostEnvironment environment)
 {
     [Function("whatsapp_message")]
     public async Task<IActionResult> Message([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp")] HttpRequest req)
@@ -47,22 +49,6 @@ public class AzureFunctions(
             var queue = queueClient.GetQueueClient("whatsappwebhook");
             await queue.CreateIfNotExistsAsync();
             await queue.SendMessageAsync(json);
-
-            // Mark read these two types of messages we want to explicitly acknowledge from users.
-            if (message.Type == MessageType.Content ||
-                message.Type == MessageType.Interactive)
-            {
-                try
-                {
-                    // Best-effort to mark as read. This might be an old message callback, 
-                    // or the message might have been deleted.
-                    await whatsapp.MarkReadAsync(message.Service.Id, message.Id);
-                }
-                catch (HttpRequestException e)
-                {
-                    logger.LogWarning("Failed to mark message as read: {Id}\r\n{Payload}", message.Id, e.Message);
-                }
-            }
         }
         else
         {
@@ -90,6 +76,23 @@ public class AzureFunctions(
                 return;
             }
 
+            // We only mark messages read in production, since in development this makes things 
+            // much harder to debug as WhatsApp will notify deliver of these messages too!
+            if (environment.IsProduction() &&
+                (message.Type == MessageType.Content || message.Type == MessageType.Interactive))
+            {
+                // Mark read these two types of messages we want to explicitly acknowledge from users.
+                try
+                {
+                    // Best-effort to mark as read. This might be an old message callback, 
+                    // or the message might have been deleted.
+                    await whatsapp.MarkReadAsync(message.Service.Id, message.Id);
+                }
+                catch (HttpRequestException e)
+                {
+                    logger.LogWarning("Failed to mark message as read: {Id}\r\n{Payload}", message.Id, e.Message);
+                }
+            }
             // Await all responses
             // No action needed, just make sure all items are processed
             await handler.HandleAsync([message]).ToArrayAsync();
