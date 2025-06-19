@@ -185,6 +185,49 @@ builder.Services.AddWhatsApp<MyWhatsAppHandler>(builder.Configuration)
 builder.Build().Run();
 ```
 
+Creating additional cross-cutting behaviors to keep handlers clean and focused on 
+a single responsibility is straightforward. For example, let's say you don't want 
+to perform any processing for status messages (these are VERY noisy, sent by whatsApp 
+foreach thing that happens to a message, such as when it is sent, delivered, read, etc.).
+You could easily create a custom component that filters out these messages:
+
+```csharp
+static class IgnoreMessagesExtensions
+{
+    public static WhatsAppHandlerBuilder UseIgnore(this WhatsAppHandlerBuilder builder)
+        => Throw.IfNull(builder).Use((inner, services) => new IgnoreMessagesHandler(inner,
+            message => message.Type != MessageType.Status && message.Type != MessageType.Unsupported));
+
+    public static WhatsAppHandlerBuilder UseIgnore(this WhatsAppHandlerBuilder builder, Func<IMessage, bool> filter)
+        => Throw.IfNull(builder).Use((inner, services) => new IgnoreMessagesHandler(inner, filter));
+
+    class IgnoreMessagesHandler(IWhatsAppHandler inner, Func<IMessage, bool> filter) : DelegatingWhatsAppHandler(inner)
+    {
+        public override IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, CancellationToken cancellation = default)
+        {
+            var filtered = messages.Where(filter).ToArray();
+            // Skip inner handler altogether if no messages pass the filter.
+            if (filtered.Length == 0)
+                return AsyncEnumerable.Empty<Response>();
+
+            return base.HandleAsync(filtered, cancellation).WithExecutionFlow();
+        }
+    }
+}
+```
+
+This new extension method can now be used in the pipeline without changing any of the 
+existing handlers:
+
+```csharp
+builder.Services.AddWhatsApp<MyWhatsAppHandler>(builder.Configuration)
+    .UseOpenTelemetry(builder.Environment.ApplicationName)
+    .UseLogging()
+    .UseIgnore()  // 👈 Ignore status+unsupported messages. We do log them.
+    .UseStorage()
+    .UseConversation();
+```
+
 ### OpenTelemetry
 
 The configurable built-in support for OpenTelemetry shown above allows tracking 
