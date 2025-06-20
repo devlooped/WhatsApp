@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.RegularExpressions;
+using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
 namespace Devlooped.WhatsApp;
@@ -27,12 +28,20 @@ public static partial class DictionaryConverter
     public static Dictionary<string, object?>? Parse(string json)
         => JsonSerializer.Deserialize<Dictionary<string, object?>>(json, options);
 
-    public static string ToYaml(this object? value)
+    public static string ToYaml(this object? value, bool formatted = true)
     {
         if (value is null)
             return string.Empty;
 
-        return ConvertUnicodeEscapes(serializer.Serialize(value).Trim());
+        if (!formatted)
+            return ConvertUnicodeEscapes(serializer.Serialize(value).Trim());
+
+        using var writer = new StringWriter();
+        var settings = new EmitterSettings();
+        var emitter = new SpectreConsoleEmitter(new Emitter(writer, settings));
+
+        serializer.Serialize(emitter, value);
+        return ConvertUnicodeEscapes(writer.ToString().Trim());
     }
 
     public static Dictionary<string, object?> FromYaml(string yaml)
