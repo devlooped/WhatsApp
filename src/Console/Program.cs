@@ -21,6 +21,16 @@ if (args.Contains("--debug"))
 }
 
 var host = Host.CreateApplicationBuilder(args);
+
+host.Configuration.AddInMemoryCollection(new Dictionary<string, string?>()
+{
+    { "Logging:LogLevel:Default", "Information" },
+    { "Logging:LogLevel:Microsoft", "Warning" },
+    { "Logging:LogLevel:Microsoft.Hosting", "Warning" },
+    { "Logging:LogLevel:System.Net.Http", "Warning" },
+    { "Logging:LogLevel:Polly", "Warning" },
+});
+
 host.Configuration.AddDotNetConfig();
 host.Configuration.AddUserSecrets<Program>();
 
