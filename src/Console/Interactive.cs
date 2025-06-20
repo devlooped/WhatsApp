@@ -126,7 +126,10 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                 if (DictionaryConverter.Parse(requestBody) is { } dictionary &&
                     DictionaryConverter.ToYaml(dictionary) is { Length: > 0 } payload)
                 {
-                    AnsiConsole.Write(new Panel(payload));
+                    AnsiConsole.Write(new Panel(payload)
+                    {
+                        Width = Math.Min(100, AnsiConsole.Profile.Width)
+                    });
                 }
                 else
                 {

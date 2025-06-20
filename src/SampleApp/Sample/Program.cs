@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Runtime.CompilerServices;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Devlooped;
 using Devlooped.WhatsApp;
@@ -45,6 +46,17 @@ builder.Services
     // Matches what we use in ConfigureOpenTelemetry
     .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging()
+    .Use(EchoAndHandle)
     .UseConversation(conversationWindowSeconds: 300 /* default */);
 
 builder.Build().Run();
+
+static async IAsyncEnumerable<Response> EchoAndHandle(IEnumerable<IMessage> messages, IWhatsAppHandler inner, [EnumeratorCancellation] CancellationToken cancellation)
+{
+    var content = messages.OfType<ContentMessage>().LastOrDefault();
+    if (content != null)
+        yield return content.Reply("Echo: " + content.Content.ToString());
+
+    await foreach (var response in inner.HandleAsync(messages, cancellation))
+        yield return response;
+}
