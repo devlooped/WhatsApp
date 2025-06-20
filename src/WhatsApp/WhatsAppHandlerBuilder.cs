@@ -31,6 +31,11 @@ public class WhatsAppHandlerBuilder
         services ??= ServiceProvider.Empty;
         var handler = handlerFactory(services);
 
+        // If we can get the IWhatsApp at all, we wrap the target handler in the 
+        // sender one, which will process responses and send them out to WhatsApp.
+        if (services.GetService<IWhatsAppClient>() is { } client)
+            handler = new SendResponsesHandler(handler, client);
+
         // Matches behavior of M.E.AI chat client builder
         // Apply the factories in reverse order, so that the first factory added is the outermost.
         if (factories is not null)

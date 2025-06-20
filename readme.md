@@ -16,7 +16,7 @@ Create agents for WhatsApp using Azure Functions.
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
-builder.Services.AddWhatsApp<MyWhatsAppHandler>(builder.Configuration);
+builder.Services.AddWhatsApp<MyWhatsAppHandler>();
 
 builder.Build().Run();
 ```
@@ -25,7 +25,7 @@ Instead of providing an `IWhatsAppHandler` implementation, you can also
 register an inline handler using minimal API style:
 
 ```csharp
-builder.Services.AddWhatsApp(builder.Configuration, (messages, cancellation) =>
+builder.Services.AddWhatsApp((messages, cancellation) =>
 {
     foreach (var message in messages)
     {
@@ -56,7 +56,7 @@ If the handler needs additional services, they can be provided directly
 as generic parameters of the `UseWhatsApp` method, such as:
 
 ```csharp
-builder.Services.AddWhatsApp<ILogger<Program>>(builder.Configuration, (logger, message, cancellation) =>
+builder.Services.AddWhatsApp<ILogger<Program>>((logger, message, cancellation) =>
 {
     logger.LogInformation($"Got messages!");
 
@@ -121,6 +121,44 @@ The above code would render as follows in WhatsApp:
 
 ![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/whatsapp.png)
 
+## Conversations
+
+WhatsApp does not provide a way to keep track of conversations, at most providing the 
+related message ID of a message that was replied to. In many agents, however, keeping 
+track of conversations is crucial for maintaining context and continuity. 
+
+This library provides a simple built-in functionality for this based on some simple 
+heuristics: 
+
+- If a message is sent in response to another message, it is considered part of the same conversation.
+- Messages sent within a short time frame (default: 5 minutes) are considered part of the same conversation.
+- Individual messages, conversations and the active conversations are stored in an Azure 
+  storage account
+
+Usage:
+
+```csharp
+builder.Services
+    .AddWhatsApp<MyWhatsAppHandler>()
+    .UseConversation(conversationWindowSeconds: 300 /* default */);
+```
+
+Unless you provide a [CloudStorageAccount](https://www.nuget.org/packages/Devlooped.CloudStorageAccount) in 
+the service collection, the library will use the `AzureWebJobsStorage` connection string automatically 
+for this, so things will just work out of the box. 
+
+An example of providing storage to a different account than the functions runtime one:
+
+```csharp
+builder.Services.AddSingleton(services => builder.Environment.IsDevelopment() ?
+    // Always local emulator in development
+    CloudStorageAccount.DevelopmentStorageAccount :
+    // First try with custom connection string
+    CloudStorageAccount.TryParse(builder.Configuration["App:Storage"] ?? "", out var storage) ?
+    storage :
+    // Fallback to built-in functions storage (default behavior).
+    CloudStorageAccount.Parse(builder.Configuration["AzureWebJobsStorage"]));
+```
 
 ## Configuration
 
@@ -176,7 +214,7 @@ message storage and conversation management:
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
-builder.Services.AddWhatsApp<MyWhatsAppHandler>(builder.Configuration)
+builder.Services.AddWhatsApp<MyWhatsAppHandler>()
     .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging()
     .UseStorage()
@@ -220,7 +258,7 @@ This new extension method can now be used in the pipeline without changing any o
 existing handlers:
 
 ```csharp
-builder.Services.AddWhatsApp<MyWhatsAppHandler>(builder.Configuration)
+builder.Services.AddWhatsApp<MyWhatsAppHandler>()
     .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging()
     .UseIgnore()  // 👈 Ignore status+unsupported messages. We do log them.

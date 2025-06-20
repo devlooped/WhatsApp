@@ -7,9 +7,9 @@ namespace Devlooped.WhatsApp;
 /// </summary>
 class MessageStorageHandler : DelegatingWhatsAppHandler
 {
-    readonly IStorageService storageService;
+    readonly IConversationStorage storageService;
 
-    public MessageStorageHandler(IWhatsAppHandler innerHandler, IStorageService storageService)
+    public MessageStorageHandler(IWhatsAppHandler innerHandler, IConversationStorage storageService)
         : base(innerHandler)
     {
         this.storageService = storageService;

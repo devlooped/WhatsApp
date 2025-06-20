@@ -12,4 +12,5 @@
 /// <param name="Id">The unique identifier for the conversation. Cannot be null or empty.</param>
 /// <param name="Messages">A list of messages exchanged in the conversation. Cannot be null; may be empty if no messages exist.</param>
 /// <param name="Timestamp">The timestamp of the conversation, represented as the number of milliseconds since the Unix epoch.</param>
-public record Conversation(string Number, string Id, List<IMessage> Messages, long Timestamp);
+[Table("WhatsAppConversations")]
+public record Conversation([PartitionKey] string Number, [RowKey] string Id, List<IMessage> Messages, long Timestamp);

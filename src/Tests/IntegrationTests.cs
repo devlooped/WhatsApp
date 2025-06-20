@@ -39,12 +39,11 @@ public class IntegrationTests : IDisposable
         IEnumerable<IMessage>? messages = null;
 
         services
-            .AddWhatsApp(configuration, (input, cancellation) =>
+            .AddWhatsApp((input, cancellation) =>
             {
                 messages = input.ToArray();
                 return AsyncEnumerable.Empty<Response>();
             })
-            .UseStorage()
             .UseConversation();
 
         var provider = services.BuildServiceProvider();

@@ -6,7 +6,7 @@
 /// <remarks>This interface provides functionality to retrieve messages associated with a specific identifier and
 /// to save messages or responses to the storage. Implementations of this interface should ensure thread safety and
 /// proper handling of cancellation tokens for asynchronous operations.</remarks>
-public interface IStorageService
+public interface IConversationStorage
 {
     /// <summary>
     /// Retrieves a message by its unique identifier for a specified number.
