@@ -116,6 +116,11 @@ public record AudioContent(string Id, string Mime, string Sha256) : MediaContent
 /// <param name="Sha256">Hash of the image.</param>
 public record ImageContent(string Id, string Mime, string Sha256) : MediaContent(Id, Mime, Sha256)
 {
+    /// <summary>
+    /// Optional caption for the image.
+    /// </summary>
+    public string? Caption { get; init; }
+
     /// <inheritdoc/>
     [JsonIgnore]
     public override ContentType Type => ContentType.Image;
@@ -129,6 +134,11 @@ public record ImageContent(string Id, string Mime, string Sha256) : MediaContent
 /// <param name="Sha256">Hash of the video.</param>
 public record VideoContent(string Id, string Mime, string Sha256) : MediaContent(Id, Mime, Sha256)
 {
+    /// <summary>
+    /// Optional caption for the image.
+    /// </summary>
+    public string? Caption { get; init; }
+
     /// <inheritdoc/>
     [JsonIgnore]
     public override ContentType Type => ContentType.Video;

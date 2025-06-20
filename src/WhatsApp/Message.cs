@@ -136,6 +136,7 @@ public abstract partial record Message(string Id, Service Service, User User, lo
                     {
                       "$type": $msgType,
                       "id": $msg[$msgType].id,
+                      "caption": $msg[$msgType].caption,
                       "mime": $msg[$msgType].mime_type,
                       "sha256": $msg[$msgType].sha256
                     }
