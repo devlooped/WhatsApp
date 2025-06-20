@@ -44,7 +44,11 @@ class SpectreConsoleEmitter : IEmitter
                 // Format value
                 var value = scalar.Value;
                 var style = DetectStyle(value);
-                inner.Emit(new Scalar(null, null, style, ScalarStyle.ForcePlain, true, false));
+                if (value.Contains('\n'))
+                    inner.Emit(new Scalar(null, null, value, ScalarStyle.Literal, true, false));
+                else
+                    inner.Emit(new Scalar(null, null, style, ScalarStyle.ForcePlain, true, false));
+
                 expectingKey = true;
             }
             else
