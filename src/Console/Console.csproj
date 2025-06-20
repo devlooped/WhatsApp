@@ -51,8 +51,4 @@
     <ProjectReference Include="..\WhatsApp\WhatsApp.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
-  </ItemGroup>
-
 </Project>
