@@ -38,14 +38,13 @@ builder.Services.AddSingleton(services => builder.Environment.IsDevelopment() ?
     CloudStorageAccount.DevelopmentStorageAccount :
     CloudStorageAccount.TryParse(builder.Configuration["App:Storage"] ?? "", out var storage) ?
     storage :
-    throw new InvalidOperationException("Missing required App:Storage connection string."));
+    CloudStorageAccount.Parse(builder.Configuration["AzureWebJobsStorage"]));
 
 builder.Services
-    .AddWhatsApp<ProcessHandler>(builder.Configuration)
+    .AddWhatsApp<ProcessHandler>()
     // Matches what we use in ConfigureOpenTelemetry
     .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging()
-    .UseStorage()
-    .UseConversation();
+    .UseConversation(conversationWindowSeconds: 300 /* default */);
 
 builder.Build().Run();

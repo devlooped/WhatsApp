@@ -35,6 +35,8 @@ public record ContactContent(string Name, string Surname, string[] Numbers) : Co
     /// <inheritdoc/>
     [JsonIgnore]
     public override ContentType Type => ContentType.Contact;
+
+    public override string ToString() => $"{Name} {Surname} ({string.Join(", ", Numbers)})";
 }
 
 /// <summary>
@@ -46,6 +48,8 @@ public record TextContent(string Text) : Content
     /// <inheritdoc/>
     [JsonIgnore]
     public override ContentType Type => ContentType.Text;
+
+    public override string ToString() => Text;
 }
 
 /// <summary>
