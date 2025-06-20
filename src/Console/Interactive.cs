@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text;
 using System.Text.Json;
+using Devlooped.WhatsApp.Client;
 using DotNetConfig;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,6 +11,13 @@ using Spectre.Console.Json;
 
 namespace Devlooped.WhatsApp;
 
+enum RenderMode
+{
+    Yaml,
+    Json,
+    Text,
+}
+
 [Service]
 class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) : IHostedService
 {
@@ -18,6 +26,8 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
     string? serviceEndpoint = configuration["WhatsApp:Endpoint"];
     string? clientEndpoint;
     HttpListener? listener;
+    RenderMode mode = RenderMode.Text;
+    bool needsNewline = true;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -33,6 +43,12 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
             Config.Build(ConfigLevel.Global)
                 .SetString("WhatsApp", "Endpoint", serviceEndpoint);
         }
+
+        var choices = Enum.GetValues<MessageType>();
+        mode = AnsiConsole.Prompt(
+            new SelectionPrompt<RenderMode>()
+                .Title("Select render mode")
+                .AddChoices([RenderMode.Text, RenderMode.Yaml, RenderMode.Json]));
 
         listener = new HttpListener();
         // Attempt to grab the first free port we can find on localhost
@@ -75,6 +91,7 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
             var input = Console.ReadLine();
             if (!string.IsNullOrWhiteSpace(input))
             {
+                needsNewline = false;
                 try
                 {
                     var message = new ContentMessage(
@@ -120,23 +137,9 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                     requestBody = await reader.ReadToEndAsync();
                 }
 
-                AnsiConsole.WriteLine();
-
-                // Try to deserialize the request so we can render it nicely in the console using YAML
-                if (DictionaryConverter.Parse(requestBody) is { } dictionary &&
-                    DictionaryConverter.ToYaml(dictionary) is { Length: > 0 } payload)
-                {
-                    AnsiConsole.Write(new Panel(payload)
-                    {
-                        Width = Math.Min(100, AnsiConsole.Profile.Width)
-                    });
-                }
-                else
-                {
-                    AnsiConsole.Write(new Panel(new JsonText(requestBody)));
-                }
-
+                await RenderAsync(requestBody);
                 AnsiConsole.Markup($":person_beard: ");
+                needsNewline = true;
 
                 var buffer = Encoding.UTF8.GetBytes("OK");
                 response.ContentLength64 = buffer.Length;
@@ -152,5 +155,60 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                 context.Response.Close();
             }
         }
+    }
+
+    async Task RenderAsync(string json)
+    {
+        if (needsNewline)
+            AnsiConsole.WriteLine();
+
+        // Try to parse the request body as a dictionary and render it as YAML
+        if (mode == RenderMode.Yaml &&
+            DictionaryConverter.Parse(json) is { } dictionary &&
+            DictionaryConverter.ToYaml(dictionary) is { Length: > 0 } payload)
+        {
+            AnsiConsole.Write(new Panel(payload)
+            {
+                Width = Math.Min(100, AnsiConsole.Profile.Width)
+            });
+            return;
+        }
+
+        if (mode == RenderMode.Text)
+        {
+            try
+            {
+                // Move discriminator to top.
+                json = await JQ.ExecuteAsync(json, "{ \"$type\": .type } + .");
+
+                if (JsonSerializer.Deserialize(json, ClientContext.Default.ClientMessage) is { } message &&
+                    message.ToString() is { } text)
+                {
+                    AnsiConsole.Write(new Panel(Markup.FromInterpolated($":robot: {text}"))
+                    {
+                        Border = BoxBorder.None,
+                        Width = Math.Min(100, AnsiConsole.Profile.Width),
+                        Padding = new(0, 0, 0, 0)
+                    });
+                    if (message is Client.InteractiveMessage interactive && interactive.Interactive.Action is { } node)
+                    {
+                        AnsiConsole.Write(new Panel(DictionaryConverter.Parse(node.ToString()).ToYaml(true))
+                        {
+                            Width = Math.Min(60, AnsiConsole.Profile.Width)
+                        });
+                    }
+                    return;
+                }
+            }
+            catch (JsonException e)
+            {
+                AnsiConsole.MarkupLineInterpolated($"[grey]{e.Message}[/]");
+            }
+        }
+
+        AnsiConsole.Write(new Panel(new JsonText(json))
+        {
+            Width = Math.Min(100, AnsiConsole.Profile.Width)
+        });
     }
 }
