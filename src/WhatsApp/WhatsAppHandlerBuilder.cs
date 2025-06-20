@@ -34,7 +34,12 @@ public class WhatsAppHandlerBuilder
         // If we can get the IWhatsApp at all, we wrap the target handler in the 
         // sender one, which will process responses and send them out to WhatsApp.
         if (services.GetService<IWhatsAppClient>() is { } client)
+        {
             handler = new SendResponsesHandler(handler, client);
+            // We also need to make sure we send messages added across the pipeline
+            // So we also place ourselves as the outermost handler.
+            (factories ??= []).Insert(0, (inner, _) => new SendResponsesHandler(inner, client));
+        }
 
         // Matches behavior of M.E.AI chat client builder
         // Apply the factories in reverse order, so that the first factory added is the outermost.

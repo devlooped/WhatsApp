@@ -19,7 +19,11 @@ class SendResponsesHandler : DelegatingWhatsAppHandler
     {
         await foreach (var response in InnerHandler.HandleAsync(messages, cancellation))
         {
-            yield return await response.SendAsync(client, cancellation);
+            // Only sent unsent messages.
+            if (string.IsNullOrEmpty(response.Id) && response.Timestamp == 0)
+                yield return await response.SendAsync(client, cancellation);
+            else
+                yield return response;
         }
     }
 }

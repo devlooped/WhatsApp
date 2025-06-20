@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -205,6 +206,64 @@ public class PipelineTests(ITestOutputHelper output)
         Assert.IsAssignableFrom<ContentMessage>(messages[1][0]);
         Assert.IsAssignableFrom<Response>(messages[1][1]);
         Assert.IsAssignableFrom<ContentMessage>(messages[1][2]);
+    }
+
+    [Fact]
+    public async Task CanSendMessagesThroughPipeline()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>()
+            {
+                { "Meta:VerifyToken", "test-challenge" },
+                { "Meta:Numbers:1234", "test-access-token" }
+            })
+            .Build();
+
+        var handler = new Mock<IWhatsAppHandler>();
+        handler.Setup(x => x.HandleAsync(It.IsAny<IEnumerable<IMessage>>(), It.IsAny<CancellationToken>()))
+            .Returns((IEnumerable<IMessage> input, CancellationToken _) =>
+            {
+                // Timestamp in WhatsApp is in Unix seconds, so we need to simulate a delay
+                Thread.Sleep(1000);
+                var message = input.OfType<ContentMessage>().Last();
+                return AsyncEnum<Response>([message.Reply(message.Content.ToString() + " Reply")]);
+            });
+
+        var services = new ServiceCollection()
+            .AddSingleton<IConfiguration>(configuration);
+
+        var sent = 0;
+
+        // Override default IWhatsAppClient to prevent any actual sending
+        var client = new Mock<IWhatsAppClient>();
+        client.Setup(x => x.SendAsync(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+              .Callback(() => sent++)
+              .ReturnsAsync(Ulid.NewUlid().ToString());
+
+        services.AddSingleton<IWhatsAppClient>(client.Object);
+
+        services.AddWhatsApp(handler.Object)
+            .Use(EchoAndHandle);
+
+        var pipeline = services.BuildServiceProvider().GetRequiredService<IWhatsAppHandler>();
+        await pipeline.HandleAsync(Text("Hello"));
+
+        // One from the echo, one from the actualy reply.
+        Assert.Equal(2, sent);
+
+        await pipeline.HandleAsync(Text("Again"));
+
+        Assert.Equal(4, sent);
+    }
+
+    static async IAsyncEnumerable<Response> EchoAndHandle(IEnumerable<IMessage> messages, IWhatsAppHandler inner, [EnumeratorCancellation] CancellationToken cancellation)
+    {
+        var content = messages.OfType<ContentMessage>().LastOrDefault();
+        if (content != null)
+            yield return content.Reply("Echo: " + content.Content.ToString());
+
+        await foreach (var response in inner.HandleAsync(messages, cancellation))
+            yield return response;
     }
 
     ContentMessage Text(string text) => new ContentMessage(
