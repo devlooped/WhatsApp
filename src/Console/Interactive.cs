@@ -16,9 +16,9 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
 {
     readonly CancellationTokenSource cts = new();
 
-    string? service = configuration["WhatsApp:Endpoint"];
-    string? number = configuration["WhatsApp:Number"];
-    OutputFormat? format = Enum.TryParse<OutputFormat>(configuration["WhatsApp:Format"], true, out var value) ? value : null;
+    string? service = configuration["whatsapp:endpoint"];
+    string? number = configuration["whatsapp:number"];
+    OutputFormat? format = Enum.TryParse<OutputFormat>(configuration["whatsApp:format"], true, out var value) ? value : null;
     string? clientEndpoint;
     HttpListener? listener;
     bool needsNewline = true;
