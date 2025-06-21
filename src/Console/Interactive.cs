@@ -110,6 +110,9 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                     {
                         AnsiConsole.MarkupLine($"[red] Failed to send message.[/] [bold]Status Code:[/] {response.StatusCode}");
                     }
+
+                    AnsiConsole.Markup($":person_beard: ");
+                    needsNewline = true;
                 }
                 catch (Exception e)
                 {
@@ -138,8 +141,6 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                 }
 
                 await RenderAsync(requestBody);
-                AnsiConsole.Markup($":person_beard: ");
-                needsNewline = true;
 
                 var buffer = Encoding.UTF8.GetBytes("OK");
                 response.ContentLength64 = buffer.Length;
@@ -184,6 +185,10 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                 if (JsonSerializer.Deserialize(json, ClientContext.Default.ClientMessage) is { } message &&
                     message.ToString() is { } text)
                 {
+                    // Don't render empty reaction since it's the clearing of the emoji actually in WhatsApp
+                    if (message.Type == Client.MessageType.Reaction && text.Length == 0)
+                        return;
+
                     AnsiConsole.Write(new Panel(Markup.FromInterpolated($":robot: {text}"))
                     {
                         Border = BoxBorder.None,
