@@ -11,44 +11,43 @@ using Spectre.Console.Json;
 
 namespace Devlooped.WhatsApp;
 
-enum RenderMode
-{
-    Yaml,
-    Json,
-    Text,
-}
-
 [Service]
 class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) : IHostedService
 {
     readonly CancellationTokenSource cts = new();
 
-    string? serviceEndpoint = configuration["WhatsApp:Endpoint"];
+    string? service = configuration["WhatsApp:Endpoint"];
+    string? number = configuration["WhatsApp:Number"];
+    OutputFormat? format = Enum.TryParse<OutputFormat>(configuration["WhatsApp:Format"], true, out var value) ? value : null;
     string? clientEndpoint;
     HttpListener? listener;
-    RenderMode mode = RenderMode.Text;
     bool needsNewline = true;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(serviceEndpoint))
+        if (string.IsNullOrEmpty(service))
         {
-            serviceEndpoint = AnsiConsole.Ask("Enter WhatsApp functions endpoint", "http://localhost:4242/whatsappcli");
+            service = AnsiConsole.Ask("Enter WhatsApp functions endpoint", "http://localhost:4242/whatsappcli");
             Config.Build(ConfigLevel.Global)
-                .SetString("WhatsApp", "Endpoint", serviceEndpoint);
+                .SetString("whatsapp", "endpoint", service);
         }
-        else if (!AnsiConsole.Confirm($"Use WhatsApp functions endpoint [link]{serviceEndpoint}[/]"))
+        if (format == null)
         {
-            serviceEndpoint = AnsiConsole.Ask("Enter WhatsApp functions endpoint", "http://localhost:4242/whatsappcli");
-            Config.Build(ConfigLevel.Global)
-                .SetString("WhatsApp", "Endpoint", serviceEndpoint);
-        }
+            var choices = Enum.GetValues<MessageType>();
+            format = AnsiConsole.Prompt(
+                new SelectionPrompt<OutputFormat>()
+                    .Title("Select output format")
+                    .AddChoices([OutputFormat.Text, OutputFormat.Yaml, OutputFormat.Json]));
 
-        var choices = Enum.GetValues<MessageType>();
-        mode = AnsiConsole.Prompt(
-            new SelectionPrompt<RenderMode>()
-                .Title("Select render mode")
-                .AddChoices([RenderMode.Text, RenderMode.Yaml, RenderMode.Json]));
+            Config.Build(ConfigLevel.Global)
+                .SetString("whatsapp", "format", format.ToString()!.ToLowerInvariant());
+        }
+        if (number == null)
+        {
+            number = AnsiConsole.Ask<long>("Enter WhatsApp user phone number", 987654321).ToString();
+            Config.Build(ConfigLevel.Global)
+                .SetString("whatsapp", "number", number);
+        }
 
         listener = new HttpListener();
         // Attempt to grab the first free port we can find on localhost
@@ -97,7 +96,7 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                     var message = new ContentMessage(
                         Id: Ulid.NewUlid().ToString(),
                         Service: new Service(clientEndpoint!, "123456789"),
-                        User: new User("Console", "987654321"),
+                        User: new User("Console", number ?? "987654321"),
                         Timestamp: DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
                         Content: new TextContent(input)
                     );
@@ -105,7 +104,7 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                     using var httpClient = httpFactory.CreateClient("whatsapp");
                     var payload = JsonSerializer.Serialize(message, JsonContext.Default.Message);
 
-                    var response = await httpClient.PostAsync(serviceEndpoint, new StringContent(payload, Encoding.UTF8, "application/json"));
+                    var response = await httpClient.PostAsync(service, new StringContent(payload, Encoding.UTF8, "application/json"));
                     if (!response.IsSuccessStatusCode)
                     {
                         AnsiConsole.MarkupLine($"[red] Failed to send message.[/] [bold]Status Code:[/] {response.StatusCode}");
@@ -164,7 +163,7 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
             AnsiConsole.WriteLine();
 
         // Try to parse the request body as a dictionary and render it as YAML
-        if (mode == RenderMode.Yaml &&
+        if (format == OutputFormat.Yaml &&
             DictionaryConverter.Parse(json) is { } dictionary &&
             DictionaryConverter.ToYaml(dictionary) is { Length: > 0 } payload)
         {
@@ -175,7 +174,7 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
             return;
         }
 
-        if (mode == RenderMode.Text)
+        if (format == OutputFormat.Text)
         {
             try
             {
