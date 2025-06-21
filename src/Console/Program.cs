@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 // Some users reported not getting emoji on Windows, so we force UTF-8 encoding.
 // This not great, but I couldn't find a better way to do it.
@@ -21,6 +22,7 @@ if (args.Contains("--debug"))
 }
 
 var host = Host.CreateApplicationBuilder(args);
+host.Logging.ClearProviders();
 
 host.Configuration.AddInMemoryCollection(new Dictionary<string, string?>()
 {
