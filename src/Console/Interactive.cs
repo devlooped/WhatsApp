@@ -187,8 +187,9 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                     AnsiConsole.Write(new Panel(Markup.FromInterpolated($":robot: {text}"))
                     {
                         Border = BoxBorder.None,
-                        Width = Math.Min(100, AnsiConsole.Profile.Width),
-                        Padding = new(0, 0, 0, 0)
+                        Expand = false,
+                        Padding = new(0, 0, 0, 0),
+                        Width = Math.Min(80, AnsiConsole.Profile.Width),
                     });
                     if (message is Client.InteractiveMessage interactive && interactive.Interactive.Action is { } node)
                     {
