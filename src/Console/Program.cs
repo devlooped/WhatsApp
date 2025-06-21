@@ -17,7 +17,6 @@ if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 var debug = false;
 var help = false;
 var version = false;
-var url = default(string);
 
 var options = new ConsoleOption
 {
@@ -39,11 +38,11 @@ if (help)
     return 0;
 }
 
-if (url != null || options.Number != null || options.Format != null)
+if (options.Endpoint != null || options.Number != null || options.Format != null)
 {
     var config = Config.Build(ConfigLevel.Global);
-    if (url != null)
-        config = config.SetString("whatsapp", "endpoint", url);
+    if (options.Endpoint != null)
+        config = config.SetString("whatsapp", "endpoint", options.Endpoint);
     if (options.Number != null)
         config = config.SetNumber("whatsapp", "number", (long)options.Number);
     if (options.Format != null)
