@@ -333,7 +333,21 @@ in production, the CLI endpoint is not available. Example:
 
 ![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/cli.png)
 
-The console will automatically remember the last used WhatsApp endpoint, and uses YAML if possible 
+The console will automatically remember the last used WhatsApp endpoint, output format and simulated 
+user phone number.
+
+```bash
+Usage: whatsapp [OPTIONS]+
+Options:
+  -u, --url                  WhatsApp functions endpoint
+  -n, --number=VALUE         Your WhatsApp user phone number
+  -j, --json                 Format output as JSON
+  -t, --text                 Format output as text
+  -y, --yaml                 Format output as YAML
+  -?, -h, --help             Display this help.
+  -v, --version              Render tool version and updates.
+```
+
 to render the responses since it provides a more readable format than JSON.
 
 <!-- #cli -->
