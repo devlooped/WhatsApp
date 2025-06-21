@@ -189,13 +189,16 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                     if (message.Type == Client.MessageType.Reaction && text.Length == 0)
                         return;
 
-                    AnsiConsole.Write(new Panel(Markup.FromInterpolated($":robot: {text}"))
-                    {
-                        Border = BoxBorder.None,
-                        Expand = false,
-                        Padding = new(0, 0, 0, 0),
-                        Width = Math.Min(80, AnsiConsole.Profile.Width),
-                    });
+                    var grid = new Grid()
+                        .AddColumn(new GridColumn().Width(2))
+                        .AddColumn(new GridColumn().Width(80))
+                        .AddRow(
+                            new Markup(":robot:"),
+                            new Spectre.Console.Text(text).Overflow(Overflow.Fold)
+                        );
+
+                    AnsiConsole.Write(grid);
+
                     if (message is Client.InteractiveMessage interactive && interactive.Interactive.Action is { } node)
                     {
                         AnsiConsole.Write(new Panel(DictionaryConverter.Parse(node.ToString()).ToYaml(true))
