@@ -50,6 +50,7 @@ public class AzureFunctionsConsole(
         // Try to deserialize the message sent by the console
         if (JsonSerializer.Deserialize(json, JsonContext.Default.Message) is Message message)
         {
+            message.FromConsole = true;
             // Await all responses
             // No action needed, just make sure all items are processed
             await handler.HandleAsync([message]).ToArrayAsync();
