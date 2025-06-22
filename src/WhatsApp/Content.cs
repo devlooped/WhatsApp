@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.AI;
 
 namespace Devlooped.WhatsApp;
 
@@ -18,6 +19,7 @@ namespace Devlooped.WhatsApp;
 public abstract record Content
 {
     /// <summary>Gets or sets any additional properties associated with the content.</summary>
+    [JsonConverter(typeof(AdditionalPropertiesDictionaryConverter))]
     public AdditionalPropertiesDictionary? AdditionalProperties { get; set; }
 
     /// <summary>

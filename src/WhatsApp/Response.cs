@@ -1,4 +1,7 @@
-﻿namespace Devlooped.WhatsApp;
+﻿using System.Text.Json.Serialization;
+using Microsoft.Extensions.AI;
+
+namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// Represents a response message or command that can be sent using a WhatsApp client.
@@ -14,6 +17,7 @@
 public abstract partial record Response(string UserNumber, string ServiceId, string Context, string? ConversationId) : IMessage
 {
     /// <inheritdoc/>
+    [JsonConverter(typeof(AdditionalPropertiesDictionaryConverter))]
     public AdditionalPropertiesDictionary? AdditionalProperties { get; set; }
 
     /// <inheritdoc/>

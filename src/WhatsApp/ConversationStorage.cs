@@ -33,7 +33,6 @@ class ConversationStorage : IConversationStorage
     /// <inheritdoc/>
     public async Task SaveAsync(IMessage message, CancellationToken cancellationToken = default)
     {
-        var data = defaultSerializer.Serialize(message);
         if (!string.IsNullOrEmpty(message.ConversationId))
         {
             var conversation = await conversationsRepository.Value.GetAsync(message.UserNumber, message.ConversationId, cancellationToken) ??

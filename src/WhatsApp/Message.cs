@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.AI;
 
 namespace Devlooped.WhatsApp;
 
@@ -20,6 +21,7 @@ namespace Devlooped.WhatsApp;
 public abstract partial record Message(string Id, Service Service, User User, long Timestamp) : IMessage
 {
     /// <inheritdoc/>
+    [JsonConverter(typeof(AdditionalPropertiesDictionaryConverter))]
     public AdditionalPropertiesDictionary? AdditionalProperties { get; set; }
 
     /// <summary>

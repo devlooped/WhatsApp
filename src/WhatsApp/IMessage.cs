@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Microsoft.Extensions.AI;
 
 namespace Devlooped.WhatsApp;
 
@@ -22,6 +23,7 @@ namespace Devlooped.WhatsApp;
 public interface IMessage
 {
     /// <summary>Gets or sets any additional properties associated with the message.</summary>
+    [JsonConverter(typeof(AdditionalPropertiesDictionaryConverter))]
     AdditionalPropertiesDictionary? AdditionalProperties { get; set; }
 
     /// <summary>
