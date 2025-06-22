@@ -6,6 +6,7 @@
     <Description>WhatsApp agents for Azure Functions</Description>
     <PackageId>Devlooped.WhatsApp</PackageId>
     <PackContent>false</PackContent>
+    <LangVersion>Preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

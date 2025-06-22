@@ -7,6 +7,15 @@ namespace Devlooped.WhatsApp;
 /// </summary>
 public static partial class MessageExtensions
 {
+    extension(IMessage message)
+    {
+        public bool FromConsole
+        {
+            get => (message.AdditionalProperties ??= []).TryGetValue("FromConsole", out var value) ? value as bool? ?? default : default;
+            set => (message.AdditionalProperties ??= [])["FromConsole"] = value;
+        }
+    }
+
     /// <summary>
     /// Creates a reaction response for the user message.
     /// </summary>
