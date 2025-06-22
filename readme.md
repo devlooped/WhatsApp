@@ -366,6 +366,12 @@ The versioning scheme for packages is:
 - PR builds: *42.42.42-pr*`[NUMBER]`
 - Branch builds: *42.42.42-*`[BRANCH]`.`[COMMITS]`
 
+To install or update the CLI from the main branch:
+
+```bash
+dotnet tool update -g dotnet-whatsapp --add-source https://pkg.kzu.app/index.json --prerelease
+```
+
 <!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
 # Sponsors 
 
