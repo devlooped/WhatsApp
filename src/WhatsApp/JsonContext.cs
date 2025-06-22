@@ -3,6 +3,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using Microsoft.Extensions.AI;
 
 namespace Devlooped.WhatsApp;
 
@@ -38,6 +39,7 @@ namespace Devlooped.WhatsApp;
 [JsonSerializable(typeof(UnsupportedMessage))]
 [JsonSerializable(typeof(MediaReference))]
 [JsonSerializable(typeof(Conversation))]
+[JsonSerializable(typeof(AdditionalPropertiesDictionary))]
 public partial class JsonContext : JsonSerializerContext
 {
     static readonly Lazy<JsonSerializerOptions> options = new(() => CreateDefaultOptions());
