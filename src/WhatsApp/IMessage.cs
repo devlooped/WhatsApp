@@ -21,6 +21,9 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(ReactionResponse), "response/reaction")]
 public interface IMessage
 {
+    /// <summary>Gets or sets any additional properties associated with the message.</summary>
+    AdditionalPropertiesDictionary? AdditionalProperties { get; set; }
+
     /// <summary>
     /// Gets the message id.
     /// </summary>

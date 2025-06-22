@@ -19,6 +19,9 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(UnsupportedMessage), "unsupported")]
 public abstract partial record Message(string Id, Service Service, User User, long Timestamp) : IMessage
 {
+    /// <inheritdoc/>
+    public AdditionalPropertiesDictionary? AdditionalProperties { get; set; }
+
     /// <summary>
     /// Optional related message identifier, such as message being replied 
     /// or reacted to, or a status message refers to, or the interactive 

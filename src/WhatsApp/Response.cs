@@ -14,6 +14,9 @@
 public abstract partial record Response(string UserNumber, string ServiceId, string Context, string? ConversationId) : IMessage
 {
     /// <inheritdoc/>
+    public AdditionalPropertiesDictionary? AdditionalProperties { get; set; }
+
+    /// <inheritdoc/>
     public string Id { get; init; } = string.Empty;
 
     /// <inheritdoc/>
