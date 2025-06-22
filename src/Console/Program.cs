@@ -56,14 +56,7 @@ host.Configuration.AddDotNetConfig();
 host.Configuration.AddUserSecrets<Program>();
 
 var http = host.Services.AddHttpClient("whatsapp");
-if (Debugger.IsAttached)
-{
-    http.ConfigureHttpClient(http => http.Timeout = TimeSpan.FromHours(1));
-}
-else
-{
-    http.AddStandardResilienceHandler();
-}
+http.ConfigureHttpClient(http => http.Timeout = TimeSpan.FromMinutes(30));
 
 var cts = new CancellationTokenSource();
 Console.CancelKeyPress += (s, e) => cts.Cancel();

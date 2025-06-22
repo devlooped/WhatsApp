@@ -109,13 +109,15 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                     {
                         AnsiConsole.MarkupLine($"[red] Failed to send message.[/] [bold]Status Code:[/] {response.StatusCode}");
                     }
-
-                    AnsiConsole.Markup($":person_beard: ");
-                    needsNewline = true;
                 }
                 catch (Exception e)
                 {
                     AnsiConsole.WriteException(e);
+                }
+                finally
+                {
+                    AnsiConsole.Markup($":person_beard: ");
+                    needsNewline = true;
                 }
             }
         }
@@ -126,12 +128,11 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
         while (!cts.IsCancellationRequested)
         {
             var context = await listener!.GetContextAsync();
+            var request = context.Request;
+            var response = context.Response;
 
             try
             {
-                var request = context.Request;
-                var response = context.Response;
-
                 // Read the request body (if any)
                 var requestBody = "{}";
                 using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
@@ -140,19 +141,21 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                 }
 
                 await RenderAsync(requestBody);
-
-                var buffer = Encoding.UTF8.GetBytes("OK");
-                response.ContentLength64 = buffer.Length;
-                response.ContentType = "text/plain";
-
-                await response.OutputStream.WriteAsync(buffer);
-                response.OutputStream.Close();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error processing request: {ex.Message}");
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.Close();
+            }
+            finally
+            {
+                var buffer = Encoding.UTF8.GetBytes("OK");
+                response.ContentLength64 = buffer.Length;
+                response.ContentType = "text/plain";
+
+                await response.OutputStream.WriteAsync(buffer);
+                response.OutputStream.Close();
             }
         }
     }
