@@ -37,6 +37,7 @@ namespace Devlooped.WhatsApp;
 [JsonSerializable(typeof(StatusMessage))]
 [JsonSerializable(typeof(UnsupportedMessage))]
 [JsonSerializable(typeof(MediaReference))]
+[JsonSerializable(typeof(Conversation))]
 public partial class JsonContext : JsonSerializerContext
 {
     static readonly Lazy<JsonSerializerOptions> options = new(() => CreateDefaultOptions());

@@ -4,6 +4,7 @@ namespace Devlooped.WhatsApp;
 
 class ConversationStorage : IConversationStorage
 {
+    static readonly DocumentSerializer defaultSerializer = new DocumentSerializer(JsonContext.DefaultOptions);
     readonly CloudStorageAccount storage;
     readonly Lazy<IDocumentRepository<IMessage>> messagesRepository;
     readonly Lazy<ITableStorage<Conversation>> conversationsRepository;
@@ -18,19 +19,21 @@ class ConversationStorage : IConversationStorage
     }
 
     protected virtual IDocumentRepository<IMessage> CreateMessagesRepository()
-        => DocumentRepository.Create<IMessage>(storage, "WhatsAppMessages", x => x.UserNumber, x => x.Id);
+        => DocumentRepository.Create<IMessage>(storage, "WhatsAppMessages", x => x.UserNumber, x => x.Id, defaultSerializer);
 
     protected virtual ITableStorage<Conversation> CreateConversationsRepository()
-        => BlobStorage.Create<Conversation>(storage, "whatsapp-conversations");
+        => BlobStorage.Create<Conversation>(storage, "whatsapp-conversations",
+            serializer: defaultSerializer);
 
     protected virtual IDocumentRepository<Conversation> CreateActiveConversationRepository()
         // We only have one active conversation by number. We can use the same table name since no conversation
         // will ever have the ID 'active'
-        => DocumentRepository.Create<Conversation>(storage, rowKey: _ => "active");
+        => DocumentRepository.Create<Conversation>(storage, rowKey: _ => "active", serializer: defaultSerializer);
 
     /// <inheritdoc/>
     public async Task SaveAsync(IMessage message, CancellationToken cancellationToken = default)
     {
+        var data = defaultSerializer.Serialize(message);
         if (!string.IsNullOrEmpty(message.ConversationId))
         {
             var conversation = await conversationsRepository.Value.GetAsync(message.UserNumber, message.ConversationId, cancellationToken) ??

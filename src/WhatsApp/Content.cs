@@ -17,6 +17,9 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(UnknownContent), "unknown")]
 public abstract record Content
 {
+    /// <summary>Gets or sets any additional properties associated with the content.</summary>
+    public AdditionalPropertiesDictionary? AdditionalProperties { get; set; }
+
     /// <summary>
     /// Get the type of content.
     /// </summary>
