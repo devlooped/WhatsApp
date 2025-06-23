@@ -1,5 +1,4 @@
 ﻿using Azure.Data.Tables;
-using Azure.Storage.Queues;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -237,23 +236,6 @@ public static class WhatsAppServiceCollectionExtensions
         if (services.FirstOrDefault(x => x.ServiceType == typeof(IWhatsAppClient)) == null)
             services.Add(new ServiceDescriptor(typeof(IWhatsAppClient), typeof(WhatsAppClient), lifetime));
 
-        if (services.FirstOrDefault(x => x.ServiceType == typeof(QueueServiceClient)) == null)
-        {
-            services.AddSingleton(services => new QueueServiceClient(
-                services.GetRequiredService<IConfiguration>()["AzureWebJobsStorage"]!,
-                new QueueClientOptions
-                {
-#if DEBUG
-                    Diagnostics =
-                    {
-                        IsLoggingEnabled = true,
-                        IsLoggingContentEnabled = true,
-                    },
-#endif
-                    MessageEncoding = QueueMessageEncoding.Base64
-                }));
-        }
-
         if (services.FirstOrDefault(x => x.ServiceType == typeof(TableServiceClient)) == null)
         {
             services.AddSingleton(services => new TableServiceClient(
@@ -287,6 +269,10 @@ public static class WhatsAppServiceCollectionExtensions
             options.Configure(configure);
 
         services.Add(new ServiceDescriptor(typeof(IWhatsAppHandler), builder.Build, lifetime));
+
+        // By default we use the queue processor, but it's idempotent if 
+        // called subsequently
+        builder.UseQueueProcessor(true);
 
         return builder;
     }

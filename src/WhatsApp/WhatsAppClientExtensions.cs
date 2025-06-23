@@ -18,7 +18,7 @@ public static partial class WhatsAppClientExtensions
         => client.CreateHttp(message.Service.Id);
 
     /// <summary>
-    /// Marks the message as read. Happens automatically when the <see cref="AzureFunctions.Message(Microsoft.AspNetCore.Http.HttpRequest)"/> 
+    /// Marks the message as read. Happens automatically when the <see cref="AzureFunctionsWebhook.Message(Microsoft.AspNetCore.Http.HttpRequest)"/> 
     /// webhook endpoint is invoked with a message.
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
@@ -28,7 +28,7 @@ public static partial class WhatsAppClientExtensions
         => MarkReadAsync(client, message.Service.Id, message.Id, cancellation);
 
     /// <summary>
-    /// Marks the message as read. Happens automatically when the <see cref="AzureFunctions.Message(Microsoft.AspNetCore.Http.HttpRequest)"/> 
+    /// Marks the message as read. Happens automatically when the <see cref="AzureFunctionsWebhook.Message(Microsoft.AspNetCore.Http.HttpRequest)"/> 
     /// webhook endpoint is invoked with a message.
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
