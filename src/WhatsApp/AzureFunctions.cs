@@ -39,6 +39,10 @@ public class AzureFunctions(
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
         {
+            if (functionOptions.ReadOnMessage is true && message.Type == MessageType.Content)
+                // Ignored since this can be an old, deleted message, for example
+                await whatsapp.MarkReadAsync(message.Service.Id, message.Id).Ignore();
+
             // Ensure idempotent processing
             var table = tableClient.GetTableClient("WhatsAppWebhook");
             await table.CreateIfNotExistsAsync();
@@ -48,18 +52,8 @@ public class AzureFunctions(
                 return new OkResult();
             }
 
-            if (functionOptions.ReactOnMessage != null &&
-                message.Type == MessageType.Content)
-            {
-                try
-                {
-                    await message.React(functionOptions.ReactOnMessage).SendAsync(whatsapp);
-                }
-                catch (Exception e)
-                {
-                    logger.LogWarning("Failed to react to message on received: {Id}\r\n{Payload}", message.Id, e.Message);
-                }
-            }
+            if (functionOptions.ReactOnMessage != null && message.Type == MessageType.Content)
+                await message.React(functionOptions.ReactOnMessage).SendAsync(whatsapp).Ignore();
 
             // Otherwise, queue the new message
             var queue = queueClient.GetQueueClient("whatsappwebhook");
@@ -81,6 +75,10 @@ public class AzureFunctions(
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
         {
+            if (functionOptions.ReadOnProcess is true && message.Type == MessageType.Content)
+                // Ignored since this can be an old, deleted message, for example
+                await whatsapp.MarkReadAsync(message.Service.Id, message.Id).Ignore();
+
             // Ensure idempotent processing at dequeue time, since we might have been called 
             // multiple times for the same message by WhatsApp (Message method) while processing was still 
             // happening (and therefore we didn't save the entity yet).
@@ -90,37 +88,6 @@ public class AzureFunctions(
             {
                 logger.LogInformation("Skipping already handled message {Id}", message.Id);
                 return;
-            }
-
-            if (message.Type == MessageType.Content)
-            {
-                if (functionOptions.ReactOnProcess != null)
-                {
-                    try
-                    {
-                        await message.React(functionOptions.ReactOnProcess).SendAsync(whatsapp);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.LogWarning("Failed to react to message on process: {Id}\r\n{Payload}", message.Id, e.Message);
-                    }
-                }
-
-                // We only mark messages read in production, since in development this makes things 
-                // much harder to debug as WhatsApp will notify deliver of these messages too!
-                if (environment.IsProduction())
-                {
-                    try
-                    {
-                        // Best-effort to mark as read. This might be an old message callback, 
-                        // or the message might have been deleted.
-                        await whatsapp.MarkReadAsync(message.Service.Id, message.Id);
-                    }
-                    catch (HttpRequestException e)
-                    {
-                        logger.LogWarning("Failed to mark message as read: {Id}\r\n{Payload}", message.Id, e.Message);
-                    }
-                }
             }
 
             // Await all responses

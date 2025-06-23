@@ -20,6 +20,7 @@ public class AzureFunctionsConsole(
     [Function("whatsapp_console")]
     public async Task<IActionResult> MessageConsole([HttpTrigger(AuthorizationLevel.Anonymous, ["post", "get"], Route = "whatsappcli")] HttpRequest req)
     {
+
         // This endpoint is only available in development environments, since it allows sending messages from the debug console.
         if (environment.IsProduction())
             return new UnauthorizedResult();
