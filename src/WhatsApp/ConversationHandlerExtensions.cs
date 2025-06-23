@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Devlooped.WhatsApp;
 
@@ -24,7 +25,9 @@ public static class ConversationHandlerExtensions
                 => new ConversationStorage(services.GetRequiredService<CloudStorageAccount>()));
         }
 
-        return builder.Use((inner, services) => new ConversationHandler(inner, services.GetRequiredService<IConversationStorage>())
+        return builder.Use((inner, services) => new ConversationHandler(inner,
+            services.GetRequiredService<IConversationStorage>(),
+            services.GetRequiredService<IOptions<WhatsAppOptions>>())
         {
             ConversationWindowSeconds = conversationWindowSeconds
         });

@@ -23,10 +23,13 @@ public class AzureFunctions(
     TableServiceClient tableClient,
     IWhatsAppClient whatsapp,
     IWhatsAppHandler handler,
-    IOptions<MetaOptions> options,
+    IOptions<MetaOptions> metaOptions,
+    IOptions<WhatsAppOptions> functionOptions,
     ILogger<AzureFunctions> logger,
     IHostEnvironment environment)
 {
+    readonly WhatsAppOptions functionOptions = functionOptions.Value;
+
     [Function("whatsapp_message")]
     public async Task<IActionResult> Message([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp")] HttpRequest req)
     {
@@ -43,6 +46,19 @@ public class AzureFunctions(
             {
                 logger.LogInformation("Skipping already handled message {Id}", message.Id);
                 return new OkResult();
+            }
+
+            if (functionOptions.ReactOnMessage != null &&
+                message.Type == MessageType.Content)
+            {
+                try
+                {
+                    await message.React(functionOptions.ReactOnMessage).SendAsync(whatsapp);
+                }
+                catch (Exception e)
+                {
+                    logger.LogWarning("Failed to react to message on received: {Id}\r\n{Payload}", message.Id, e.Message);
+                }
             }
 
             // Otherwise, queue the new message
@@ -76,23 +92,37 @@ public class AzureFunctions(
                 return;
             }
 
-            // We only mark messages read in production, since in development this makes things 
-            // much harder to debug as WhatsApp will notify deliver of these messages too!
-            if (environment.IsProduction() &&
-                (message.Type == MessageType.Content || message.Type == MessageType.Interactive))
+            if (message.Type == MessageType.Content)
             {
-                // Mark read these two types of messages we want to explicitly acknowledge from users.
-                try
+                if (functionOptions.ReactOnProcess != null)
                 {
-                    // Best-effort to mark as read. This might be an old message callback, 
-                    // or the message might have been deleted.
-                    await whatsapp.MarkReadAsync(message.Service.Id, message.Id);
+                    try
+                    {
+                        await message.React(functionOptions.ReactOnProcess).SendAsync(whatsapp);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogWarning("Failed to react to message on process: {Id}\r\n{Payload}", message.Id, e.Message);
+                    }
                 }
-                catch (HttpRequestException e)
+
+                // We only mark messages read in production, since in development this makes things 
+                // much harder to debug as WhatsApp will notify deliver of these messages too!
+                if (environment.IsProduction())
                 {
-                    logger.LogWarning("Failed to mark message as read: {Id}\r\n{Payload}", message.Id, e.Message);
+                    try
+                    {
+                        // Best-effort to mark as read. This might be an old message callback, 
+                        // or the message might have been deleted.
+                        await whatsapp.MarkReadAsync(message.Service.Id, message.Id);
+                    }
+                    catch (HttpRequestException e)
+                    {
+                        logger.LogWarning("Failed to mark message as read: {Id}\r\n{Payload}", message.Id, e.Message);
+                    }
                 }
             }
+
             // Await all responses
             // No action needed, just make sure all items are processed
             await handler.HandleAsync([message]).ToArrayAsync();
@@ -110,7 +140,7 @@ public class AzureFunctions(
     public IActionResult Register([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "whatsapp")] HttpRequest req)
     {
         if (req.Query.TryGetValue("hub.mode", out var mode) && mode == "subscribe" &&
-            req.Query.TryGetValue("hub.verify_token", out var token) && token == options.Value.VerifyToken &&
+            req.Query.TryGetValue("hub.verify_token", out var token) && token == metaOptions.Value.VerifyToken &&
             req.Query.TryGetValue("hub.challenge", out var values) &&
             values.ToString() is { } challenge)
         {

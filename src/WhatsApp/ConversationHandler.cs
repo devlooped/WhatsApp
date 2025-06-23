@@ -1,10 +1,13 @@
 ﻿using System.Runtime.CompilerServices;
+using Microsoft.Extensions.Options;
 
 namespace Devlooped.WhatsApp;
 
 
-class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage) : DelegatingWhatsAppHandler(inner)
+class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, IOptions<WhatsAppOptions> options) : DelegatingWhatsAppHandler(inner)
 {
+    readonly WhatsAppOptions options = options.Value;
+
     /// <summary>
     /// Configures the time window to consider for conversation messages. 
     /// Messages sent within this time frame will be grouped together as part of the same conversation.
@@ -14,6 +17,9 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage) 
     public override async IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         var conversation = new List<IMessage>();
+
+        if (options.ReactOnConversation != null && messages.LastOrDefault() is ContentMessage content)
+            yield return content.React(options.ReactOnConversation);
 
         foreach (var message in messages)
         {

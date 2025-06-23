@@ -42,7 +42,13 @@ builder.Services.AddSingleton(services => builder.Environment.IsDevelopment() ?
     CloudStorageAccount.Parse(builder.Configuration["AzureWebJobsStorage"]));
 
 builder.Services
-    .AddWhatsApp<ProcessHandler>()
+    .AddWhatsApp<ProcessHandler>(configure: options =>
+    {
+        options.ReactOnMessage = "🌐";
+        options.ReactOnProcess = "⚙️";
+        options.ReactOnConversation = "💭";
+    })
+    .UseIgnore()
     // Matches what we use in ConfigureOpenTelemetry
     .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging()

@@ -233,11 +233,11 @@ You could easily create a custom component that filters out these messages:
 static class IgnoreMessagesExtensions
 {
     public static WhatsAppHandlerBuilder UseIgnore(this WhatsAppHandlerBuilder builder)
-        => Throw.IfNull(builder).Use((inner, services) => new IgnoreMessagesHandler(inner,
+        => builder.Use((inner, services) => new IgnoreMessagesHandler(inner,
             message => message.Type != MessageType.Status && message.Type != MessageType.Unsupported));
 
     public static WhatsAppHandlerBuilder UseIgnore(this WhatsAppHandlerBuilder builder, Func<IMessage, bool> filter)
-        => Throw.IfNull(builder).Use((inner, services) => new IgnoreMessagesHandler(inner, filter));
+        => builder.Use((inner, services) => new IgnoreMessagesHandler(inner, filter));
 
     class IgnoreMessagesHandler(IWhatsAppHandler inner, Func<IMessage, bool> filter) : DelegatingWhatsAppHandler(inner)
     {
@@ -248,7 +248,7 @@ static class IgnoreMessagesExtensions
             if (filtered.Length == 0)
                 return AsyncEnumerable.Empty<Response>();
 
-            return base.HandleAsync(filtered, cancellation).WithExecutionFlow();
+            return base.HandleAsync(filtered, cancellation);
         }
     }
 }
