@@ -269,6 +269,7 @@ public static class WhatsAppServiceCollectionExtensions
             options.Configure(configure);
 
         services.Add(new ServiceDescriptor(typeof(IWhatsAppHandler), builder.Build, lifetime));
+        services.Add(new ServiceDescriptor(typeof(PipelineRunner), typeof(PipelineRunner), lifetime));
 
         // By default we use the queue processor, but it's idempotent if 
         // called subsequently
