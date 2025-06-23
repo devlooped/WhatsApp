@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Spectre.Console;
 using Spectre.Console.Json;
+using Spectre.Console.Rendering;
 
 namespace Devlooped.WhatsApp;
 
@@ -62,8 +63,7 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
             }
             catch (HttpListenerException)
             {
-                // Port is already in use, try another one
-                listener.Prefixes.Clear();
+                listener = new HttpListener();
             }
         }
 
@@ -191,13 +191,14 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                     if (message.Type == Client.MessageType.Reaction && text.Length == 0)
                         return;
 
+                    IRenderable body = message.Type == Client.MessageType.Reaction || (text.StartsWith("[") && text.EndsWith("]"))
+                        ? TryMarkup(text)
+                        : new Spectre.Console.Text(text).Overflow(Overflow.Fold);
+
                     var grid = new Grid()
                         .AddColumn(new GridColumn().Width(2))
                         .AddColumn(new GridColumn().Width(80))
-                        .AddRow(
-                            new Markup(":robot:"),
-                            new Spectre.Console.Text(text).Overflow(Overflow.Fold)
-                        );
+                        .AddRow(new Markup(":robot:"), body);
 
                     AnsiConsole.Write(grid);
 
@@ -221,5 +222,17 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
         {
             Width = Math.Min(100, AnsiConsole.Profile.Width)
         });
+    }
+
+    static IRenderable TryMarkup(string text)
+    {
+        try
+        {
+            return new Markup(text);
+        }
+        catch (Exception)
+        {
+            return new Spectre.Console.Text(text).Overflow(Overflow.Fold);
+        }
     }
 }
