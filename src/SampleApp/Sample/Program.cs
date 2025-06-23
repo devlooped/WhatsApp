@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Azure.Messaging.EventGrid;
 using Devlooped;
 using Devlooped.WhatsApp;
 using Microsoft.Azure.Functions.Worker.Builder;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Response = Devlooped.WhatsApp.Response;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
@@ -43,7 +45,7 @@ builder.Services.AddSingleton(services => builder.Environment.IsDevelopment() ?
     storage :
     CloudStorageAccount.Parse(builder.Configuration["AzureWebJobsStorage"]));
 
-builder.Services
+var whatsapp = builder.Services
     .AddWhatsApp<ProcessHandler>(configure: options =>
     {
         options.ReactOnMessage = "🌐";
@@ -56,6 +58,14 @@ builder.Services
     .UseLogging()
     .Use(EchoAndHandle)
     .UseConversation(conversationWindowSeconds: 300 /* default */);
+
+// If event grid is set up, switch to processing messages using that
+if (builder.Configuration["EventGrid:Topic"] is { Length: > 0 } topic &&
+    builder.Configuration["EventGrid:Key"] is { Length: > 0 } key)
+{
+    whatsapp.UseEventGridProcessor(new EventGridPublisherClient(
+        new Uri(topic), new Azure.AzureKeyCredential(key)));
+}
 
 builder.Build().Run();
 

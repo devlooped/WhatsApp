@@ -12,9 +12,9 @@ namespace Devlooped.WhatsApp;
 /// Azure functions used in development environments to allow the WhatsApp CLI to connect 
 /// and exercise the WhatsApp API without requiring a full WhatsApp for Business account.
 /// </summary>
-public class AzureFunctionsConsole(
+class AzureFunctionsConsole(
     IWhatsAppHandler handler,
-    ILogger<AzureFunctions> logger,
+    ILogger<AzureFunctionsWebhook> logger,
     IHostEnvironment environment)
 {
     [Function("whatsapp_console")]
