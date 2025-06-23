@@ -329,9 +329,17 @@ library and its backend functions. This allows you to interact with your WhatsAp
 having to set up your WhatsApp for Business app for local development. 
 
 The backend functions are only enabled if the hosting environment is set to `Development` so that 
-in production, the CLI endpoint is not available. Example:
+in production, the CLI endpoint is not available. Example with text format:
 
-![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/cli.png)
+![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/cli-text.png)
+
+Yaml format:
+
+![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/cli-yaml.png)
+
+JSON format:
+
+![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/cli-json.png)
 
 The console will automatically remember the last used WhatsApp endpoint, output format and simulated 
 user phone number.
