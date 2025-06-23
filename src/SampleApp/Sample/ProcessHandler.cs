@@ -45,11 +45,21 @@ class ProcessHandler(ILogger<Program> logger, JsonSerializerOptions options) : I
             yield return content.React("🧠");
 
             // simulate some hard work at hand, like doing some LLM-stuff :)
-            //await Task.Delay(2000);
+            await Task.Delay(2000);
+
             yield return content.Reply(
-                $"☑️ Got your {content.Content.Type}:\r\n{JsonSerializer.Serialize(content, options)}",
+                $"☑️ Got your {content.Content.Type}",
                 new Button("btn_good", "👍"),
                 new Button("btn_bad", "👎"));
+
+            yield return content.Reply(
+                $"""
+                ```
+                {JsonSerializer.Serialize(content, options)}
+                ```
+                """);
+
+            yield return content.React("✅");
         }
         else if (message is UnsupportedMessage unsupported)
         {

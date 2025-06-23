@@ -21,12 +21,13 @@ public static class WhatsAppServiceCollectionExtensions
     public static WhatsAppHandlerBuilder AddWhatsApp(
         this IServiceCollection collection,
         IWhatsAppHandler handler,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
     {
         Throw.IfNull(collection);
         Throw.IfNull(handler);
 
-        return AddWhatsApp(collection, _ => handler, lifetime);
+        return AddWhatsApp(collection, _ => handler, lifetime, configure);
     }
 
     /// <summary>Registers a singleton <see cref="IWhatsAppClient"/> and <see cref="IWhatsAppHandler"/> in the <see cref="IServiceCollection"/>.</summary>
@@ -39,7 +40,8 @@ public static class WhatsAppServiceCollectionExtensions
     public static WhatsAppHandlerBuilder AddWhatsApp(
         this IServiceCollection collection,
         Func<IServiceProvider, IWhatsAppHandler> handlerFactory,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
     {
         _ = Throw.IfNull(collection);
         _ = Throw.IfNull(handlerFactory);
@@ -48,7 +50,7 @@ public static class WhatsAppServiceCollectionExtensions
         var builder = new WhatsAppHandlerBuilder(handlerFactory, collection);
 
         // Configure default services
-        ConfigureServices(collection, builder, lifetime);
+        ConfigureServices(collection, builder, lifetime, configure);
 
         return builder;
     }
@@ -58,15 +60,17 @@ public static class WhatsAppServiceCollectionExtensions
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp(
         this IServiceCollection collection,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
-        => collection.AddWhatsApp(services => services.GetRequiredService<IWhatsAppHandler>(), lifetime);
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
+        => collection.AddWhatsApp(services => services.GetRequiredService<IWhatsAppHandler>(), lifetime, configure);
 
     /// <summary>
     /// Configure the WhatsApp handler for Azure Functions.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<THandler>(
         this IServiceCollection collection,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
         where THandler : class, IWhatsAppHandler
     {
         if (collection.FirstOrDefault(x => x.ServiceType == typeof(THandler)) == null)
@@ -74,7 +78,7 @@ public static class WhatsAppServiceCollectionExtensions
             collection.Add(new ServiceDescriptor(typeof(THandler), typeof(THandler), lifetime));
         }
 
-        return collection.AddWhatsApp(services => services.GetRequiredService<THandler>(), lifetime);
+        return collection.AddWhatsApp(services => services.GetRequiredService<THandler>(), lifetime, configure);
     }
 
     /// <summary>
@@ -83,10 +87,11 @@ public static class WhatsAppServiceCollectionExtensions
     public static WhatsAppHandlerBuilder AddWhatsApp(
         this IServiceCollection collection,
         Func<IServiceProvider, IEnumerable<IMessage>, CancellationToken, IAsyncEnumerable<Response>> handler,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
     {
         return collection.AddWhatsApp(
-            services => AnonymousWhatsAppHandler.Create(services, handler), lifetime);
+            services => AnonymousWhatsAppHandler.Create(services, handler), lifetime, configure);
     }
 
     /// <summary>
@@ -95,10 +100,11 @@ public static class WhatsAppServiceCollectionExtensions
     public static WhatsAppHandlerBuilder AddWhatsApp(
         this IServiceCollection collection,
         Func<IEnumerable<IMessage>, CancellationToken, IAsyncEnumerable<Response>> handler,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
     {
         return collection.AddWhatsApp(
-            services => AnonymousWhatsAppHandler.Create(services, handler), lifetime);
+            services => AnonymousWhatsAppHandler.Create(services, handler), lifetime, configure);
     }
 
     /// <summary>
@@ -107,11 +113,12 @@ public static class WhatsAppServiceCollectionExtensions
     public static WhatsAppHandlerBuilder AddWhatsApp<TService>(
         this IServiceCollection collection,
         Func<TService, IEnumerable<IMessage>, CancellationToken, IAsyncEnumerable<Response>> handler,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
         where TService : notnull
     {
         return collection.AddWhatsApp(
-            services => AnonymousWhatsAppHandler.Create(services.GetRequiredService<TService>(), handler), lifetime);
+            services => AnonymousWhatsAppHandler.Create(services.GetRequiredService<TService>(), handler), lifetime, configure);
     }
 
     /// <summary>
@@ -120,7 +127,8 @@ public static class WhatsAppServiceCollectionExtensions
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2>(
         this IServiceCollection collection,
         Func<TService1, TService2, IEnumerable<IMessage>, CancellationToken, IAsyncEnumerable<Response>> handler,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
         where TService1 : notnull
         where TService2 : notnull
     {
@@ -128,7 +136,7 @@ public static class WhatsAppServiceCollectionExtensions
             services => AnonymousWhatsAppHandler.Create(
                 services.GetRequiredService<TService1>(),
                 services.GetRequiredService<TService2>(),
-                handler), lifetime);
+                handler), lifetime, configure);
     }
 
     /// <summary>
@@ -137,7 +145,8 @@ public static class WhatsAppServiceCollectionExtensions
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3>(
         this IServiceCollection collection,
         Func<TService1, TService2, TService3, IEnumerable<IMessage>, CancellationToken, IAsyncEnumerable<Response>> handler,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
         where TService1 : notnull
         where TService2 : notnull
         where TService3 : notnull
@@ -147,7 +156,7 @@ public static class WhatsAppServiceCollectionExtensions
                 services.GetRequiredService<TService1>(),
                 services.GetRequiredService<TService2>(),
                 services.GetRequiredService<TService3>(),
-                handler), lifetime);
+                handler), lifetime, configure);
     }
 
     /// <summary>
@@ -156,7 +165,8 @@ public static class WhatsAppServiceCollectionExtensions
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3, TService4>(
         this IServiceCollection collection,
         Func<TService1, TService2, TService3, TService4, IEnumerable<IMessage>, CancellationToken, IAsyncEnumerable<Response>> handler,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
         where TService1 : notnull
         where TService2 : notnull
         where TService3 : notnull
@@ -168,7 +178,7 @@ public static class WhatsAppServiceCollectionExtensions
                 services.GetRequiredService<TService2>(),
                 services.GetRequiredService<TService3>(),
                 services.GetRequiredService<TService4>(),
-                handler), lifetime);
+                handler), lifetime, configure);
     }
 
     /// <summary>
@@ -177,7 +187,8 @@ public static class WhatsAppServiceCollectionExtensions
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3, TService4, TService5>(
         this IServiceCollection collection,
         Func<TService1, TService2, TService3, TService4, TService5, IEnumerable<IMessage>, CancellationToken, IAsyncEnumerable<Response>> handler,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
         where TService1 : notnull
         where TService2 : notnull
         where TService3 : notnull
@@ -191,7 +202,7 @@ public static class WhatsAppServiceCollectionExtensions
                 services.GetRequiredService<TService3>(),
                 services.GetRequiredService<TService4>(),
                 services.GetRequiredService<TService5>(),
-                handler), lifetime);
+                handler), lifetime, configure);
     }
 
     /// <summary>
@@ -200,7 +211,8 @@ public static class WhatsAppServiceCollectionExtensions
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3, TService4, TService5, TService6>(
         this IServiceCollection collection,
         Func<TService1, TService2, TService3, TService4, TService5, TService6, IEnumerable<IMessage>, CancellationToken, IAsyncEnumerable<Response>> handler,
-        ServiceLifetime lifetime = ServiceLifetime.Singleton)
+        ServiceLifetime lifetime = ServiceLifetime.Singleton,
+        Action<WhatsAppOptions>? configure = null)
         where TService1 : notnull
         where TService2 : notnull
         where TService3 : notnull
@@ -216,9 +228,9 @@ public static class WhatsAppServiceCollectionExtensions
                 services.GetRequiredService<TService4>(),
                 services.GetRequiredService<TService5>(),
                 services.GetRequiredService<TService6>(),
-                handler), lifetime);
+                handler), lifetime, configure);
     }
-    static WhatsAppHandlerBuilder ConfigureServices(IServiceCollection services, WhatsAppHandlerBuilder builder, ServiceLifetime lifetime)
+    static WhatsAppHandlerBuilder ConfigureServices(IServiceCollection services, WhatsAppHandlerBuilder builder, ServiceLifetime lifetime, Action<WhatsAppOptions>? configure)
     {
         services.AddHttpClient("whatsapp").AddStandardResilienceHandler();
 
@@ -267,6 +279,12 @@ public static class WhatsAppServiceCollectionExtensions
         services.AddOptions<MetaOptions>()
             .BindConfiguration("Meta")
             .ValidateDataAnnotations();
+
+        var options = services.AddOptions<WhatsAppOptions>()
+            .BindConfiguration("WhatsApp");
+
+        if (configure != null)
+            options.Configure(configure);
 
         services.Add(new ServiceDescriptor(typeof(IWhatsAppHandler), builder.Build, lifetime));
 
