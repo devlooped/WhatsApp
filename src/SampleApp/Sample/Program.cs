@@ -12,10 +12,12 @@ using Microsoft.Extensions.Logging;
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 builder.AddServiceDefaults();
-
-#if DEBUG
-builder.Environment.EnvironmentName = "Development";
 builder.Configuration.AddUserSecrets<Program>();
+
+#if CI || RELEASE
+builder.Environment.EnvironmentName = "Production";
+#else
+builder.Environment.EnvironmentName = "Development";
 #endif
 
 if (builder.Environment.IsDevelopment())
