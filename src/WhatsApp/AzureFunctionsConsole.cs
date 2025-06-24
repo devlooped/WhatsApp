@@ -13,6 +13,7 @@ namespace Devlooped.WhatsApp;
 /// and exercise the WhatsApp API without requiring a full WhatsApp for Business account.
 /// </summary>
 class AzureFunctionsConsole(
+    IWhatsAppClient client,
     IWhatsAppHandler handler,
     ILogger<AzureFunctionsWebhook> logger,
     IHostEnvironment environment)
@@ -51,6 +52,9 @@ class AzureFunctionsConsole(
         // Try to deserialize the message sent by the console
         if (JsonSerializer.Deserialize(json, JsonContext.Default.Message) is Message message)
         {
+            if (message is UserMessage user)
+                await user.SendProgress(client, true, true).Ignore();
+
             message.FromConsole = true;
             // Await all responses
             // No action needed, just make sure all items are processed
