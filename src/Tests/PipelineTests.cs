@@ -161,7 +161,7 @@ public class PipelineTests(ITestOutputHelper output)
             .Build();
 
         var storage = new MemoryConversationStorage();
-        var response = AsyncEnum<Response>([new TextResponse(user.Number, service.Id, "1234", null, "Bye")]);
+        var response = AsyncEnum<Response>([new TextResponse(service.Id, user.Number, "1234", null, "Bye")]);
         var messages = new List<IMessage[]>();
 
         var handler = new Mock<IWhatsAppHandler>();

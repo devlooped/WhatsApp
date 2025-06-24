@@ -5,13 +5,13 @@
 /// </summary>
 /// <remarks>This response type allows sending a text message with up to two optional buttons  for user
 /// interaction. If no buttons are provided, the response will consist of  only the text message.</remarks>
-/// <param name="Number">The phone number of the recipient in international format.</param>
-/// <param name="Service">The identifier of the service handling the message.</param>
+/// <param name="ServiceId">The identifier of the service handling the message.</param>
+/// <param name="UserNumber">The phone number of the recipient in international format.</param>
 /// <param name="Context">The unique identifier of the message to which this response is a reply to .</param>
 /// <param name="Text">The text content of the response message.</param>
 /// <param name="Button1">An optional button to include in the response for user interaction.</param>
 /// <param name="Button2">An optional second button to include in the response for user interaction.</param>
-public record TextResponse(string Number, string Service, string Context, string? ConversationId, string Text, Button? Button1 = default, Button? Button2 = default) : Response(Number, Service, Context, ConversationId)
+public record TextResponse(string ServiceId, string UserNumber, string Context, string? ConversationId, string Text, Button? Button1 = default, Button? Button2 = default) : Response(ServiceId, UserNumber, Context, ConversationId)
 {
     /// <inheritdoc/>
     protected override Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)

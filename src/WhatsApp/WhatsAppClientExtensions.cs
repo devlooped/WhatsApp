@@ -472,6 +472,36 @@ public static partial class WhatsAppClientExtensions
             }
         }, cancellation);
 
+    /// <summary>
+    /// Sends a typing indicator in response to a user message, marking it as read too.
+    /// </summary>
+    /// <param name="client">The WhatsApp client.</param>
+    /// <param name="message">The message to mark as read and send typing indicator for.</param>
+    /// <param name="cancellation">The cancellation token.</param>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/typing-indicators"/>
+    public static Task SendTyping(this IWhatsAppClient client, UserMessage message, CancellationToken cancellation = default)
+        => SendTyping(client, message.Service.Id, message.Id, cancellation);
+
+    /// <summary>
+    /// Sends a typing indicator in response to a user message, marking it as read too.
+    /// </summary>
+    /// <param name="client">The WhatsApp client.</param>
+    /// <param name="serviceId">The service number to send the typing indicator through.</param>
+    /// <param name="messageId">The identifier of the message to mark as read and send typing indicator for.</param>
+    /// <param name="cancellation">The cancellation token.</param>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/typing-indicators"/>
+    public static Task SendTyping(this IWhatsAppClient client, string serviceId, string messageId, CancellationToken cancellation = default)
+        => client.SendAsync(serviceId, new
+        {
+            messaging_product = "whatsapp",
+            status = "read",
+            message_id = messageId,
+            typing_indicator = new
+            {
+                type = "text"
+            }
+        }, cancellation);
+
     static string NormalizeNumber(string number) =>
         // On the web, we don't get the 9 after 54 \o/
         // so for Argentina numbers, we need to remove the 9.
