@@ -4,7 +4,8 @@ using Microsoft.Extensions.Options;
 
 namespace Devlooped.WhatsApp;
 
-class PipelineRunner(TableServiceClient tableClient,
+class PipelineRunner(
+    TableServiceClient tableClient,
     IWhatsAppClient whatsapp,
     IWhatsAppHandler handler,
     IOptions<WhatsAppOptions> functionOptions,
@@ -18,9 +19,10 @@ class PipelineRunner(TableServiceClient tableClient,
 
         if (await Message.DeserializeAsync(json) is { } message)
         {
-            if (functionOptions.ReadOnProcess is true && message.Type == MessageType.Content)
-                // Ignored since this can be an old, deleted message, for example
-                await whatsapp.MarkReadAsync(message.Service.Id, message.Id).Ignore();
+            // If we got a user message, we can send progress updates as configured. We ignore exceptions in the 
+            // operation since it can be a notification for an old message or it may have been deleted by the user.
+            if (message is UserMessage user)
+                await user.SendProgress(whatsapp, functionOptions.ReadOnProcess is true, functionOptions.TypingOnProcess is true).Ignore();
 
             // Ensure idempotent processing at dequeue time, since we might have been called 
             // multiple times for the same message by WhatsApp (Message method) while processing was still 

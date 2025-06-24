@@ -35,9 +35,10 @@ class AzureFunctionsWebhook(
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
         {
-            if (functionOptions.ReadOnMessage is true && message.Type == MessageType.Content)
-                // Ignored since this can be an old, deleted message, for example
-                await whatsapp.MarkReadAsync(message.Service.Id, message.Id).Ignore();
+            // If we got a user message, we can send progress updates as configured. We ignore exceptions in the 
+            // operation since it can be a notification for an old message or it may have been deleted by the user.
+            if (message is UserMessage user)
+                await user.SendProgress(whatsapp, functionOptions.ReadOnMessage is true, functionOptions.TypingOnMessage is true).Ignore();
 
             // Ensure idempotent processing
             var table = tableClient.GetTableClient("WhatsAppWebhook");
