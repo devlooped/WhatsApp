@@ -2,38 +2,31 @@
 
 static class UserMessageExtensions
 {
+    /// <summary>
+    /// Sends progress update for the given message. 
+    /// <paramref name="sendTyping"/> implies <paramref name="markRead"/>. But you can 
+    /// mark read without sending typing indicator.
+    /// </summary>
+    /// <remarks>
+    /// Both actions (sending typing indicator and marking read) are ignored for exceptions since 
+    /// the message may have been deleted by the user in the meantime.
+    /// </remarks>
     public static async Task SendProgress(this UserMessage message, IWhatsAppClient client, bool markRead, bool sendTyping)
     {
-        // These actions are ignored for exceptions since they may be triggered for an old, deleted message, for example.
         if (sendTyping is true)
         {
-            if (markRead)
+            await client.SendAsync(message.Service.Id, new
             {
-                await client.SendAsync(message.Service.Id, new
+                messaging_product = "whatsapp",
+                status = "read",
+                message_id = message.Id,
+                typing_indicator = new
                 {
-                    messaging_product = "whatsapp",
-                    status = "read",
-                    message_id = message.Id,
-                    typing_indicator = new
-                    {
-                        type = "text"
-                    }
-                }).Ignore();
-            }
-            else
-            {
-                await client.SendAsync(message.Service.Id, new
-                {
-                    messaging_product = "whatsapp",
-                    message_id = message.Id,
-                    typing_indicator = new
-                    {
-                        type = "text"
-                    }
-                }).Ignore();
-            }
+                    type = "text"
+                }
+            }).Ignore();
         }
-        else
+        else if (markRead)
         {
             await client.MarkReadAsync(message.Service.Id, message.Id).Ignore();
         }
