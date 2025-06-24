@@ -42,7 +42,7 @@ class PipelineRunner(TableServiceClient tableClient,
         }
         else
         {
-            logger.LogWarning("Failed to deserialize message.");
+            logger.LogWarning("Failed to deserialize message. {Message}", json);
         }
     }
 }

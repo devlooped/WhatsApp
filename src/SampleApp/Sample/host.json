@@ -19,7 +19,8 @@
       "Azure": "Warning",
       "Azure.Core": "Error",
       "Microsoft": "Warning",
-      "System": "Warning"
+      "System": "Warning",
+      "Devlooped.WhatsApp": "Debug"
     }
   }
 }
