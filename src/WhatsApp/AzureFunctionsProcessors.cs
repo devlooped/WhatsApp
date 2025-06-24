@@ -1,4 +1,5 @@
-﻿using Azure.Messaging.EventGrid;
+﻿using System.Text.RegularExpressions;
+using Azure.Messaging.EventGrid;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 
@@ -19,7 +20,7 @@ class AzureFunctionsProcessors(PipelineRunner runner)
         [Microsoft.Azure.Functions.Worker.Http.FromBody] EventGridEvent e)
 #endif
     {
-        await runner.ProcessAsync(e.Data.ToString());
+        await runner.ProcessAsync(Regex.Unescape(e.Data.ToString()).Trim('"'));
         return new OkResult();
     }
 }
