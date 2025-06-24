@@ -44,6 +44,9 @@ class ProcessHandler(ILogger<Program> logger, JsonSerializerOptions options) : I
         {
             yield return content.React("🧠");
 
+            yield return content.Reply("Spinning my digital neurons...");
+            yield return content.Typing();
+
             // simulate some hard work at hand, like doing some LLM-stuff :)
             await Task.Delay(2000);
 

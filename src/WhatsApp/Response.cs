@@ -7,14 +7,12 @@ namespace Devlooped.WhatsApp;
 /// Represents a response message or command that can be sent using a WhatsApp client.
 /// </summary>
 /// <remarks>This abstract record serves as a base type for defining specific response messages or commands that
-/// can be sent to a WhatsApp client. It provides common properties such as <see cref="UserNumber"/>, <see cref="ServiceId"/>,
-/// <see cref="Context"/>, and <see cref="ConversationId"/>, as well as methods for sending the response
-/// asynchronously.</remarks>
-/// <param name="Number">The phone number of the recipient in international format.</param>
-/// <param name="ServiceId">The identifier of the service handling the message.</param>
+/// can be sent through WhatsApp client.</remarks>
+/// <param name="ServiceId">The identifier of the service to use to send the response through.</param>
+/// <param name="UserNumber">The phone number of the recipient in international format.</param>
 /// <param name="Context">The unique identifier of the message to which the reaction is being sent.</param>
 /// <param name="ConversationId">The conversation id where this response was generated</param>
-public abstract partial record Response(string UserNumber, string ServiceId, string Context, string? ConversationId) : IMessage
+public abstract partial record Response(string ServiceId, string UserNumber, string Context, string? ConversationId) : IMessage
 {
     /// <inheritdoc/>
     [JsonConverter(typeof(AdditionalPropertiesDictionaryConverter))]

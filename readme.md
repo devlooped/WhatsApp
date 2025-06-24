@@ -91,6 +91,34 @@ if (message is ContentMessage content)
 This allows the handler to remain decoupled from the actual sending of messages, making it 
 easier to unit test. 
 
+There's no limitation on the number of responses you can yield during processing, but 
+sending an intermediate reply will cause the typing indicator sent by default by the 
+webhook to dissapear. To signal ongoing processing to the user, you can send the typing 
+status response as follows:
+
+```csharp
+yield return content.Reply("Spinning my digital neurons...");
+yield return content.Typing();
+
+// simulate some hard work at hand, like doing some LLM-stuff :)
+await Task.Delay(2000);
+
+yield return content.Reply("That was tough, but here's your reponse: ... ");
+}
+```
+
+In this case, the typing status will be restored right after the initial reply.
+
+This is how the initial typing status looks like when the webhook gets the message: 
+
+![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/progress1.png)
+
+And after we send the "Spinning..." message, the restored typing status would 
+look like the following:
+
+![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/progress2.png)
+
+
 If sending messages outside the handler pipeline is needed, you can use the provided 
 `IWhatsAppClient`, which is a very thin abstraction allowing you to send arbitrary payloads 
 to WhatsApp for Business:
@@ -117,9 +145,11 @@ if (message is ContentMessage content)
 }
 ```
 
-The above code would render as follows in WhatsApp:
+Regardless of the approach used (handler-generated reponse async enumerable or direct 
+client calls), the above examples would render as follows in WhatsApp:
 
 ![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/whatsapp.png)
+
 
 ## Conversations
 
@@ -200,6 +230,42 @@ The `Numbers` dictionary is a map of WhatsApp phone identifiers and the
 corresponding access token for it. To get a permanent access token for 
 use, you'd need to create a [system user](https://business.facebook.com/latest/settings/system_users) 
 with full control permissions to the WhatsApp Business API (app).
+
+You can also configure how the WhatsApp webhook and processing pipeline behaves by passing 
+in an additional delegate to the `AddWhatsApp` method via the `configure` parameter:
+
+```csharp
+builder.Services
+    .AddWhatsApp<ProcessHandler>(configure: options =>
+    {
+        options.ReactOnMessage = "🌐";
+        options.ReactOnProcess = "⚙️";
+        options.ReactOnConversation = "💭";
+    })
+```
+
+The `WhatsAppOptions` passed in can also be set in configuration, which will be read 
+automatically when the `AddWhatsApp` method is called, so the following configuration 
+is equivalent to the above:
+
+```json
+{
+    "WhatsApp": {
+        "ReactOnMessage": "🌐",
+        "ReactOnProcess": "⚙️",
+        "ReactOnConversation": "💭"
+    }
+}
+```
+
+By default, the library will mark messages read on webhook invocation by WhatsApp, 
+and send the typing status to the user:
+
+![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/typing.png)
+
+You can modify this behavior through the `WhatsAppOptions` as well, with the 
+`TypingOnMessage` and `TypingOnProcess` properties. Sending the typing status implies 
+marking the message as read too.
 
 ## Functionality pipelines
 

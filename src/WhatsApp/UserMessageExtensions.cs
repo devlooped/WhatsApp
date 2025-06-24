@@ -15,16 +15,7 @@ static class UserMessageExtensions
     {
         if (sendTyping is true)
         {
-            await client.SendAsync(message.Service.Id, new
-            {
-                messaging_product = "whatsapp",
-                status = "read",
-                message_id = message.Id,
-                typing_indicator = new
-                {
-                    type = "text"
-                }
-            }).Ignore();
+            await client.SendTyping(message).Ignore();
         }
         else if (markRead)
         {

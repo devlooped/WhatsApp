@@ -9,6 +9,9 @@ public static partial class MessageExtensions
 {
     extension(IMessage message)
     {
+        /// <summary>
+        /// Gets or sets whether the message was sent from the WhatsApp CLI.
+        /// </summary>
         public bool FromConsole
         {
             get => (message.AdditionalProperties ??= []).TryGetValue("FromConsole", out var value) ? value as bool? ?? default : default;
@@ -20,13 +23,13 @@ public static partial class MessageExtensions
     /// Creates a reaction response for the user message.
     /// </summary>
     public static ReactionResponse React(this IMessage message, string emoji)
-        => new(message.UserNumber, message.ServiceId, message.Id, message.ConversationId, emoji);
+        => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, emoji);
 
     /// <summary>
     /// Creates a simple template response for the message.
     /// </summary>
     public static TemplateResponse Template(this IMessage message, string name, string language)
-        => new(message.UserNumber, message.Id, message.Id, message.ConversationId, name, language);
+        => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, name, language);
 
     /// <summary>
     /// Creates a complex template response for the message.
@@ -37,19 +40,31 @@ public static partial class MessageExtensions
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
     public static TemplateResponse Template(this IMessage message, object template)
-        => new(message.UserNumber, message.ServiceId, message.Id, message.ConversationId, template);
+        => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, template);
+
+    /// <summary>
+    /// Sends a typing indicator status to signal that there is an ongoing response to the user message.
+    /// </summary>
+    public static TypingResponse Typing(this UserMessage message)
+        => new(message.Service.Id, message.User.Number, message.Id, message.ConversationId);
 
     /// <summary>
     /// Creates a text response for the message.
     /// </summary>
     public static TextResponse Reply(this IMessage message, string text)
-        => new(message.UserNumber, message.ServiceId, message.Id, message.ConversationId, text);
+        => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text);
 
     /// <summary>
     /// Creates a text response with buttons for the message.
     /// </summary>
     public static TextResponse Reply(this IMessage message, string text, Button button1, Button? button2 = default)
-        => new(message.UserNumber, message.ServiceId, message.Id, message.ConversationId, text, button1, button2);
+        => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text, button1, button2);
+
+    /// <summary>
+    /// Creates a reaction response for the user message.
+    /// </summary>
+    public static TypingResponse Typing(this UserMessage message, string emoji)
+        => new(message.Service.Id, message.User.Number, message.Id, message.ConversationId);
 
     /// <summary>
     /// Attempts to retrieve a single message from the specified collection.

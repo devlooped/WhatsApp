@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Azure.Messaging.EventGrid;
+using Azure.Storage.Queues;
 using Devlooped;
 using Devlooped.WhatsApp;
 using Microsoft.Azure.Functions.Worker.Builder;
@@ -67,7 +68,24 @@ if (builder.Configuration["EventGrid:Topic"] is { Length: > 0 } topic &&
         new Uri(topic), new Azure.AzureKeyCredential(key)));
 }
 
-builder.Build().Run();
+var app = builder.Build();
+
+#region DebugInit
+#if DEBUG
+async Task InitAsync(QueueClient queue)
+{
+    await queue.CreateIfNotExistsAsync();
+    await queue.ClearMessagesAsync();
+}
+// Create and clear queues locally so we don't get constant warnings in the logs
+var queues = app.Services.GetRequiredService<QueueServiceClient>();
+await InitAsync(queues.GetQueueClient("whatsappwebhook"));
+await InitAsync(queues.GetQueueClient("whatsappmessages"));
+await InitAsync(queues.GetQueueClient("whatsappmemory"));
+#endif
+#endregion
+
+app.Run();
 
 static async IAsyncEnumerable<Response> EchoAndHandle(IEnumerable<IMessage> messages, IWhatsAppHandler inner, [EnumeratorCancellation] CancellationToken cancellation)
 {
