@@ -61,12 +61,6 @@ public static partial class MessageExtensions
         => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text, button1, button2);
 
     /// <summary>
-    /// Creates a reaction response for the user message.
-    /// </summary>
-    public static TypingResponse Typing(this UserMessage message, string emoji)
-        => new(message.Service.Id, message.User.Number, message.Id, message.ConversationId);
-
-    /// <summary>
     /// Attempts to retrieve a single message from the specified collection.
     /// </summary>
     /// <remarks>This method checks whether the provided collection contains exactly one message. If so, the
