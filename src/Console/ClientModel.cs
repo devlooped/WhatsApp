@@ -56,15 +56,23 @@ enum MessageType
     Content = 1,
     Interactive = 2,
     Reaction = 4,
+    Typing = 8
 }
 
 [JsonPolymorphic]
 [JsonDerivedType(typeof(ContentMessage), "text")]
 [JsonDerivedType(typeof(InteractiveMessage), "interactive")]
 [JsonDerivedType(typeof(ReactionMessage), "reaction")]
+[JsonDerivedType(typeof(TypingMessage), "typing")]
 abstract record ClientMessage
 {
     public abstract MessageType Type { get; }
+}
+
+record TypingMessage : ClientMessage
+{
+    public override MessageType Type => MessageType.Typing;
+    public override string ToString() => "...";
 }
 
 record ContentMessage(Context Context, Text Text) : ClientMessage

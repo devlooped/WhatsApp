@@ -160,6 +160,9 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
         }
     }
 
+    CancellationTokenSource typingCancellation = new();
+    Task? typingStatus;
+
     async Task RenderAsync(string json)
     {
         if (needsNewline)
@@ -182,14 +185,32 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
             try
             {
                 // Move discriminator to top.
-                json = await JQ.ExecuteAsync(json, "{ \"$type\": .type } + .");
+                json = await JQ.ExecuteAsync(json,
+                    """
+                    { "$type": (."type" // "typing") } + .
+                    """);
 
                 if (JsonSerializer.Deserialize(json, ClientContext.Default.ClientMessage) is { } message &&
                     message.ToString() is { } text)
                 {
+                    if (message.Type == Client.MessageType.Typing)
+                    {
+                        await ResetTypingAsync();
+                        typingStatus = AnsiConsole.Status().StartAsync("...", async x =>
+                        {
+                            while (!cts.IsCancellationRequested && !typingCancellation.IsCancellationRequested)
+                            {
+                                await Task.Delay(100);
+                            }
+                        });
+                        return;
+                    }
+
                     // Don't render empty reaction since it's the clearing of the emoji actually in WhatsApp
                     if (message.Type == Client.MessageType.Reaction && text.Length == 0)
                         return;
+
+                    await ResetTypingAsync();
 
                     IRenderable body = message.Type == Client.MessageType.Reaction || (text.StartsWith("[") && text.EndsWith("]"))
                         ? TryMarkup(text)
@@ -222,6 +243,18 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
         {
             Width = Math.Min(100, AnsiConsole.Profile.Width)
         });
+    }
+
+    async Task ResetTypingAsync()
+    {
+        if (typingStatus != null && !typingStatus.IsCompleted)
+        {
+            typingCancellation.Cancel();
+            await typingStatus;
+            typingStatus = null;
+            if (!typingCancellation.TryReset())
+                typingCancellation = new CancellationTokenSource();
+        }
     }
 
     static IRenderable TryMarkup(string text)
