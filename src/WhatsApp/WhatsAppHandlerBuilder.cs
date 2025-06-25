@@ -47,13 +47,17 @@ public class WhatsAppHandlerBuilder
         {
             for (var i = factories.Count - 1; i >= 0; i--)
             {
-                handler = factories[i](handler!, services);
-                if (handler is null)
+                var current = factories[i](handler!, services);
+                if (current is null)
                 {
                     Throw.InvalidOperationException(
                         $"The {nameof(WhatsAppHandlerBuilder)} entry at index {i} returned null. " +
                         $"Ensure that the callbacks passed to {nameof(Use)} return non-null {nameof(IWhatsAppHandler)} instances.");
                 }
+
+                // Only keep non-skipping handlers.
+                if (current != WhatsAppHandler.Skip)
+                    handler = factories[i](handler!, services);
             }
         }
 

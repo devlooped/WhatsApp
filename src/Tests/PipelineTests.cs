@@ -31,6 +31,7 @@ public class PipelineTests(ITestOutputHelper output)
                 called = true;
                 return inner.HandleAsync(message, cancellation);
             })
+            .Use(handler => WhatsAppHandler.Skip)
             .Build();
 
         await pipeline.HandleAsync(new ReactionMessage("1234", service, user, 0, "🗽"));
