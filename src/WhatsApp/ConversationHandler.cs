@@ -8,11 +8,7 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
 {
     readonly WhatsAppOptions options = options.Value;
 
-    /// <summary>
-    /// Configures the time window to consider for conversation messages. 
-    /// Messages sent within this time frame will be grouped together as part of the same conversation.
-    /// </summary>
-    public int ConversationWindowSeconds { get; set; } = 5 * 60; // 5 minutes
+    public int ConversationWindowSeconds { get; set; } = options.Value.ConversationWindowSeconds;
 
     public override async IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
     {

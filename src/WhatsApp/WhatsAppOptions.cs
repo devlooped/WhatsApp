@@ -6,6 +6,12 @@
 public class WhatsAppOptions
 {
     /// <summary>
+    /// Configures the time window to consider for conversation messages. 
+    /// Messages sent within this time frame will be grouped together as part of the same conversation.
+    /// </summary>
+    public int ConversationWindowSeconds { get; set; } = 5 * 60; // 5 minutes
+
+    /// <summary>
     /// Mark messages as read when received in the WhatsApp webhook endpoint. 
     /// Defaults to <c>true</c>.
     /// </summary>

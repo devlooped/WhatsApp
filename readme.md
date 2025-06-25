@@ -173,6 +173,9 @@ builder.Services
     .UseConversation(conversationWindowSeconds: 300 /* default */);
 ```
 
+The conversation window can also be configured via `WhatsAppOptions` in the configuration, 
+such as setting `WhatsApp:ConversationWindowSeconds = 600`.
+
 Unless you provide a [CloudStorageAccount](https://www.nuget.org/packages/Devlooped.CloudStorageAccount) in 
 the service collection, the library will use the `AzureWebJobsStorage` connection string automatically 
 for this, so things will just work out of the box. 
