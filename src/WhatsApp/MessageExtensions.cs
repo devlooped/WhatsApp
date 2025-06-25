@@ -23,7 +23,9 @@ public static partial class MessageExtensions
     /// Creates a reaction response for the user message.
     /// </summary>
     public static ReactionResponse React(this IMessage message, string emoji)
-        => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, emoji);
+        => message is UserMessage user
+            ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, emoji)
+            : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, emoji);
 
     /// <summary>
     /// Creates a simple template response for the message.
@@ -46,19 +48,23 @@ public static partial class MessageExtensions
     /// Sends a typing indicator status to signal that there is an ongoing response to the user message.
     /// </summary>
     public static TypingResponse Typing(this UserMessage message)
-        => new(message.Service.Id, message.User.Number, message.Id, message.ConversationId);
+        => new(message.Service, message.User.Number, message.Id, message.ConversationId);
 
     /// <summary>
     /// Creates a text response for the message.
     /// </summary>
     public static TextResponse Reply(this IMessage message, string text)
-        => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text);
+        => message is UserMessage user
+        ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text)
+        : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text);
 
     /// <summary>
     /// Creates a text response with buttons for the message.
     /// </summary>
     public static TextResponse Reply(this IMessage message, string text, Button button1, Button? button2 = default)
-        => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text, button1, button2);
+        => message is UserMessage user
+            ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text, button1, button2)
+            : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text, button1, button2);
 
     /// <summary>
     /// Attempts to retrieve a single message from the specified collection.
