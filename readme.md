@@ -331,7 +331,6 @@ builder.Services.AddWhatsApp<MyWhatsAppHandler>()
     .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging()
     .UseIgnore()  // 👈 Ignore status+unsupported messages. We do log them.
-    .UseStorage()
     .UseConversation();
 ```
 
@@ -426,6 +425,25 @@ Options:
 ```
 
 to render the responses since it provides a more readable format than JSON.
+
+For non-text messages, the CLI falls short since you cannot attach files or images. For these 
+cases, you can continue to send messages via WhatsApp, but get the responses also in the CLI. 
+This works by inspecting messages in the current conversation (so it depends on `UseConversation`) 
+and detecting if any messages were sent by the CLI. If that is the case, non-console messages 
+will generate responses for the CLI as well:
+
+```csharp
+builder.Services.AddWhatsApp<MyWhatsAppHandler>()
+    .UseOpenTelemetry(builder.Environment.ApplicationName)
+    .UseConversation()
+    .UseConsole() // 👈 Enable CLI support for WhatsApp-originated messages
+
+```
+
+> [!IMPORTANT]
+> `UseConsole` will only be added to the pipeline if the hosting environment is set to `Development`, 
+> so it's not necessary to check for that in your code. This is to ensure that the CLI behaviors 
+> never impact production environments.
 
 <!-- #cli -->
 

@@ -11,9 +11,18 @@
 /// <param name="Emoji">The emoji representing the reaction to the message.</param>
 public record ReactionResponse(string ServiceId, string UserNumber, string Context, string? ConversationId, string Emoji) : Response(ServiceId, UserNumber, Context, ConversationId)
 {
+    readonly CompositeService? service;
+
+    internal ReactionResponse(Service service, string userNumber, string context, string? conversationId, string emoji)
+        : this(service.Id, userNumber, context, conversationId, emoji)
+        => this.service = service as CompositeService;
+
     /// <inheritdoc/>
     protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
     {
+        if (service != null)
+            await client.ReactAsync(service.Secondary.Id, UserNumber, Context, Emoji, cancellationToken);
+
         await client.ReactAsync(ServiceId, UserNumber, Context, Emoji);
 
         return Ulid.NewUlid().ToString();

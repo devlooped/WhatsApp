@@ -13,18 +13,33 @@
 /// <param name="Button2">An optional second button to include in the response for user interaction.</param>
 public record TextResponse(string ServiceId, string UserNumber, string Context, string? ConversationId, string Text, Button? Button1 = default, Button? Button2 = default) : Response(ServiceId, UserNumber, Context, ConversationId)
 {
+    readonly CompositeService? service;
+
+    internal TextResponse(Service service, string userNumber, string context, string? conversationId, string text, Button? button1 = default, Button? button2 = default)
+        : this(service.Id, userNumber, context, conversationId, text, button1, button2)
+        => this.service = service as CompositeService;
+
     /// <inheritdoc/>
-    protected override Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
+    protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellation = default)
+    {
+        if (service != null)
+            await SendReplyAsync(client, service.Secondary.Id, cancellation);
+
+        return await SendReplyAsync(client, ServiceId, cancellation);
+    }
+
+    Task<string?> SendReplyAsync(IWhatsAppClient client, string serviceId, CancellationToken cancellation)
     {
         if (Button1 != null)
         {
-            return (Button2 == null ?
-                client.ReplyAsync(ServiceId, UserNumber, Context, Text, Button1) :
-                client.ReplyAsync(ServiceId, UserNumber, Context, Text, Button1, Button2));
+            if (Button2 == null)
+                return client.ReplyAsync(serviceId, UserNumber, Context, Text, Button1, cancellation);
+            else
+                return client.ReplyAsync(serviceId, UserNumber, Context, Text, Button1, Button2, cancellation);
         }
         else
         {
-            return client.ReplyAsync(ServiceId, UserNumber, Context, Text);
+            return client.ReplyAsync(serviceId, UserNumber, Context, Text, cancellation);
         }
     }
 }
