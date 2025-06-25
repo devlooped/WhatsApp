@@ -51,16 +51,14 @@ class ProcessHandler(ILogger<Program> logger, JsonSerializerOptions options) : I
             await Task.Delay(2000);
 
             yield return content.Reply(
-                $"☑️ Got your {content.Content.Type}",
-                new Button("btn_good", "👍"),
-                new Button("btn_bad", "👎"));
-
-            yield return content.Reply(
                 $"""
+                ☑️ Got your {content.Content.Type}
                 ```
                 {JsonSerializer.Serialize(content, options)}
                 ```
-                """);
+                """,
+                new Button("btn_good", "👍"),
+                new Button("btn_bad", "👎"));
 
             yield return content.React("✅");
         }
