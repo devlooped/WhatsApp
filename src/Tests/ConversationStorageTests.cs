@@ -60,5 +60,15 @@ public class ConversationStorageTests
             Assert.NotNull(text.AdditionalProperties);
             Assert.Equal("ContentValue", (string)text.AdditionalProperties["ContentProp"]!);
         }
+
+        message.AdditionalProperties?["Agent"] = "Calendar";
+
+        await storage.SaveAsync(message);
+
+        var updatedMessage = await storage.GetMessageAsync(user.Number, messageId);
+
+        Assert.NotNull(updatedMessage?.AdditionalProperties);
+        Assert.Equal("Calendar", updatedMessage.AdditionalProperties?["Agent"]);
+        Assert.Equal("MessageValue", (string)updatedMessage.AdditionalProperties!["MessageProp"]!);
     }
 }

@@ -38,7 +38,16 @@ class ConversationStorage : IConversationStorage
             var conversation = await conversationsRepository.Value.GetAsync(message.UserNumber, message.ConversationId, cancellationToken) ??
                 new(message.UserNumber, message.ConversationId, [], message.Timestamp);
 
-            conversation.Messages.Add(message);
+            if (conversation.Messages.FirstOrDefault(x => x.Id == message.Id) is { } existing)
+            {
+                // Message is being updated, so we can just replace it
+                var index = conversation.Messages.IndexOf(existing);
+                conversation.Messages[index] = message;
+            }
+            else
+            {
+                conversation.Messages.Add(message);
+            }
 
             // Save the conversation
             await conversationsRepository.Value.PutAsync(conversation, cancellationToken);
