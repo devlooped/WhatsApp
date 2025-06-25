@@ -28,7 +28,7 @@ public static class ConsoleHandlerExtensions
         {
             // In production environments, we have ZERO impact since we're not even added to the pipeline.
             if (services.GetRequiredService<IHostEnvironment>().IsProduction())
-                return WhatsAppHandler.Skip;
+                return WhatsAppHandler.Continue;
 
             return new ConsoleHandler(inner);
         });

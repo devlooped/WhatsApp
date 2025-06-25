@@ -12,7 +12,7 @@ public class WhatsAppHandlerBuilder
     readonly Func<IServiceProvider, IWhatsAppHandler> handlerFactory;
     List<Func<IWhatsAppHandler, IServiceProvider, IWhatsAppHandler>>? factories;
 
-    public WhatsAppHandlerBuilder() : this(_ => WhatsAppHandler.Empty)
+    public WhatsAppHandlerBuilder() : this(_ => WhatsAppHandler.Stop)
     {
     }
 
@@ -56,7 +56,7 @@ public class WhatsAppHandlerBuilder
                 }
 
                 // Only keep non-skipping handlers.
-                if (current != WhatsAppHandler.Skip)
+                if (current != WhatsAppHandler.Continue)
                     handler = factories[i](handler!, services);
             }
         }
