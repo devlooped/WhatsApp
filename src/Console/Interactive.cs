@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Devlooped.WhatsApp.Client;
 using DotNetConfig;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +14,7 @@ using Spectre.Console.Rendering;
 namespace Devlooped.WhatsApp;
 
 [Service]
-class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) : IHostedService
+partial class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) : IHostedService
 {
     readonly CancellationTokenSource cts = new();
 
@@ -214,6 +215,8 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
 
                     IRenderable body = message.Type == Client.MessageType.Reaction || (text.StartsWith("[") && text.EndsWith("]"))
                         ? TryMarkup(text)
+                        : text.Contains("```")
+                        ? TryCodeBlocks(text.Trim())
                         : new Spectre.Console.Text(text).Overflow(Overflow.Fold);
 
                     var grid = new Grid()
@@ -221,15 +224,10 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
                         .AddColumn(new GridColumn().Width(80))
                         .AddRow(new Markup(":robot:"), body);
 
-                    AnsiConsole.Write(grid);
-
                     if (message is Client.InteractiveMessage interactive && interactive.Interactive.Action is { } node)
-                    {
-                        AnsiConsole.Write(new Panel(DictionaryConverter.Parse(node.ToString()).ToYaml(true))
-                        {
-                            Width = Math.Min(60, AnsiConsole.Profile.Width)
-                        });
-                    }
+                        grid.AddRow(new Markup(" "), new Markup(DictionaryConverter.Parse(node.ToString()).ToYaml(true)));
+
+                    AnsiConsole.Write(grid);
                     return;
                 }
             }
@@ -245,15 +243,71 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
         });
     }
 
-    async Task ResetTypingAsync()
+    static IRenderable TryCodeBlocks(string text)
     {
-        if (typingStatus != null && !typingStatus.IsCompleted)
+        var grid = new Grid();
+        grid.AddColumn(new());
+
+        // Regular expression to find code blocks with text before/after
+        var regex = CodeBlockExpr();
+
+        var lastEnd = 0;
+        var matches = regex.Matches(text);
+
+        if (matches.Count == 0)
+            return TryMarkup(text);
+
+        foreach (Match match in matches)
         {
-            typingCancellation.Cancel();
-            await typingStatus;
-            typingStatus = null;
-            if (!typingCancellation.TryReset())
-                typingCancellation = new CancellationTokenSource();
+            // Add text before code block if any
+            var beforeText = match.Groups[1].Value;
+            if (!string.IsNullOrWhiteSpace(beforeText))
+                grid.AddRow(TryMarkup(beforeText.Trim()));
+
+            var codeBlock = match.Groups[2].Value.Trim();
+            grid.AddRow(TryCode(codeBlock));
+
+            lastEnd = match.Index + match.Length;
+        }
+
+        // Add any remaining text after the last code block
+        if (lastEnd < text.Length)
+        {
+            var remainingText = text[lastEnd..];
+            if (!string.IsNullOrWhiteSpace(remainingText))
+                grid.AddRow(TryMarkup(remainingText.Trim()));
+        }
+
+        return grid;
+    }
+
+    static IRenderable TryCode(string code)
+    {
+        try
+        {
+            JsonDocument.Parse(code, new JsonDocumentOptions
+            {
+                AllowTrailingCommas = true,
+                CommentHandling = JsonCommentHandling.Skip
+            });
+
+            return new JsonText(code);
+        }
+        catch (JsonException)
+        {
+            // if it fails as JSON, try parsing as a YAML dictionary
+            try
+            {
+                var yaml = DictionaryConverter.ToYaml(DictionaryConverter.FromYaml(code), formatted: true);
+                return new Panel(yaml)
+                {
+                    Width = Math.Min(80, AnsiConsole.Profile.Width)
+                };
+            }
+            catch (Exception)
+            {
+                return new Markup($"[grey]{code}[/]");
+            }
         }
     }
 
@@ -268,4 +322,19 @@ class Interactive(IConfiguration configuration, IHttpClientFactory httpFactory) 
             return new Spectre.Console.Text(text).Overflow(Overflow.Fold);
         }
     }
+
+    async Task ResetTypingAsync()
+    {
+        if (typingStatus != null && !typingStatus.IsCompleted)
+        {
+            typingCancellation.Cancel();
+            await typingStatus;
+            typingStatus = null;
+            if (!typingCancellation.TryReset())
+                typingCancellation = new CancellationTokenSource();
+        }
+    }
+
+    [GeneratedRegex(@"(.*?)```([\s\S]*?)```", RegexOptions.Singleline)]
+    private static partial Regex CodeBlockExpr();
 }
