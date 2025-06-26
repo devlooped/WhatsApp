@@ -142,7 +142,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                 }
                 finally
                 {
-                    RestartTimer();
+                    RestartPersonHead();
                 }
             }
         }
@@ -167,7 +167,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
 
                 // Callbacks from the server push the head timer forward always, 
                 // so given it some time to render responses.
-                RestartTimer();
+                RestartPersonHead();
                 await RenderAsync(requestBody);
             }
             catch (Exception ex)
@@ -184,6 +184,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
 
                 await response.OutputStream.WriteAsync(buffer);
                 response.OutputStream.Close();
+                RestartPersonHead();
             }
         }
     }
@@ -191,7 +192,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
     CancellationTokenSource typingCancellation = new();
     Task? typingStatus;
 
-    void RestartTimer()
+    void RestartPersonHead()
     {
         personTimer?.Start();         // no-op if already started
         personTimer?.Interval = 500; // moves event .5'' into the future if already started
@@ -238,7 +239,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                             {
                                 await Task.Delay(100);
                                 // We should never let the head appear while we're still "typing"
-                                RestartTimer();
+                                RestartPersonHead();
                             }
                         });
                         return;
