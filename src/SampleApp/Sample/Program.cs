@@ -71,6 +71,14 @@ if (builder.Configuration["EventGrid:Topic"] is { Length: > 0 } topic &&
         new Uri(topic), new Azure.AzureKeyCredential(key)));
 }
 
+if (builder.Environment.IsDevelopment())
+{
+    // Make sure we never timeout when calling back to the console
+    builder.Services.AddHttpClient()
+        .ConfigureHttpClientDefaults(client => client.ConfigureHttpClient(http =>
+          http.Timeout = TimeSpan.FromMinutes(30)));
+}
+
 var app = builder.Build();
 
 #region DebugInit
