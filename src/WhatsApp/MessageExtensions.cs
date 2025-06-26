@@ -17,6 +17,24 @@ public static partial class MessageExtensions
             get => (message.AdditionalProperties ??= []).TryGetValue("FromConsole", out var value) ? value as bool? ?? default : default;
             set => (message.AdditionalProperties ??= [])["FromConsole"] = value;
         }
+
+        /// <summary>
+        /// Alternative text to send to the console, if the message is intended to reach the CLI.
+        /// </summary>
+        public string? ConsoleText
+        {
+            get => (message.AdditionalProperties ??= []).TryGetValue("ConsoleText", out var value) ? value as string : null;
+            set => (message.AdditionalProperties ??= [])["ConsoleText"] = value;
+        }
+
+        /// <summary>
+        /// The message is intended for consumption only in the console and should not be sent to WhatsApp.
+        /// </summary>
+        public bool ConsoleOnly
+        {
+            get => (message.AdditionalProperties ??= []).TryGetValue("ConsoleOnly", out var value) ? value as bool? ?? default : default;
+            set => (message.AdditionalProperties ??= [])["ConsoleOnly"] = value;
+        }
     }
 
     /// <summary>
