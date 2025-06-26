@@ -91,9 +91,17 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
         // Initially non-started
         personTimer.Elapsed += (sender, e) =>
         {
-            AnsiConsole.Markup($":person_beard: ");
-            needsNewline = true;
-            personTimer.Stop();
+            lock (personTimer)
+            {
+                personTimer.Stop();
+                // We never write a second head if newline is awaited, since that 
+                // means we have already written it.
+                if (!needsNewline)
+                {
+                    AnsiConsole.Markup($":person_beard: ");
+                    needsNewline = true;
+                }
+            }
         };
 
         while (!cts.IsCancellationRequested)
