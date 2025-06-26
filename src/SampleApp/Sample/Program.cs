@@ -60,6 +60,8 @@ var whatsapp = builder.Services
     .Use(EchoAndHandle)
     .UseConversation(conversationWindowSeconds: 300 /* default */)
     .UseConsole();
+// Uncomment next line to render a JSON of text message/responses 
+//.UseConsoleRender();
 
 // If event grid is set up, switch to processing messages using that
 if (builder.Configuration["EventGrid:Topic"] is { Length: > 0 } topic &&
