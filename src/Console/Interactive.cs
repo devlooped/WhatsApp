@@ -233,7 +233,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                         ? TryMarkup(text)
                         : text.Contains("```")
                         ? TryCodeBlocks(text.Trim())
-                        : new Spectre.Console.Text(text).Overflow(Overflow.Fold);
+                        : TryCode(text.Trim(), false);
 
                     var grid = new Grid()
                         .AddColumn(new GridColumn().Width(2))
@@ -297,7 +297,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
         return grid;
     }
 
-    static IRenderable TryCode(string code)
+    static IRenderable TryCode(string code, bool greyFallback = true)
     {
         try
         {
@@ -322,7 +322,15 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
             }
             catch (Exception)
             {
-                return new Markup($"[grey]{code}[/]");
+                if (greyFallback)
+                {
+                    // If it fails as YAML, fallback to grey text
+                    return new Markup($"[grey]{code}[/]");
+                }
+                else
+                {
+                    return TryMarkup(code);
+                }
             }
         }
     }
