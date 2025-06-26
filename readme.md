@@ -357,6 +357,40 @@ before invoking `UseWhatsApp`, the library will automatically use them. Otherwis
 it will register both services using the `AzureWebJobsStorage` connection string, 
 therefore sharing storage with the Azure Functions runtime.
 
+As an alternative (and more instantaneous in practice) approach to asynchronous message 
+processing, Azure Event Grid is also a supported option. It requires setting up an 
+Azure Event Grid topic, and subscribing it to the `whatsapp_eventgrid` function 
+and then configure the topic URL and access key for use with the pipeline, such as:
+
+
+```csharp
+var whatsapp = builder.Services.AddWhatsApp<MyWhatsAppHandler>()
+    ...;
+
+// If event grid is set up, switch to processing messages using that
+if (builder.Configuration["EventGrid:Topic"] is { Length: > 0 } topic &&
+    builder.Configuration["EventGrid:Key"] is { Length: > 0 } key)
+{
+    whatsapp.UseEventGridProcessor(new EventGridPublisherClient(
+        new Uri(topic), new Azure.AzureKeyCredential(key)));
+}
+```
+
+You can also create your enqueue message processing to your own implementation 
+by providing your own version of the trivial `IMessageProcessor` interface 
+and registering that in the container: 
+
+```csharp
+public interface IMessageProcessor
+{
+    /// <summary>
+    /// Enqueues the WhatsApp for Business webhook message for async processing.
+    /// </summary>
+    Task EnqueueAsync(string json, CancellationToken cancellation = default);
+}
+```
+
+
 ## License
 
 We offer this project under a dual licensing model, tailored to the needs 
