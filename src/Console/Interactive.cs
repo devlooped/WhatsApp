@@ -218,7 +218,8 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                     if (message.Type == Client.MessageType.Reaction && text.Length == 0)
                         return;
 
-                    await ResetTypingAsync();
+                    if (message.Type != Client.MessageType.Reaction)
+                        await ResetTypingAsync();
 
                     IRenderable body = message.Type == Client.MessageType.Reaction || (text.StartsWith("[") && text.EndsWith("]"))
                         ? TryMarkup(text)
