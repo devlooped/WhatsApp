@@ -42,9 +42,14 @@ class ProcessHandler(ILogger<Program> logger, JsonSerializerOptions options) : I
         }
         else if (message is ContentMessage content)
         {
-            yield return content.React("🧠");
+            yield return content.React("🧠")
+                .WithConsoleText(":brain::fire:");
 
-            yield return content.Reply("Spinning my digital neurons...");
+            yield return content.Reply("Spinning my digital neurons...")
+                // Showcases how to use CLI-specific text
+                .WithConsoleText("[lime]Spinning[/] my :desktop_computer: :brain:...");
+
+            // Showcases restoring the typing indicator after a reply
             yield return content.Typing();
 
             // simulate some hard work at hand, like doing some LLM-stuff :)
@@ -59,6 +64,9 @@ class ProcessHandler(ILogger<Program> logger, JsonSerializerOptions options) : I
                 """,
                 new Button("btn_good", "👍"),
                 new Button("btn_bad", "👎"));
+
+            yield return content.Reply("[grey][italic]This is for the CLI only.[/][/] [link=https://github.com/devlooped/WhatsApp]WhatsApp Lib[/]")
+                .ForConsoleOnly();
 
             yield return content.React("✅");
         }

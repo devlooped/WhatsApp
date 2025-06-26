@@ -37,6 +37,27 @@ public static partial class MessageExtensions
         }
     }
 
+    extension<T>(T response) where T : Response
+    {
+        /// <summary>
+        /// Marks the response for console use only by setting the <c>ConsoleOnly</c> property to <see langword="true"/>.
+        /// </summary>
+        public T ForConsoleOnly()
+        {
+            response.ConsoleOnly = true;
+            return response;
+        }
+
+        /// <summary>
+        /// Sets the console alternate text for the response, in case the response is intended to be sent to the CLI.
+        /// </summary>
+        public T WithConsoleText(string text)
+        {
+            response.ConsoleText = text;
+            return response;
+        }
+    }
+
     /// <summary>
     /// Creates a reaction response for the user message.
     /// </summary>

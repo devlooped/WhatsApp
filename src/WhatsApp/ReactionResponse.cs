@@ -11,6 +11,8 @@
 /// <param name="Emoji">The emoji representing the reaction to the message.</param>
 public record ReactionResponse(string ServiceId, string UserNumber, string Context, string? ConversationId, string Emoji) : Response(ServiceId, UserNumber, Context, ConversationId)
 {
+    // If this variable is not null, it means the originating message came from WhatsApp
+    // and there's an ongoing conversation with the CLI simultaneously.
     readonly CompositeService? service;
 
     internal ReactionResponse(Service service, string userNumber, string context, string? conversationId, string emoji)
@@ -23,8 +25,13 @@ public record ReactionResponse(string ServiceId, string UserNumber, string Conte
         if (service != null)
             await client.ReactAsync(service.Secondary.Id, UserNumber, Context, this.ConsoleText ?? Emoji, cancellationToken);
 
+        // If service is null, it's either a WhatsApp regular without CLI, or it's pure CLI.
+        // In both cases, we need to send the reaction to the WhatsApp service. 
+        // The other case is if we did get a composite service, but the message is not intended for console only.
         if (service == null || this.ConsoleOnly != true)
-            await client.ReactAsync(ServiceId, UserNumber, Context, Emoji);
+            await client.ReactAsync(ServiceId, UserNumber, Context,
+                // Automatically pick the CLI version of the text if sending to the CLI
+                ServiceId.IsCLI() ? this.ConsoleText ?? Emoji : Emoji);
 
         return Ulid.NewUlid().ToString();
     }
