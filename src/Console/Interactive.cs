@@ -25,7 +25,9 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
     string? clientEndpoint;
     HttpListener? listener;
     bool needsNewline = true;
-    Timer? personTimer = null;
+    // Initially non-started
+    Timer personTimer = new() { AutoReset = false };
+    CancellationTokenSource? typingCancellation = null;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -87,8 +89,6 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
     {
         AnsiConsole.MarkupLine($":robot: Ready");
         AnsiConsole.Markup($":person_beard: ");
-        personTimer = new Timer { AutoReset = false };
-        // Initially non-started
         personTimer.Elapsed += (sender, e) =>
         {
             lock (personTimer)
@@ -158,6 +158,10 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
 
             try
             {
+                // Stop head from appearing while we're processing
+                lock (personTimer)
+                    personTimer.Stop();
+
                 // Read the request body (if any)
                 var requestBody = "{}";
                 using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
@@ -167,7 +171,6 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
 
                 // Callbacks from the server push the head timer forward always, 
                 // so given it some time to render responses.
-                RestartPersonHead();
                 await RenderAsync(requestBody);
             }
             catch (Exception ex)
@@ -189,13 +192,14 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
         }
     }
 
-    CancellationTokenSource typingCancellation = new();
-    Task? typingStatus;
 
     void RestartPersonHead()
     {
-        personTimer?.Start();         // no-op if already started
-        personTimer?.Interval = 500; // moves event .5'' into the future if already started
+        lock (personTimer)
+        {
+            personTimer.Start();         // no-op if already started
+            personTimer.Interval = 1000; // moves event .5'' into the future if already started
+        }
     }
 
     async Task RenderAsync(string json)
@@ -232,10 +236,10 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                 {
                     if (message.Type == Client.MessageType.Typing)
                     {
-                        await ResetTypingAsync();
-                        typingStatus = AnsiConsole.Status().StartAsync("...", async x =>
+                        KeepTyping();
+                        _ = AnsiConsole.Status().StartAsync("...", async x =>
                         {
-                            while (!cts.IsCancellationRequested && !typingCancellation.IsCancellationRequested)
+                            while (!cts.IsCancellationRequested && typingCancellation?.IsCancellationRequested != true)
                             {
                                 await Task.Delay(100);
                                 // We should never let the head appear while we're still "typing"
@@ -249,8 +253,8 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                     if (message.Type == Client.MessageType.Reaction && text.Length == 0)
                         return;
 
-                    if (message.Type != Client.MessageType.Reaction)
-                        await ResetTypingAsync();
+                    if (message.Type is Client.MessageType.Content or Client.MessageType.Interactive)
+                        typingCancellation?.Cancel();
 
                     var parts = text.Split('|');
                     var emoji = ":robot:";
@@ -260,7 +264,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                         text = parts[1].Trim();
                     }
 
-                    IRenderable body = message.Type == Client.MessageType.Reaction || (text.StartsWith("[") && text.EndsWith("]"))
+                    var body = message.Type == Client.MessageType.Reaction || (text.StartsWith("[") && text.EndsWith("]"))
                         ? TryMarkup(text)
                         : text.Contains("```")
                         ? TryCodeBlocks(text.Trim())
@@ -274,7 +278,9 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                     if (message is Client.InteractiveMessage interactive && interactive.Interactive.Action is { } node)
                         grid.AddRow(new Markup(" "), new Markup(DictionaryConverter.Parse(node.ToString()).ToYaml(true)));
 
-                    AnsiConsole.Write(grid);
+                    AnsiConsole.Write(new Panel(grid)
+                        .Border(BoxBorder.None)
+                        .Padding(0, 1, 0, 0));
                     return;
                 }
             }
@@ -290,6 +296,20 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
             Padding = new Padding(0, 0, 0, 0),
             Width = Math.Min(100, AnsiConsole.Profile.Width)
         });
+    }
+
+    void KeepTyping()
+    {
+        if (typingCancellation is null || typingCancellation.IsCancellationRequested)
+        {
+            typingCancellation?.Dispose();
+            // matches the behavior of WhatsApp indicators
+            typingCancellation = new(TimeSpan.FromSeconds(25));
+        }
+        else
+        {
+            typingCancellation.CancelAfter(TimeSpan.FromSeconds(25));
+        }
     }
 
     static IRenderable TryCodeBlocks(string text)
@@ -379,18 +399,6 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
         catch (Exception)
         {
             return new Spectre.Console.Text(text).Overflow(Overflow.Fold);
-        }
-    }
-
-    async Task ResetTypingAsync()
-    {
-        if (typingStatus != null && !typingStatus.IsCompleted)
-        {
-            typingCancellation.Cancel();
-            await typingStatus;
-            typingStatus = null;
-            if (!typingCancellation.TryReset())
-                typingCancellation = new CancellationTokenSource();
         }
     }
 
