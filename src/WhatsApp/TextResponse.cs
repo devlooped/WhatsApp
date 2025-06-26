@@ -22,24 +22,28 @@ public record TextResponse(string ServiceId, string UserNumber, string Context, 
     /// <inheritdoc/>
     protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellation = default)
     {
+        string? id = null;
         if (service != null)
-            await SendReplyAsync(client, service.Secondary.Id, cancellation);
+            id = await SendReplyAsync(client, service.Secondary.Id, this.ConsoleText ?? Text, cancellation);
 
-        return await SendReplyAsync(client, ServiceId, cancellation);
+        if (service == null || this.ConsoleOnly != true)
+            return await SendReplyAsync(client, ServiceId, Text, cancellation);
+
+        return id;
     }
 
-    Task<string?> SendReplyAsync(IWhatsAppClient client, string serviceId, CancellationToken cancellation)
+    Task<string?> SendReplyAsync(IWhatsAppClient client, string serviceId, string text, CancellationToken cancellation)
     {
         if (Button1 != null)
         {
             if (Button2 == null)
-                return client.ReplyAsync(serviceId, UserNumber, Context, Text, Button1, cancellation);
+                return client.ReplyAsync(serviceId, UserNumber, Context, text, Button1, cancellation);
             else
-                return client.ReplyAsync(serviceId, UserNumber, Context, Text, Button1, Button2, cancellation);
+                return client.ReplyAsync(serviceId, UserNumber, Context, text, Button1, Button2, cancellation);
         }
         else
         {
-            return client.ReplyAsync(serviceId, UserNumber, Context, Text, cancellation);
+            return client.ReplyAsync(serviceId, UserNumber, Context, text, cancellation);
         }
     }
 }
