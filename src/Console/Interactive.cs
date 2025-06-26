@@ -221,6 +221,14 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                     if (message.Type != Client.MessageType.Reaction)
                         await ResetTypingAsync();
 
+                    var parts = text.Split('|');
+                    var emoji = ":robot:";
+                    if (parts.Length > 1)
+                    {
+                        emoji = parts[0].Trim();
+                        text = parts[1].Trim();
+                    }
+
                     IRenderable body = message.Type == Client.MessageType.Reaction || (text.StartsWith("[") && text.EndsWith("]"))
                         ? TryMarkup(text)
                         : text.Contains("```")
@@ -230,7 +238,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                     var grid = new Grid()
                         .AddColumn(new GridColumn().Width(2))
                         .AddColumn(new GridColumn().Width(80))
-                        .AddRow(new Markup(":robot:"), body);
+                        .AddRow(new Markup(emoji), body);
 
                     if (message is Client.InteractiveMessage interactive && interactive.Interactive.Action is { } node)
                         grid.AddRow(new Markup(" "), new Markup(DictionaryConverter.Parse(node.ToString()).ToYaml(true)));
