@@ -32,8 +32,8 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
 
         await foreach (var response in base.HandleAsync(conversation, cancellation))
         {
-            // We don't care about typing status messages for conversation storage
-            if (response is not TypingResponse)
+            // We don't care about typing status or reaction messages for conversation storage
+            if (response is not TypingResponse or ReactionResponse)
                 await storage.SaveAsync(response, cancellation);
 
             yield return response;
