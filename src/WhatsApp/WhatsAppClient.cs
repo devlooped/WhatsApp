@@ -56,8 +56,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
         if (!options.Numbers.TryGetValue(numberId, out var token))
         {
             // Try to reply to the debug console
-            if (numberId.StartsWith("http://localhost", StringComparison.OrdinalIgnoreCase) &&
-                Uri.TryCreate(numberId, UriKind.Absolute, out var uri))
+            if (numberId.IsCLI() && Uri.TryCreate(numberId, UriKind.Absolute, out var uri))
             {
                 using var httpClient = httpFactory.CreateClient();
 
