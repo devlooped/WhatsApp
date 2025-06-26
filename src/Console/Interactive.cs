@@ -94,21 +94,28 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                 needsNewline = false;
                 try
                 {
-                    var message = new ContentMessage(
-                        Id: Ulid.NewUlid().ToString(),
-                        Service: new Service(clientEndpoint!, "123456789"),
-                        User: new User("Console", number ?? "987654321"),
-                        Timestamp: DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
-                        Content: new TextContent(input)
-                    );
-
-                    using var httpClient = httpFactory.CreateClient("whatsapp");
-                    var payload = JsonSerializer.Serialize(message, JsonContext.Default.Message);
-
-                    var response = await httpClient.PostAsync(service, new StringContent(payload, Encoding.UTF8, "application/json"));
-                    if (!response.IsSuccessStatusCode)
+                    if (input.Trim() is "cls" or "clear")
                     {
-                        AnsiConsole.MarkupLine($"[red] Failed to send message.[/] [bold]Status Code:[/] {response.StatusCode}");
+                        Console.Clear();
+                    }
+                    else
+                    {
+                        var message = new ContentMessage(
+                            Id: Ulid.NewUlid().ToString(),
+                            Service: new Service(clientEndpoint!, "123456789"),
+                            User: new User("Console", number ?? "987654321"),
+                            Timestamp: DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+                            Content: new TextContent(input)
+                        );
+
+                        using var httpClient = httpFactory.CreateClient("whatsapp");
+                        var payload = JsonSerializer.Serialize(message, JsonContext.Default.Message);
+
+                        var response = await httpClient.PostAsync(service, new StringContent(payload, Encoding.UTF8, "application/json"));
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            AnsiConsole.MarkupLine($"[red] Failed to send message.[/] [bold]Status Code:[/] {response.StatusCode}");
+                        }
                     }
                 }
                 catch (Exception e)
