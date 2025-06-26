@@ -1,5 +1,116 @@
 # Changelog
 
+## [v0.5.0](https://github.com/devlooped/WhatsApp/tree/v0.5.0) (2025-06-26)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v1.0.0-rc.13...v0.5.0)
+
+:sparkles: Implemented enhancements:
+
+- Add tests for the latest added features: storage, conversations, features, etc [\#113](https://github.com/devlooped/WhatsApp/issues/113)
+- Switch to CTS-based typing progress, align with WhatsApp indicator [\#197](https://github.com/devlooped/WhatsApp/pull/197) (@kzu)
+- Improve CLI rendering of head, remove paddings, etc. [\#196](https://github.com/devlooped/WhatsApp/pull/196) (@kzu)
+- Set methods for setting console-only text and processing [\#195](https://github.com/devlooped/WhatsApp/pull/195) (@kzu)
+- Allow alternative text for console consumption and console-only messages [\#194](https://github.com/devlooped/WhatsApp/pull/194) (@kzu)
+- Attempt to infer code blocks in more cases [\#193](https://github.com/devlooped/WhatsApp/pull/193) (@kzu)
+- Allow setting emoji column for render via message text [\#192](https://github.com/devlooped/WhatsApp/pull/192) (@kzu)
+- Don't reset typing status indicator on reactions [\#191](https://github.com/devlooped/WhatsApp/pull/191) (@kzu)
+- Allow clearing the CLI without restarting the app [\#190](https://github.com/devlooped/WhatsApp/pull/190) (@kzu)
+- Rename handlers Empty \> Stop, Skip \> Continue [\#187](https://github.com/devlooped/WhatsApp/pull/187) (@kzu)
+- Provide seamless continuity between CLI and WhatsApp [\#186](https://github.com/devlooped/WhatsApp/pull/186) (@kzu)
+- Add a way to skip a handler in the pipeline [\#185](https://github.com/devlooped/WhatsApp/pull/185) (@kzu)
+- Make conversation window configurable via options [\#184](https://github.com/devlooped/WhatsApp/pull/184) (@kzu)
+- Allow updating messages in storage [\#183](https://github.com/devlooped/WhatsApp/pull/183) (@kzu)
+- Render typing status in console too [\#182](https://github.com/devlooped/WhatsApp/pull/182) (@kzu)
+- Add public API for typing indicators [\#181](https://github.com/devlooped/WhatsApp/pull/181) (@kzu)
+- Typing indicators imply marking message read [\#180](https://github.com/devlooped/WhatsApp/pull/180) (@kzu)
+- Add typing indicator support during webhook or process [\#179](https://github.com/devlooped/WhatsApp/pull/179) (@kzu)
+- Add support for pluggable async message processing strategies [\#176](https://github.com/devlooped/WhatsApp/pull/176) (@kzu)
+- Allow flexible mark as read behavior for content messages [\#173](https://github.com/devlooped/WhatsApp/pull/173) (@kzu)
+- Allow configuring progress reactions in key built-in stages [\#172](https://github.com/devlooped/WhatsApp/pull/172) (@kzu)
+- Allow server-side to send formatted responses to console [\#171](https://github.com/devlooped/WhatsApp/pull/171) (@kzu)
+- Simplify by reusing M.E.AI AdditionalProperties [\#166](https://github.com/devlooped/WhatsApp/pull/166) (@kzu)
+- Allow message and content extensibility via AdditionalProperties [\#165](https://github.com/devlooped/WhatsApp/pull/165) (@kzu)
+- Add CLI options to avoid interactive prompts [\#164](https://github.com/devlooped/WhatsApp/pull/164) (@kzu)
+- Wrap agent text at 80 chars for easier reading [\#163](https://github.com/devlooped/WhatsApp/pull/163) (@kzu)
+- Improve rendering of person heads [\#162](https://github.com/devlooped/WhatsApp/pull/162) (@kzu)
+- Remove all loggers from the default host [\#161](https://github.com/devlooped/WhatsApp/pull/161) (@kzu)
+- Make sure we don't lose config in CLI [\#160](https://github.com/devlooped/WhatsApp/pull/160) (@kzu)
+- Allow pipeline handlers to send messages too [\#157](https://github.com/devlooped/WhatsApp/pull/157) (@kzu)
+- Add missing Caption property to image and video content [\#155](https://github.com/devlooped/WhatsApp/pull/155) (@kzu)
+- Move MarkRead to just before invoking the pipeline [\#150](https://github.com/devlooped/WhatsApp/pull/150) (@kzu)
+- Add missing MessageType.Response [\#147](https://github.com/devlooped/WhatsApp/pull/147) (@kzu)
+
+:bug: Fixed bugs:
+
+- Massive timeout increase to aid local debugging [\#167](https://github.com/devlooped/WhatsApp/pull/167) (@kzu)
+
+:hammer: Other:
+
+- Improve discoverability of ConversationOptions from WhatsApp [\#132](https://github.com/devlooped/WhatsApp/issues/132)
+
+:twisted_rightwards_arrows: Merged:
+
+- Detect and render code blocks within text output in CLI [\#188](https://github.com/devlooped/WhatsApp/pull/188) (@kzu)
+- Flag messages coming from the console for pipeline [\#170](https://github.com/devlooped/WhatsApp/pull/170) (@kzu)
+- Don't warn on hosting issues \(like missing docker\) [\#169](https://github.com/devlooped/WhatsApp/pull/169) (@kzu)
+- Update readme.md with CLI from main command [\#168](https://github.com/devlooped/WhatsApp/pull/168) (@kzu)
+- Improved interactive console renderings [\#158](https://github.com/devlooped/WhatsApp/pull/158) (@kzu)
+- Revamp and simplify conversation management [\#153](https://github.com/devlooped/WhatsApp/pull/153) (@kzu)
+- Fix naming of parameters to match uniform usage in the API [\#148](https://github.com/devlooped/WhatsApp/pull/148) (@kzu)
+
+## [v1.0.0-rc.13](https://github.com/devlooped/WhatsApp/tree/v1.0.0-rc.13) (2025-06-18)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v1.0.0-rc.12...v1.0.0-rc.13)
+
+:sparkles: Implemented enhancements:
+
+- Add WhatsApp CLI [\#145](https://github.com/devlooped/WhatsApp/pull/145) (@kzu)
+- Improve feature filter naming to avoid potential collisions [\#133](https://github.com/devlooped/WhatsApp/pull/133) (@kzu)
+- When logging errors, also log payload [\#131](https://github.com/devlooped/WhatsApp/pull/131) (@kzu)
+- Rename To/From to Service/User [\#105](https://github.com/devlooped/WhatsApp/pull/105) (@kzu)
+- Rename Text to Reply as a message extension [\#104](https://github.com/devlooped/WhatsApp/pull/104) (@kzu)
+- Make usability extension methods public [\#103](https://github.com/devlooped/WhatsApp/pull/103) (@kzu)
+- Add CancellationToken parameter consistently to all WhatsAppClientExtensions [\#102](https://github.com/devlooped/WhatsApp/pull/102) (@kzu)
+- Generalize the former reengage as a general solution [\#101](https://github.com/devlooped/WhatsApp/pull/101) (@kzu)
+- Merge use storage feature/capability into main [\#90](https://github.com/devlooped/WhatsApp/pull/90) (@kzu)
+- Add an AsBuilder extension method for improved discoverability [\#72](https://github.com/devlooped/WhatsApp/pull/72) (@kzu)
+- Add OpenTelemetry support [\#66](https://github.com/devlooped/WhatsApp/pull/66) (@kzu)
+- Refactor UseWhatsApp \> AddWhatsApp for IServiceCollection [\#65](https://github.com/devlooped/WhatsApp/pull/65) (@kzu)
+- Make JSON serialization context public for persistence scenarios [\#64](https://github.com/devlooped/WhatsApp/pull/64) (@kzu)
+
+:bug: Fixed bugs:
+
+- Rename all records Service/User properties [\#139](https://github.com/devlooped/WhatsApp/pull/139) (@kzu)
+- Fix hang on main handler registration, cleanup sample handler [\#115](https://github.com/devlooped/WhatsApp/pull/115) (@kzu)
+- Add JQ to top-level app too [\#67](https://github.com/devlooped/WhatsApp/pull/67) (@kzu)
+
+:hammer: Other:
+
+- Add CancellationToken parameter consistently to all WhatsAppClientExtensions [\#100](https://github.com/devlooped/WhatsApp/issues/100)
+- Expose IServiceCollection in the WhatsAppHandlerBuilder [\#87](https://github.com/devlooped/WhatsApp/issues/87)
+
+:twisted_rightwards_arrows: Merged:
+
+- Add end to end integration test for feature flags and storage [\#144](https://github.com/devlooped/WhatsApp/pull/144) (@kzu)
+- Added the ability of receiving/sending messages from the a debug console [\#143](https://github.com/devlooped/WhatsApp/pull/143) (@adalon)
+- Disable inherntly flaky media resolving test [\#138](https://github.com/devlooped/WhatsApp/pull/138) (@kzu)
+- Misc changes for improving the conversation support [\#124](https://github.com/devlooped/WhatsApp/pull/124) (@adalon)
+- Keep delegating if storage or conversation were not used [\#116](https://github.com/devlooped/WhatsApp/pull/116) (@adalon)
+- Add dogfooding section to readme [\#99](https://github.com/devlooped/WhatsApp/pull/99) (@kzu)
+- Improved the conversation handling to fully filter data in the backend [\#98](https://github.com/devlooped/WhatsApp/pull/98) (@adalon)
+- Minor renames and doc fixes [\#93](https://github.com/devlooped/WhatsApp/pull/93) (@kzu)
+- Added UseConversation feature/capability [\#91](https://github.com/devlooped/WhatsApp/pull/91) (@adalon)
+- Converted WhatsApp.sln into the new .slnx format [\#84](https://github.com/devlooped/WhatsApp/pull/84) (@adalon)
+- Place the fill attribute on the root node [\#83](https://github.com/devlooped/WhatsApp/pull/83) (@kzu)
+- Remove unnecessary ServiceDefaults project [\#82](https://github.com/devlooped/WhatsApp/pull/82) (@kzu)
+- Make empty handler public [\#75](https://github.com/devlooped/WhatsApp/pull/75) (@kzu)
+- Refactored handlers to return async enum responses [\#74](https://github.com/devlooped/WhatsApp/pull/74) (@adalon)
+- Not using the distributed table storage package at all [\#71](https://github.com/devlooped/WhatsApp/pull/71) (@kzu)
+- Add missing local settings file [\#70](https://github.com/devlooped/WhatsApp/pull/70) (@kzu)
+- Use func azure deploy [\#69](https://github.com/devlooped/WhatsApp/pull/69) (@kzu)
+- The sample is being deployed to a windows host [\#68](https://github.com/devlooped/WhatsApp/pull/68) (@kzu)
+- Add full WhatsAppSuffix for clarity [\#63](https://github.com/devlooped/WhatsApp/pull/63) (@kzu)
+
 ## [v1.0.0-rc.12](https://github.com/devlooped/WhatsApp/tree/v1.0.0-rc.12) (2025-05-16)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v1.0.0-rc.11...v1.0.0-rc.12)
