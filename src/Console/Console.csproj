@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>Preview</LangVersion>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <PackageId>dotnet-whatsapp</PackageId>
     <Description>A WhatsApp simulator client that complements Devlooped.WhatsApp.</Description>

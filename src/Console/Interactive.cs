@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Spectre.Console;
 using Spectre.Console.Json;
 using Spectre.Console.Rendering;
+using Timer = System.Timers.Timer;
 
 namespace Devlooped.WhatsApp;
 
@@ -24,6 +25,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
     string? clientEndpoint;
     HttpListener? listener;
     bool needsNewline = true;
+    Timer? personTimer = null;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -85,6 +87,14 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
     {
         AnsiConsole.MarkupLine($":robot: Ready");
         AnsiConsole.Markup($":person_beard: ");
+        personTimer = new Timer { AutoReset = false };
+        // Initially non-started
+        personTimer.Elapsed += (sender, e) =>
+        {
+            AnsiConsole.Markup($":person_beard: ");
+            needsNewline = true;
+            personTimer.Stop();
+        };
 
         while (!cts.IsCancellationRequested)
         {
@@ -124,8 +134,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                 }
                 finally
                 {
-                    AnsiConsole.Markup($":person_beard: ");
-                    needsNewline = true;
+                    RestartTimer();
                 }
             }
         }
@@ -148,6 +157,9 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                     requestBody = await reader.ReadToEndAsync();
                 }
 
+                // Callbacks from the server push the head timer forward always, 
+                // so given it some time to render responses.
+                RestartTimer();
                 await RenderAsync(requestBody);
             }
             catch (Exception ex)
@@ -171,6 +183,12 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
     CancellationTokenSource typingCancellation = new();
     Task? typingStatus;
 
+    void RestartTimer()
+    {
+        personTimer?.Start();         // no-op if already started
+        personTimer?.Interval = 500; // moves event .5'' into the future if already started
+    }
+
     async Task RenderAsync(string json)
     {
         if (needsNewline)
@@ -183,6 +201,8 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
         {
             AnsiConsole.Write(new Panel(payload)
             {
+                Border = BoxBorder.None,
+                Padding = new Padding(0, 0, 0, 0),
                 Width = Math.Min(100, AnsiConsole.Profile.Width)
             });
             return;
@@ -209,6 +229,8 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                             while (!cts.IsCancellationRequested && !typingCancellation.IsCancellationRequested)
                             {
                                 await Task.Delay(100);
+                                // We should never let the head appear while we're still "typing"
+                                RestartTimer();
                             }
                         });
                         return;
@@ -236,8 +258,8 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                         : TryCode(text.Trim(), false);
 
                     var grid = new Grid()
-                        .AddColumn(new GridColumn().Width(2))
-                        .AddColumn(new GridColumn().Width(80))
+                        .AddColumn(new GridColumn().Width(2).Padding(0, 0))
+                        .AddColumn(new GridColumn().Width(80).Padding(1, 0))
                         .AddRow(new Markup(emoji), body);
 
                     if (message is Client.InteractiveMessage interactive && interactive.Interactive.Action is { } node)
@@ -255,6 +277,8 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
 
         AnsiConsole.Write(new Panel(new JsonText(json))
         {
+            Border = BoxBorder.None,
+            Padding = new Padding(0, 0, 0, 0),
             Width = Math.Min(100, AnsiConsole.Profile.Width)
         });
     }
@@ -317,6 +341,8 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                 var yaml = DictionaryConverter.ToYaml(DictionaryConverter.FromYaml(code), formatted: true);
                 return new Panel(yaml)
                 {
+                    Border = BoxBorder.None,
+                    Padding = new Padding(0, 0, 0, 0),
                     Width = Math.Min(80, AnsiConsole.Profile.Width)
                 };
             }
