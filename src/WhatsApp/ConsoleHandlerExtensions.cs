@@ -24,6 +24,13 @@ public static class ConsoleHandlerExtensions
     {
         _ = Throw.IfNull(builder);
 
+        builder.Services.AddHttpClient("whatsapp_console", x =>
+        {
+            // NOTE: only us invoke this http client from within the WhatsApp client, 
+            // and only when in development.
+            x.Timeout = TimeSpan.FromMinutes(30); // Long timeout for console interactions
+        });
+
         return builder.Use((inner, services) =>
         {
             // In production environments, we have ZERO impact since we're not even added to the pipeline.

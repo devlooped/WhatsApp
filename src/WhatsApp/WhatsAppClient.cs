@@ -58,7 +58,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
             // Try to reply to the debug console
             if (numberId.IsCLI() && Uri.TryCreate(numberId, UriKind.Absolute, out var uri))
             {
-                using var httpClient = httpFactory.CreateClient();
+                using var httpClient = httpFactory.CreateClient("whatsapp_console");
 
                 await httpClient.PostAsJsonAsync(uri, payload, JsonContext.DefaultOptions, cancellationToken);
 
