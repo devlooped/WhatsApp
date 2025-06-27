@@ -197,6 +197,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
     {
         lock (personTimer)
         {
+            needsNewline = false;
             personTimer.Start();         // no-op if already started
             personTimer.Interval = 1000; // moves event .5'' into the future if already started
         }
