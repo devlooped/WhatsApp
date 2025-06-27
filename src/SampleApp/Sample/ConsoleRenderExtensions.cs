@@ -29,7 +29,7 @@ static class ConsoleRenderExtensions
             {
                 await client.SendAsync(user,
                     $"""
-                    ```
+                    ```json
                     {JsonSerializer.Serialize(
                         messages.Where(x => x is UserMessage || x is TextResponse),
                         JsonContext.DefaultOptions)}
@@ -37,12 +37,12 @@ static class ConsoleRenderExtensions
                     """);
             }
 
-            var responses = new List<Response>();
+            var responses = new List<TextResponse>();
 
             await foreach (var response in base.HandleAsync(messages, cancellation))
             {
-                if (response is TextResponse)
-                    responses.Add(response);
+                if (response is TextResponse text)
+                    responses.Add(text);
 
                 yield return response;
             }
@@ -51,7 +51,7 @@ static class ConsoleRenderExtensions
             {
                 await client.SendAsync(user,
                     $"""
-                    ```
+                    ```json
                     {JsonSerializer.Serialize(responses, JsonContext.DefaultOptions)}
                     ```
                     """);
