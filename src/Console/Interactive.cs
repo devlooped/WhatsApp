@@ -159,8 +159,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
             try
             {
                 // Stop head from appearing while we're processing
-                lock (personTimer)
-                    personTimer.Stop();
+                personTimer.Stop();
 
                 // Read the request body (if any)
                 var requestBody = "{}";
@@ -195,12 +194,9 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
 
     void RestartPersonHead()
     {
-        lock (personTimer)
-        {
-            needsNewline = false;
-            personTimer.Start();         // no-op if already started
-            personTimer.Interval = 1000; // moves event .5'' into the future if already started
-        }
+        needsNewline = false;
+        personTimer.Start();         // no-op if already started
+        personTimer.Interval = 1000; // moves event .5'' into the future if already started
     }
 
     async Task RenderAsync(string json)
@@ -265,8 +261,12 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                         text = parts[1].Trim();
                     }
 
-                    var body = message.Type == Client.MessageType.Reaction || (text.StartsWith("[") && text.EndsWith("]"))
+                    var body = message.Type == Client.MessageType.Reaction || (text.StartsWith("[") && text.EndsWith("[/]"))
                         ? TryMarkup(text)
+                        : text.StartsWith("```json", StringComparison.OrdinalIgnoreCase) && text.EndsWith("```")
+                        ? TryJson(text[7..^3].Trim())
+                        : text.StartsWith("```yaml", StringComparison.OrdinalIgnoreCase) && text.EndsWith("```")
+                        ? TryYaml(text[7..^3].Trim())
                         : text.Contains("```")
                         ? TryCodeBlocks(text.Trim())
                         : TryCode(text.Trim(), false);
@@ -381,13 +381,44 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                 if (greyFallback)
                 {
                     // If it fails as YAML, fallback to grey text
-                    return new Markup($"[grey]{code}[/]");
+                    return Markup.FromInterpolated($"[grey]{code}[/]");
                 }
                 else
                 {
                     return TryMarkup(code);
                 }
             }
+        }
+    }
+
+    static IRenderable TryJson(string json)
+    {
+        try
+        {
+            return new JsonText(json);
+        }
+        catch (Exception)
+        {
+            return Markup.FromInterpolated($"[grey]{json}[/]");
+        }
+    }
+
+    static IRenderable TryYaml(string yaml)
+    {
+        try
+        {
+            var dictionary = DictionaryConverter.FromYaml(yaml);
+            var formattedYaml = DictionaryConverter.ToYaml(dictionary, formatted: true);
+            return new Panel(formattedYaml)
+            {
+                Border = BoxBorder.None,
+                Padding = new Padding(0, 0, 0, 0),
+                Width = Math.Min(80, AnsiConsole.Profile.Width)
+            };
+        }
+        catch (Exception)
+        {
+            return Markup.FromInterpolated($"[grey]{yaml}[/]");
         }
     }
 
