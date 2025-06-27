@@ -24,19 +24,19 @@ public record TextResponse(string ServiceId, string UserNumber, string Context, 
     /// <inheritdoc/>
     protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellation = default)
     {
-        string? id = null;
         if (service != null)
-            id = await SendReplyAsync(client, service.Secondary.Id, this.ConsoleText ?? Text, cancellation);
+            await SendReplyAsync(client, service.Secondary.Id, this.ConsoleText ?? Text, cancellation);
 
         // If service is null, it's either a WhatsApp regular without CLI, or it's pure CLI.
-        // In both cases, we need to send the reaction to the WhatsApp service. 
-        // The other case is if we did get a composite service, but the message is not intended for console only.
-        if (service == null || this.ConsoleOnly != true)
-            return await SendReplyAsync(client, ServiceId,
-                // Automatically pick the CLI version of the text if sending to the CLI
-                ServiceId.IsCLI() ? this.ConsoleText ?? Text : Text, cancellation);
+        // In the former case, we don't want to send messages that are CLI-only if the service id 
+        // is not actually a CLI service.
+        if (service == null && this.ConsoleOnly == true && !ServiceId.IsCLI())
+            return null;
 
-        return id;
+        // It may not be CLI-only but still provide a CLI-enhanced text.
+        return await SendReplyAsync(client, ServiceId,
+            // Automatically pick the CLI version of the text if sending to the CLI
+            ServiceId.IsCLI() ? this.ConsoleText ?? Text : Text, cancellation);
     }
 
     Task<string?> SendReplyAsync(IWhatsAppClient client, string serviceId, string text, CancellationToken cancellation)
