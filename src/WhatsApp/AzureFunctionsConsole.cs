@@ -56,9 +56,10 @@ class AzureFunctionsConsole(
                 await user.SendProgress(client, true, true).Ignore();
 
             message.FromConsole = true;
+
             // Await all responses
             // No action needed, just make sure all items are processed
-            await handler.HandleAsync([message]).ToArrayAsync();
+            _ = Task.Run(() => handler.HandleAsync([message]).ToArrayAsync().AsTask()).Ignore();
         }
         else
         {
