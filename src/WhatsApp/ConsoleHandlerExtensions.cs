@@ -53,16 +53,15 @@ public static class ConsoleHandlerExtensions
                 if (message.FromConsole && user is not null)
                     console ??= user.Service;
 
-                // Mark non-console user messages as coming from the console by 
-                // composing the service id with the console service id for dual reply
+                // Composing the service id with the console service id for dual reply
                 if (console != null && !message.FromConsole && user is not null)
                 {
                     return user with
                     {
                         Service = new CompositeService(user.Service, console),
-                        FromConsole = true,
                     };
                 }
+
                 // Otherwise, just return the message as is.
                 return message;
             })];
