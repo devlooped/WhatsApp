@@ -55,7 +55,7 @@ class AzureFunctionsConsole(
             if (message is UserMessage user)
                 await user.SendProgress(client, true, true).Ignore();
 
-            message.FromConsole = true;
+            message = message.With(x => x["FromConsole"] = true);
 
             // Await all responses
             // No action needed, just make sure all items are processed

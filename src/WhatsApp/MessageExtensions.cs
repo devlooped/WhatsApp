@@ -13,29 +13,17 @@ public static partial class MessageExtensions
         /// <summary>
         /// Gets or sets whether the message was sent from the WhatsApp CLI.
         /// </summary>
-        public bool FromConsole
-        {
-            get => (message.AdditionalProperties ??= []).TryGetValue("FromConsole", out var value) ? value as bool? ?? default : default;
-            set => (message.AdditionalProperties ??= [])["FromConsole"] = value;
-        }
+        public bool FromConsole => message.AdditionalProperties?.TryGetValue("FromConsole", out var value) is true ? value as bool? ?? default : default;
 
         /// <summary>
         /// Alternative text to send to the console, if the message is intended to reach the CLI.
         /// </summary>
-        public string? ConsoleText
-        {
-            get => (message.AdditionalProperties ??= []).TryGetValue("ConsoleText", out var value) ? value as string : null;
-            set => (message.AdditionalProperties ??= [])["ConsoleText"] = value;
-        }
+        public string? ConsoleText => message.AdditionalProperties?.TryGetValue("ConsoleText", out var value) is true ? value as string : null;
 
         /// <summary>
         /// The message is intended for consumption only in the console and should not be sent to WhatsApp.
         /// </summary>
-        public bool ConsoleOnly
-        {
-            get => (message.AdditionalProperties ??= []).TryGetValue("ConsoleOnly", out var value) ? value as bool? ?? default : default;
-            set => (message.AdditionalProperties ??= [])["ConsoleOnly"] = value;
-        }
+        public bool ConsoleOnly => message.AdditionalProperties?.TryGetValue("ConsoleOnly", out var value) is true ? value as bool? ?? default : default;
     }
 
     extension<T>(T message) where T : IMessage
@@ -82,20 +70,12 @@ public static partial class MessageExtensions
         /// <summary>
         /// Marks the response for console use only by setting the <c>ConsoleOnly</c> property to <see langword="true"/>.
         /// </summary>
-        public T ForConsoleOnly()
-        {
-            response.ConsoleOnly = true;
-            return response;
-        }
+        public T ForConsoleOnly() => response.With(x => x["ConsoleOnly"] = true);
 
         /// <summary>
         /// Sets the console alternate text for the response, in case the response is intended to be sent to the CLI.
         /// </summary>
-        public T WithConsoleText(string text)
-        {
-            response.ConsoleText = text;
-            return response;
-        }
+        public T WithConsoleText(string text) => response.With(x => x["ConsoleText"] = text);
     }
 
     /// <summary>
