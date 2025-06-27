@@ -28,7 +28,7 @@ public record ReactionResponse(string ServiceId, string UserNumber, string Conte
         // If service is null, it's either a WhatsApp regular without CLI, or it's pure CLI.
         // In the former case, we don't want to send messages that are CLI-only if the service id 
         // is not actually a CLI service.
-        if (service == null && this.ConsoleOnly == true && !ServiceId.IsCLI())
+        if (this.ConsoleOnly == true && !ServiceId.IsCLI())
             return null;
 
         // It may not be CLI-only but still provide a CLI-enhanced text.
