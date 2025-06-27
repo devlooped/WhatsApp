@@ -5,6 +5,9 @@ using Microsoft.Extensions.Logging;
 
 class ProcessHandler(ILogger<Program> logger, JsonSerializerOptions options) : IWhatsAppHandler
 {
+    // Simulate agents responding
+    readonly string[] agents = ["tasks", "support", "sales"];
+
     public async IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         // Avoid warning CS1998 // Async method lacks 'await' operators and will run synchronously
@@ -55,15 +58,18 @@ class ProcessHandler(ILogger<Program> logger, JsonSerializerOptions options) : I
             // simulate some hard work at hand, like doing some LLM-stuff :)
             await Task.Delay(2000);
 
+            var agent = agents[Random.Shared.Next(agents.Length)];
+
             yield return content.Reply(
                 $"""
-                ☑️ Got your {content.Content.Type}
+                ☑️ {agent} got your {content.Content.Type}
                 ```
                 {JsonSerializer.Serialize(content, options)}
                 ```
                 """,
                 new Button("btn_good", "👍"),
-                new Button("btn_bad", "👎"));
+                new Button("btn_bad", "👎"))
+                .With(x => x["Agent"] = agent);
 
             yield return content.Reply("[grey][italic]This is for the CLI only.[/][/] [link=https://github.com/devlooped/WhatsApp]WhatsApp Lib[/]")
                 .ForConsoleOnly();
