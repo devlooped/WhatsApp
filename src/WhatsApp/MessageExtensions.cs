@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.AI;
 
 namespace Devlooped.WhatsApp;
 
@@ -37,8 +38,47 @@ public static partial class MessageExtensions
         }
     }
 
+    extension<T>(T message) where T : IMessage
+    {
+        /// <summary>
+        /// Configures the response by applying the specified action to it.
+        /// </summary>
+        public T Configure(Action<T> configure)
+        {
+            configure(message);
+            return message;
+        }
+    }
+
+    extension(Message message)
+    {
+        /// <summary>
+        /// Configures the message by applying the specified action to it.
+        /// </summary>
+        public Message With(Action<AdditionalPropertiesDictionary> properties)
+        {
+            if (message.AdditionalProperties is null)
+                message = message with { AdditionalProperties = [] };
+
+            properties(message.AdditionalProperties);
+            return message;
+        }
+    }
+
     extension<T>(T response) where T : Response
     {
+        /// <summary>
+        /// Sets additional properties in the response.
+        /// </summary>
+        public T With(Action<AdditionalPropertiesDictionary> properties)
+        {
+            if (response.AdditionalProperties is null)
+                response = response with { AdditionalProperties = [] };
+
+            properties(response.AdditionalProperties);
+            return response;
+        }
+
         /// <summary>
         /// Marks the response for console use only by setting the <c>ConsoleOnly</c> property to <see langword="true"/>.
         /// </summary>
