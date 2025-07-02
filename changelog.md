@@ -1,5 +1,25 @@
 # Changelog
 
+## [v0.6.0](https://github.com/devlooped/WhatsApp/tree/v0.6.0) (2025-07-02)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.5.0...v0.6.0)
+
+:sparkles: Implemented enhancements:
+
+- Ensure we never send react/resply to WhatsApp for ConsoleOnly [\#209](https://github.com/devlooped/WhatsApp/pull/209) (@kzu)
+- Add extension methods for more intuitive config of messages [\#207](https://github.com/devlooped/WhatsApp/pull/207) (@kzu)
+- Allow service to force JSON/YAML markup rendering on CLI [\#206](https://github.com/devlooped/WhatsApp/pull/206) (@kzu)
+- Don't store service reactions in conversation storage [\#200](https://github.com/devlooped/WhatsApp/pull/200) (@kzu)
+
+:bug: Fixed bugs:
+
+- Phone numbers may be longer than int [\#211](https://github.com/devlooped/WhatsApp/pull/211) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Further simplify message config and CLI extensions [\#208](https://github.com/devlooped/WhatsApp/pull/208) (@kzu)
+- Long client console timeout [\#204](https://github.com/devlooped/WhatsApp/pull/204) (@kzu)
+
 ## [v0.5.0](https://github.com/devlooped/WhatsApp/tree/v0.5.0) (2025-06-26)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v1.0.0-rc.13...v0.5.0)
