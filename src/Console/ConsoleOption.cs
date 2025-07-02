@@ -15,7 +15,7 @@ class ConsoleOption : OptionSet
 
     public OutputFormat? Format { get; private set; }
 
-    public int? Number { get; private set; }
+    public long? Number { get; private set; }
 
-    static int ParseNumber(string value) => int.Parse([.. value.Where(char.IsDigit)]);
+    static long ParseNumber(string value) => long.Parse([.. value.Where(char.IsDigit)]);
 }
