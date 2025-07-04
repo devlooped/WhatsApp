@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.ComponentModel;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.AI;
 
@@ -9,7 +10,7 @@ namespace Devlooped.WhatsApp;
 /// </summary>
 [JsonPolymorphic]
 [JsonDerivedType(typeof(DocumentContent), "document")]
-[JsonDerivedType(typeof(ContactContent), "contacts")]
+[JsonDerivedType(typeof(ContactsContent), "contacts")]
 [JsonDerivedType(typeof(TextContent), "text")]
 [JsonDerivedType(typeof(LocationContent), "location")]
 [JsonDerivedType(typeof(ImageContent), "image")]
@@ -29,18 +30,30 @@ public abstract record Content
     public abstract ContentType Type { get; }
 }
 
-/// <summary>
-/// Content contains contact information.
-/// </summary>
-/// <param name="Name">Name of the contact.</param>
-/// <param name="Surname">Surname of the contact.</param>
-/// <param name="Numbers">Phone numbers of the contact.</param>
-public record ContactContent(string Name, string Surname, string[] Numbers) : Content
+[Obsolete("Use ContactsContent instead.", true)]
+[EditorBrowsable(EditorBrowsableState.Never)]
+public record ContactContent(string Name, string Surname, string[] Numbers) : ContactsContent([new(Name, Surname, Numbers)])
 {
     /// <inheritdoc/>
     [JsonIgnore]
     public override ContentType Type => ContentType.Contact;
+}
 
+/// <summary>
+/// Content contains contact(s) information.
+/// </summary>
+public record ContactsContent(Contact[] Contacts) : Content
+{
+    /// <inheritdoc/>
+    [JsonIgnore]
+    public override ContentType Type => ContentType.Contacts;
+}
+
+/// <summary>
+/// Contact information.
+/// </summary>
+public record Contact(string Name, string Surname, string[] Numbers)
+{
     public override string ToString() => $"{Name} {Surname} ({string.Join(", ", Numbers)})";
 }
 

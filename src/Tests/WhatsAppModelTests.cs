@@ -1,12 +1,11 @@
-﻿using Xunit.Abstractions;
-
-namespace Devlooped.WhatsApp;
+﻿namespace Devlooped.WhatsApp;
 
 public class WhatsAppModelTests(ITestOutputHelper output)
 {
     [Theory]
     [InlineData(nameof(ContentType.Audio), "927483105672819", "wamid.XYZRandomString123ABC456DEF789GHI==")]
     [InlineData(nameof(ContentType.Contact), "927481035162874", "wamid.HBgNNDcyODkwMTIzNDU2NhUCABIYFjE4QTlDMzU2MkJDOTg3RUY2NDg5RTFEMTIzQzVFRAA==")]
+    [InlineData(nameof(ContentType.Contacts), "123456789012345", "wamid.ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")]
     [InlineData(nameof(ContentType.Document), "813947205126374", "wamid.HBgNMTIwMjU1NTk4NzY1NhUCABIYFjE4QTlDMzU2MkJDOTg3RUY2NDg5RTFEMTIzQzVFRAA==")]
     [InlineData(nameof(ContentType.Image), "813927405162784", "wamid.HBgNMTIwMjU1NTk4NzY1NhUCABIYFjE4QTlDMzU2MkJDOTg3RUY2NDg5RTFEMTIzQzVFRAA==")]
     [InlineData(nameof(ContentType.Location), "813920475601234", "wamid.HBgNMTIwMjk4NzQ1NjM1NhUCABIYFjE5RDhGMzQ2NEJDOTg3RUY2NDg5RTFEMTIzQzVFRAA==")]
@@ -41,7 +40,7 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
     [Theory]
     [InlineData(ContentType.Audio)]
-    [InlineData(ContentType.Contact)]
+    [InlineData(ContentType.Contacts)]
     [InlineData(ContentType.Document)]
     [InlineData(ContentType.Image)]
     [InlineData(ContentType.Location)]
@@ -60,6 +59,31 @@ public class WhatsAppModelTests(ITestOutputHelper output)
         Assert.NotNull(message.User);
         Assert.NotNull(content.Content);
         Assert.Equal(type, content.Content.Type);
+    }
+
+    [Fact]
+    public async Task DeserializeContacts()
+    {
+        var json = await File.ReadAllTextAsync($"Content/WhatsApp/Contacts.json");
+        var message = await Message.DeserializeAsync(json);
+
+        var content = Assert.IsType<ContentMessage>(message);
+
+        Assert.Equal(ContentType.Contacts, content.Content.Type);
+        var contacts = Assert.IsType<ContactsContent>(content.Content);
+        Assert.Equal(3, contacts.Contacts.Length);
+
+        // Assert for first contact
+        Assert.Equal("First1", contacts.Contacts[0].Name);
+        Assert.Equal("1111111111111", contacts.Contacts[0].Numbers[0]);
+
+        // Assert for second contact
+        Assert.Equal("First2", contacts.Contacts[1].Name);
+        Assert.Equal("2222222222222", contacts.Contacts[1].Numbers[0]);
+
+        // Assert for third contact
+        Assert.Equal("First3", contacts.Contacts[2].Name);
+        Assert.Equal("3333333333333", contacts.Contacts[2].Numbers[0]);
     }
 
     [Fact]

@@ -1,4 +1,6 @@
-﻿namespace Devlooped.WhatsApp;
+﻿using System.ComponentModel;
+
+namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// Defines the type of content.
@@ -6,7 +8,9 @@
 public enum ContentType
 {
     Audio,
-    Contact,
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    Contact, // Legacy single-contact type
+    Contacts,
     Document,
     Image,
     Location,
