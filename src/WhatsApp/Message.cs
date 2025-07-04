@@ -117,10 +117,11 @@ public abstract partial record Message(string Id, Service Service, User User, lo
                   elif $msgType == "contacts" then
                     {
                       "$type": "contacts",
-                      "name": $msg.contacts[0].name.first_name,
-                      "surname": $msg.contacts[0].name.last_name,
-                      "numbers": [$msg.contacts[0].phones[] | select(.wa_id? != null) | .wa_id]
-                    }
+                      "contacts": $msg.contacts | map({
+                          "name": .name.first_name,
+                          "surname": .name.last_name,
+                          "numbers": [.phones[] | select(.wa_id? != null) | .wa_id]
+                      })                    }
                   elif $msgType == "text" then
                     {
                       "$type": "text",

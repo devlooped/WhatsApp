@@ -1,0 +1,101 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "123456789012345",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "1234567890",
+              "phone_number_id": "987654321098765"
+            },
+            "contacts": [
+              {
+                "profile": { "name": "User1" },
+                "wa_id": "1111111111111"
+              }
+            ],
+            "messages": [
+              {
+                "from": "1111111111111",
+                "id": "wamid.ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+                "timestamp": "1234567890",
+                "type": "contacts",
+                "contacts": [
+                  {
+                    "emails": [
+                      {
+                        "email": "user1@example.com",
+                        "type": "Other"
+                      }
+                    ],
+                    "name": {
+                      "first_name": "First1",
+                      "formatted_name": "First1 Last1"
+                    },
+                    "phones": [
+                      {
+                        "phone": "+1 123-456-7890",
+                        "wa_id": "1111111111111",
+                        "type": "MOBILE"
+                      }
+                    ]
+                  },
+                  {
+                    "emails": [
+                      {
+                        "email": "user2@example.com",
+                        "type": "Other"
+                      },
+                      {
+                        "email": "user2@example.com",
+                        "type": "Other"
+                      }
+                    ],
+                    "name": {
+                      "first_name": "First2",
+                      "formatted_name": "First2 Last2"
+                    },
+                    "phones": [
+                      {
+                        "phone": "+1 987-654-3210",
+                        "wa_id": "2222222222222",
+                        "type": "MOBILE"
+                      }
+                    ]
+                  },
+                  {
+                    "emails": [
+                      {
+                        "email": "user3@example.com",
+                        "type": "HOME"
+                      },
+                      {
+                        "email": "user3@example.com",
+                        "type": "HOME"
+                      }
+                    ],
+                    "name": {
+                      "first_name": "First3",
+                      "formatted_name": "First3 Last3"
+                    },
+                    "phones": [
+                      {
+                        "phone": "+1 555-555-5555",
+                        "wa_id": "3333333333333",
+                        "type": "WhatsApp"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}
