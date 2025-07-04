@@ -11,14 +11,14 @@
 /// <param name="Text">The text content of the response message.</param>
 /// <param name="Button1">An optional button to include in the response for user interaction.</param>
 /// <param name="Button2">An optional second button to include in the response for user interaction.</param>
-public record TextResponse(string ServiceId, string UserNumber, string Context, string? ConversationId, string Text, Button? Button1 = default, Button? Button2 = default) : Response(ServiceId, UserNumber, Context, ConversationId)
+public record TextResponse(string ServiceId, string UserNumber, string Context, string? ConversationId, string Text, Button? Button1 = default, Button? Button2 = default, Button? Button3 = default) : Response(ServiceId, UserNumber, Context, ConversationId)
 {
     // If this variable is not null, it means the originating message came from WhatsApp
     // and there's an ongoing conversation with the CLI simultaneously.
     readonly CompositeService? service;
 
-    internal TextResponse(Service service, string userNumber, string context, string? conversationId, string text, Button? button1 = default, Button? button2 = default)
-        : this(service.Id, userNumber, context, conversationId, text, button1, button2)
+    internal TextResponse(Service service, string userNumber, string context, string? conversationId, string text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
+        : this(service.Id, userNumber, context, conversationId, text, button1, button2, button3)
         => this.service = service as CompositeService;
 
     /// <inheritdoc/>
@@ -45,8 +45,10 @@ public record TextResponse(string ServiceId, string UserNumber, string Context, 
         {
             if (Button2 == null)
                 return client.ReplyAsync(serviceId, UserNumber, Context, text, Button1, cancellation);
-            else
+            else if (Button3 == null)
                 return client.ReplyAsync(serviceId, UserNumber, Context, text, Button1, Button2, cancellation);
+            else
+                return client.ReplyAsync(serviceId, UserNumber, Context, text, Button1, Button2, Button3, cancellation);
         }
         else
         {

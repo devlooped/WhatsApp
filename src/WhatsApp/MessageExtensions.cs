@@ -120,10 +120,10 @@ public static partial class MessageExtensions
     /// <summary>
     /// Creates a text response with buttons for the message.
     /// </summary>
-    public static TextResponse Reply(this IMessage message, string text, Button button1, Button? button2 = default)
+    public static TextResponse Reply(this IMessage message, string text, Button button1, Button? button2 = default, Button? button3 = default)
         => message is UserMessage user
-            ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text, button1, button2)
-            : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text, button1, button2);
+            ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text, button1, button2, button3)
+            : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text, button1, button2, button3);
 
     /// <summary>
     /// Attempts to retrieve a single message from the specified collection.

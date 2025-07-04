@@ -215,6 +215,51 @@ public static partial class WhatsAppClientExtensions
     /// Replies to a user message with a additional interactive buttons.
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
+    /// <param name="serviceId">The service number to send through.</param>
+    /// <param name="userNumber">The user phone number to send to.</param>
+    /// <param name="reply">The text message to respond with.</param>
+    /// <param name="replyTo">The message to reply to.</param>
+    /// <param name="button1">Interactive button for a user choice.</param>
+    /// <param name="button2">Interactive button for a user choice.</param>
+    /// <param name="button3">Interactive button for a user choice.</param>
+    /// <param name="cancellation">The cancellation token.</param>
+    /// <returns>The identifier of the reply message.</returns>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, string serviceId, string userNumber, string replyTo, string reply, Button button1, Button button2, Button button3, CancellationToken cancellation = default)
+        => client.SendAsync(serviceId, new
+        {
+            messaging_product = "whatsapp",
+            preview_url = false,
+            recipient_type = "individual",
+            to = NormalizeNumber(userNumber),
+            type = "interactive",
+            context = new
+            {
+                message_id = replyTo
+            },
+            interactive = new
+            {
+                type = "button",
+                body = new
+                {
+                    text = reply
+                },
+                action = new
+                {
+                    buttons = new[]
+                    {
+                        new { type = "reply", reply = new { id = button1.Id, title = button1.Title } },
+                        new { type = "reply", reply = new { id = button2.Id, title = button2.Title } },
+                        new { type = "reply", reply = new { id = button3.Id, title = button3.Title } },
+                    }
+                }
+            }
+        }, cancellation);
+
+    /// <summary>
+    /// Replies to a user message with a additional interactive buttons.
+    /// </summary>
+    /// <param name="client">The WhatsApp client.</param>
     /// <param name="message">The message to reply to.</param>
     /// <param name="reply">The text message to respond with.</param>
     /// <param name="button1">Interactive button for a user choice.</param>
