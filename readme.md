@@ -484,7 +484,7 @@ builder.Services.AddWhatsApp<MyWhatsAppHandler>()
 ## Dogfooding
 
 [![CI Version](https://img.shields.io/endpoint?url=https://shields.kzu.app/vpre/Devlooped.WhatsApp/main&label=nuget.ci&color=brightgreen)](https://pkg.kzu.app/index.json)
-[![Build](https://github.com/devlooped/WhatsApp/workflows/build/badge.svg?branch=main)](https://github.com/devlooped/WhatsApp/actions)
+[![Build](https://github.com/devlooped/WhatsApp/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/devlooped/WhatsApp/actions/workflows/build.yml)
 
 We also produce CI packages from branches and pull requests so you can dogfood builds as quickly as they are produced. 
 
