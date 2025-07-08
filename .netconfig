@@ -148,3 +148,9 @@
 	sha = 77e83f238196d2723640abef0c7b6f43994f9747
 	etag = fcb9759a96966df40dcd24906fd328ddec05953b7e747a6bb8d0d1e4c3865274
 	weak
+[file "src/WhatsApp/Extensions/IAsyncEnumerableExtensions.cs"]
+	url = https://github.com/devlooped/catbag/blob/main/System/Collections/Generic/IAsyncEnumerableExtensions.cs
+	sha = 3e2b4bfe3f2707bf3567bcd6367db5c7eb2696c0
+
+	weak
+	etag = 371342087cec0269473a91f7fc295fd1049e21f016a1b7113614f2c4e3eefe5f
