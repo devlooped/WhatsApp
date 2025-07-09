@@ -9,13 +9,12 @@
 /// <param name="Text">The content of the message calling to action.</param>
 /// <param name="Action">The action button text.</param>
 /// <param name="Url">The URL to navigate to when the action button is clicked.</param>
-/// /// <param name="ConversationId">The conversation id where this response was generated</param>
-public record CallToActionResponse(string ServiceId, string UserNumber, string Text, string Action, string Url, string? ConversationId) : Response(ServiceId, UserNumber, null, ConversationId)
+public record CallToActionResponse(string ServiceId, string UserNumber, string Text, string Action, string Url) : Response(ServiceId, UserNumber, null)
 {
     readonly CompositeService? service;
 
-    internal CallToActionResponse(Service service, string userNumber, string Text, string Action, string Url, string? conversationId)
-        : this(service.Id, userNumber, Text, Action, Url, conversationId)
+    internal CallToActionResponse(Service service, string userNumber, string Text, string Action, string Url)
+        : this(service.Id, userNumber, Text, Action, Url)
         => this.service = service as CompositeService;
 
     protected override Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellation = default)

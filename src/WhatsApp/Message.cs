@@ -39,9 +39,6 @@ public abstract partial record Message(string Id, Service Service, User User, lo
     [JsonPropertyName("notification")]
     internal string? NotificationId { get; init; }
 
-    /// <inheritdoc/>
-    public string? ConversationId { get; init; }
-
     const string JQ =
         """
         (

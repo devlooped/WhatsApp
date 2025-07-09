@@ -33,10 +33,11 @@ class ConversationStorage : IConversationStorage
     /// <inheritdoc/>
     public async Task SaveAsync(IMessage message, CancellationToken cancellationToken = default)
     {
-        if (!string.IsNullOrEmpty(message.ConversationId))
+        var conversationId = message.ConversationId;
+        if (!string.IsNullOrEmpty(conversationId))
         {
-            var conversation = await conversationsRepository.Value.GetAsync(message.UserNumber, message.ConversationId, cancellationToken) ??
-                new(message.UserNumber, message.ConversationId, [], message.Timestamp);
+            var conversation = await conversationsRepository.Value.GetAsync(message.UserNumber, conversationId, cancellationToken) ??
+                new(message.UserNumber, conversationId, [], message.Timestamp);
 
             if (conversation.Messages.FirstOrDefault(x => x.Id == message.Id) is { } existing)
             {
