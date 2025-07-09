@@ -33,10 +33,22 @@ public record TextResponse : Response
         Button3 = button3;
     }
 
-    public string Text { get; }
-    public Button? Button1 { get; }
-    public Button? Button2 { get; }
-    public Button? Button3 { get; }
+    /// <summary>
+    /// Gets or sets the text content of the response message.
+    /// </summary>
+    public string Text { get; init; }
+    /// <summary>
+    /// An optional button to include in the response for user interaction.
+    /// </summary>
+    public Button? Button1 { get; init; }
+    /// <summary>
+    /// An optional second button to include in the response for user interaction.
+    /// </summary>
+    public Button? Button2 { get; init; }
+    /// <summary>
+    /// An optional third button to include in the response for user interaction.
+    /// </summary>
+    public Button? Button3 { get; init; }
 
     internal TextResponse(Service service, string userNumber, string? context, string? conversationId, string text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
         : this(service.Id, userNumber, context, conversationId, text, button1, button2, button3)
