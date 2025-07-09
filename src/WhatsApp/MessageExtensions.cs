@@ -110,6 +110,14 @@ public static partial class MessageExtensions
         => new(message.Service, message.User.Number, message.Id, message.ConversationId);
 
     /// <summary>
+    /// Sends an interactive call to action response to the user message.
+    /// </summary>
+    public static CallToActionResponse CallToAction(this IMessage message, string text, string action, string url)
+        => message is UserMessage user
+        ? new(user.Service, message.UserNumber, message.Id, text, action, url, message.ConversationId)
+        : new(message.ServiceId, message.UserNumber, message.Id, text, action, url, message.ConversationId);
+
+    /// <summary>
     /// Creates a text reply for the message.
     /// </summary>
     public static TextResponse Reply(this IMessage message, string text)

@@ -99,6 +99,39 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         });
     }
 
+    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    public async Task SendsCallToActionAsync()
+    {
+        var (configuration, client) = Initialize();
+
+        // Send an interactive message with three buttons showcasing the payload/value 
+        // being different than the button text
+        await client.SendAsync(configuration["SendFrom"]!, new
+        {
+            messaging_product = "whatsapp",
+            recipient_type = "individual",
+            to = configuration["SendTo"]!,
+            type = "interactive",
+            interactive = new
+            {
+                type = "cta_url",
+                body = new
+                {
+                    text = "Tap the button to send a message to a contact"
+                },
+                action = new
+                {
+                    name = "cta_url",
+                    parameters = new
+                    {
+                        display_text = "Send",
+                        url = "https://wa.me/541234567890?text=Hi"
+                    }
+                }
+            }
+        });
+    }
+
     [SecretsFact("Meta:VerifyToken", "MediaTo", Skip = "Media attachments are deleted if user deletes them, so skip.")]
     public async Task ResolvesMediaIdFromHttpClient()
     {

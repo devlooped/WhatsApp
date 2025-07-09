@@ -547,6 +547,42 @@ public static partial class WhatsAppClientExtensions
             }
         }, cancellation);
 
+    /// <summary>
+    /// Sends a call-to-action interactive message to a user.
+    /// </summary>
+    /// <param name="client">The WhatsApp client used to send the message.</param>
+    /// <param name="serviceId">The identifier for the service sending the message.</param>
+    /// <param name="userNumber">The phone number of the recipient. Must be in a valid format.</param>
+    /// <param name="message">The text message to be sent to the user.</param>
+    /// <param name="buttonText">The text displayed on the call-to-action button.</param>
+    /// <param name="cancellation">A token to monitor for cancellation requests. Defaults to <see cref="CancellationToken.None"/>.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    public static Task<string?> SendCallToActionAsync(this IWhatsAppClient client, string serviceId, string userNumber, string message, string buttonText, string url, CancellationToken cancellation = default)
+        => client.SendAsync(serviceId, new
+        {
+            messaging_product = "whatsapp",
+            recipient_type = "individual",
+            to = NormalizeNumber(userNumber),
+            type = "interactive",
+            interactive = new
+            {
+                type = "cta_url",
+                body = new
+                {
+                    text = message
+                },
+                action = new
+                {
+                    name = "cta_url",
+                    parameters = new
+                    {
+                        display_text = buttonText,
+                        url = url
+                    }
+                }
+            }
+        }, cancellation);
+
     static string NormalizeNumber(string number) =>
         // On the web, we don't get the 9 after 54 \o/
         // so for Argentina numbers, we need to remove the 9.
