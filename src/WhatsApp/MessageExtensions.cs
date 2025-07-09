@@ -24,6 +24,82 @@ public static partial class MessageExtensions
         /// The message is intended for consumption only in the console and should not be sent to WhatsApp.
         /// </summary>
         public bool ConsoleOnly => message.AdditionalProperties?.TryGetValue("ConsoleOnly", out var value) is true ? value as bool? ?? default : default;
+
+        /// <summary>
+        /// Creates a reaction response for the user message.
+        /// </summary>
+        public ReactionResponse React(string emoji)
+            => message is UserMessage user
+                ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, emoji)
+                : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, emoji);
+
+        /// <summary>
+        /// Creates a simple template response for the message.
+        /// </summary>
+        public TemplateResponse Template(string name, string language)
+            => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, name, language);
+
+        /// <summary>
+        /// Creates a complex template response for the message.
+        /// </summary>
+        /// <param name="template">The full template object as supported by the WhatsApp for Business API.</param>
+        /// <see cref="https://developers.facebook.com/docs/whatsapp/api/messages/message-templates#supported-languages"/>
+        /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
+        /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
+        public TemplateResponse Template(object template)
+            => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, template);
+
+        /// <summary>
+        /// Sends an interactive call to action response to the user message.
+        /// </summary>
+        /// <param name="text">The content of the message calling to action.</param>
+        /// <param name="action">The action button text.</param>
+        /// <param name="url">The URL to navigate to when the action button is clicked.</param>
+        public CallToActionResponse CallToAction(string text, string action, string url)
+            => message is UserMessage user
+            ? new(user.Service, message.UserNumber, text, action, url, message.ConversationId)
+            : new(message.ServiceId, message.UserNumber, text, action, url, message.ConversationId);
+
+        /// <summary>
+        /// Creates a text reply for the message.
+        /// </summary>
+        public TextResponse Reply(string text)
+            => message is UserMessage user
+            ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text)
+            : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text);
+
+        /// <summary>
+        /// Creates a text reply with buttons for the message.
+        /// </summary>
+        public TextResponse Reply(string text, Button button1, Button? button2 = default, Button? button3 = default)
+            => message is UserMessage user
+                ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text, button1, button2, button3)
+                : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text, button1, button2, button3);
+
+        /// <summary>
+        /// Creates a text response for the originating user, but not a message reply.
+        /// </summary>
+        public TextResponse Send(string text)
+            => message is UserMessage user
+            ? new(user.Service, message.UserNumber, null, message.ConversationId, text)
+            : new(message.ServiceId, message.UserNumber, null, message.ConversationId, text);
+
+        /// <summary>
+        /// Creates a text response for the originating user, but not a message reply.
+        /// </summary>
+        public TextResponse Send(string text, Button button1, Button? button2 = default, Button? button3 = default)
+            => message is UserMessage user
+                ? new(user.Service, message.UserNumber, null, message.ConversationId, text, button1, button2, button3)
+                : new(message.ServiceId, message.UserNumber, null, message.ConversationId, text, button1, button2, button3);
+    }
+
+    extension(UserMessage message)
+    {
+        /// <summary>
+        /// Sends a typing indicator status to signal that there is an ongoing response to the user message.
+        /// </summary>
+        public TypingResponse Typing()
+            => new(message.Service, message.User.Number, message.Id, message.ConversationId);
     }
 
     extension<T>(T message) where T : IMessage
@@ -77,81 +153,6 @@ public static partial class MessageExtensions
         /// </summary>
         public T WithConsoleText(string text) => response.With(x => x["ConsoleText"] = text);
     }
-
-    /// <summary>
-    /// Creates a reaction response for the user message.
-    /// </summary>
-    public static ReactionResponse React(this IMessage message, string emoji)
-        => message is UserMessage user
-            ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, emoji)
-            : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, emoji);
-
-    /// <summary>
-    /// Creates a simple template response for the message.
-    /// </summary>
-    public static TemplateResponse Template(this IMessage message, string name, string language)
-        => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, name, language);
-
-    /// <summary>
-    /// Creates a complex template response for the message.
-    /// </summary>
-    /// <param name="message">The message to respond to.</param>
-    /// <param name="template">The full template object as supported by the WhatsApp for Business API.</param>
-    /// <see cref="https://developers.facebook.com/docs/whatsapp/api/messages/message-templates#supported-languages"/>
-    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
-    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
-    public static TemplateResponse Template(this IMessage message, object template)
-        => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, template);
-
-    /// <summary>
-    /// Sends a typing indicator status to signal that there is an ongoing response to the user message.
-    /// </summary>
-    public static TypingResponse Typing(this UserMessage message)
-        => new(message.Service, message.User.Number, message.Id, message.ConversationId);
-
-    /// <summary>
-    /// Sends an interactive call to action response to the user message.
-    /// </summary>
-    /// <param name="message">The originating user message.</param>
-    /// <param name="text">The content of the message calling to action.</param>
-    /// <param name="action">The action button text.</param>
-    /// <param name="url">The URL to navigate to when the action button is clicked.</param>
-    public static CallToActionResponse CallToAction(this IMessage message, string text, string action, string url)
-        => message is UserMessage user
-        ? new(user.Service, message.UserNumber, text, action, url, message.ConversationId)
-        : new(message.ServiceId, message.UserNumber, text, action, url, message.ConversationId);
-
-    /// <summary>
-    /// Creates a text reply for the message.
-    /// </summary>
-    public static TextResponse Reply(this IMessage message, string text)
-        => message is UserMessage user
-        ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text)
-        : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text);
-
-    /// <summary>
-    /// Creates a text reply with buttons for the message.
-    /// </summary>
-    public static TextResponse Reply(this IMessage message, string text, Button button1, Button? button2 = default, Button? button3 = default)
-        => message is UserMessage user
-            ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text, button1, button2, button3)
-            : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text, button1, button2, button3);
-
-    /// <summary>
-    /// Creates a text response for the originating user, but not a message reply.
-    /// </summary>
-    public static TextResponse Send(this IMessage message, string text)
-        => message is UserMessage user
-        ? new(user.Service, message.UserNumber, null, message.ConversationId, text)
-        : new(message.ServiceId, message.UserNumber, null, message.ConversationId, text);
-
-    /// <summary>
-    /// Creates a text response for the originating user, but not a message reply.
-    /// </summary>
-    public static TextResponse Send(this IMessage message, string text, Button button1, Button? button2 = default, Button? button3 = default)
-        => message is UserMessage user
-            ? new(user.Service, message.UserNumber, null, message.ConversationId, text, button1, button2, button3)
-            : new(message.ServiceId, message.UserNumber, null, message.ConversationId, text, button1, button2, button3);
 
     /// <summary>
     /// Attempts to retrieve a single message from the specified collection.
