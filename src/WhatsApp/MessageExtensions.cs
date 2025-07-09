@@ -112,10 +112,14 @@ public static partial class MessageExtensions
     /// <summary>
     /// Sends an interactive call to action response to the user message.
     /// </summary>
+    /// <param name="message">The originating user message.</param>
+    /// <param name="text">The content of the message calling to action.</param>
+    /// <param name="action">The action button text.</param>
+    /// <param name="url">The URL to navigate to when the action button is clicked.</param>
     public static CallToActionResponse CallToAction(this IMessage message, string text, string action, string url)
         => message is UserMessage user
-        ? new(user.Service, message.UserNumber, message.Id, text, action, url, message.ConversationId)
-        : new(message.ServiceId, message.UserNumber, message.Id, text, action, url, message.ConversationId);
+        ? new(user.Service, message.UserNumber, text, action, url, message.ConversationId)
+        : new(message.ServiceId, message.UserNumber, text, action, url, message.ConversationId);
 
     /// <summary>
     /// Creates a text reply for the message.

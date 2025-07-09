@@ -554,10 +554,10 @@ public static partial class WhatsAppClientExtensions
     /// <param name="serviceId">The identifier for the service sending the message.</param>
     /// <param name="userNumber">The phone number of the recipient. Must be in a valid format.</param>
     /// <param name="message">The text message to be sent to the user.</param>
-    /// <param name="buttonText">The text displayed on the call-to-action button.</param>
+    /// <param name="action">The text displayed on the call-to-action button.</param>
     /// <param name="cancellation">A token to monitor for cancellation requests. Defaults to <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<string?> SendCallToActionAsync(this IWhatsAppClient client, string serviceId, string userNumber, string message, string buttonText, string url, CancellationToken cancellation = default)
+    public static Task<string?> CallToActionAsync(this IWhatsAppClient client, string serviceId, string userNumber, string message, string action, string url, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
@@ -576,7 +576,7 @@ public static partial class WhatsAppClientExtensions
                     name = "cta_url",
                     parameters = new
                     {
-                        display_text = buttonText,
+                        display_text = action,
                         url = url
                     }
                 }
