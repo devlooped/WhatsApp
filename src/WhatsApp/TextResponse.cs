@@ -38,7 +38,7 @@ public record TextResponse : Response
     public Button? Button2 { get; }
     public Button? Button3 { get; }
 
-    internal TextResponse(Service service, string userNumber, string context, string? conversationId, string text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
+    internal TextResponse(Service service, string userNumber, string? context, string? conversationId, string text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
         : this(service.Id, userNumber, context, conversationId, text, button1, button2, button3)
         => this.service = service as CompositeService;
 

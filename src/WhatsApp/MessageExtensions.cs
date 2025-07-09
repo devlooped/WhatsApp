@@ -110,7 +110,7 @@ public static partial class MessageExtensions
         => new(message.Service, message.User.Number, message.Id, message.ConversationId);
 
     /// <summary>
-    /// Creates a text response for the message.
+    /// Creates a text reply for the message.
     /// </summary>
     public static TextResponse Reply(this IMessage message, string text)
         => message is UserMessage user
@@ -118,12 +118,28 @@ public static partial class MessageExtensions
         : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text);
 
     /// <summary>
-    /// Creates a text response with buttons for the message.
+    /// Creates a text reply with buttons for the message.
     /// </summary>
     public static TextResponse Reply(this IMessage message, string text, Button button1, Button? button2 = default, Button? button3 = default)
         => message is UserMessage user
             ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text, button1, button2, button3)
             : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text, button1, button2, button3);
+
+    /// <summary>
+    /// Creates a text response for the originating user, but not a message reply.
+    /// </summary>
+    public static TextResponse Send(this IMessage message, string text)
+        => message is UserMessage user
+        ? new(user.Service, message.UserNumber, null, message.ConversationId, text)
+        : new(message.ServiceId, message.UserNumber, null, message.ConversationId, text);
+
+    /// <summary>
+    /// Creates a text response for the originating user, but not a message reply.
+    /// </summary>
+    public static TextResponse Send(this IMessage message, string text, Button button1, Button? button2 = default, Button? button3 = default)
+        => message is UserMessage user
+            ? new(user.Service, message.UserNumber, null, message.ConversationId, text, button1, button2, button3)
+            : new(message.ServiceId, message.UserNumber, null, message.ConversationId, text, button1, button2, button3);
 
     /// <summary>
     /// Attempts to retrieve a single message from the specified collection.
