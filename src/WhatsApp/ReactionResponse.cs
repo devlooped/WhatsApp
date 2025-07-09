@@ -9,14 +9,14 @@
 /// <param name="UserNumber">The phone number of the recipient in international format.</param>
 /// <param name="Context">The unique identifier of the message to which the reaction is being sent.</param>
 /// <param name="Emoji">The emoji representing the reaction to the message.</param>
-public record ReactionResponse(string ServiceId, string UserNumber, string Context, string? ConversationId, string Emoji) : Response(ServiceId, UserNumber, Context, ConversationId)
+public record ReactionResponse(string ServiceId, string UserNumber, string Context, string Emoji) : Response(ServiceId, UserNumber, Context)
 {
     // If this variable is not null, it means the originating message came from WhatsApp
     // and there's an ongoing conversation with the CLI simultaneously.
     readonly CompositeService? service;
 
-    internal ReactionResponse(Service service, string userNumber, string context, string? conversationId, string emoji)
-        : this(service.Id, userNumber, context, conversationId, emoji)
+    internal ReactionResponse(Service service, string userNumber, string context, string emoji)
+        : this(service.Id, userNumber, context, emoji)
         => this.service = service as CompositeService;
 
     /// <inheritdoc/>

@@ -147,7 +147,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         await stream.CopyToAsync(fs);
     }
 
-    [SecretsFact("Meta:VerifyToken", "MediaTo")]
+    [SecretsFact("Meta:VerifyToken", "MediaTo", Skip = "Media are transient and therefore this test requires an active message present")]
     public async Task ResolveMediaThrowsForNonExistentId()
     {
         var (configuration, client) = Initialize();

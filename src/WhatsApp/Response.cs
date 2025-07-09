@@ -11,8 +11,7 @@ namespace Devlooped.WhatsApp;
 /// <param name="ServiceId">The identifier of the service to use to send the response through.</param>
 /// <param name="UserNumber">The phone number of the recipient in international format.</param>
 /// <param name="Context">Optional identifier of the message to which this response may be a reply to.</param>
-/// <param name="ConversationId">The conversation id where this response was generated</param>
-public abstract partial record Response(string ServiceId, string UserNumber, string? Context, string? ConversationId) : IMessage
+public abstract partial record Response(string ServiceId, string UserNumber, string? Context) : IMessage
 {
     /// <inheritdoc/>
     [JsonConverter(typeof(AdditionalPropertiesDictionaryConverter))]

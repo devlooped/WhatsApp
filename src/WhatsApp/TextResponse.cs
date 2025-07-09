@@ -21,9 +21,9 @@ public record TextResponse : Response
     /// <param name="text">The text content of the response message.</param>
     /// <param name="button1">An optional button to include in the response for user interaction.</param>
     /// <param name="button2">An optional second button to include in the response for user interaction.</param>
-    /// <param name="button2">An optional third button to include in the response for user interaction.</param>
-    public TextResponse(string serviceId, string userNumber, string? context, string? conversationId, string text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
-        : base(serviceId, userNumber, context, conversationId)
+    /// <param name="button3">An optional third button to include in the response for user interaction.</param>
+    public TextResponse(string serviceId, string userNumber, string? context, string? text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
+        : base(serviceId, userNumber, context)
     {
         sender = context == null ? SendTextAsync : SendReplyAsync;
 
@@ -36,7 +36,7 @@ public record TextResponse : Response
     /// <summary>
     /// Gets or sets the text content of the response message.
     /// </summary>
-    public string Text { get; init; }
+    public string? Text { get; init; }
     /// <summary>
     /// An optional button to include in the response for user interaction.
     /// </summary>
@@ -50,15 +50,15 @@ public record TextResponse : Response
     /// </summary>
     public Button? Button3 { get; init; }
 
-    internal TextResponse(Service service, string userNumber, string? context, string? conversationId, string text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
-        : this(service.Id, userNumber, context, conversationId, text, button1, button2, button3)
+    internal TextResponse(Service service, string userNumber, string? context, string? text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
+        : this(service.Id, userNumber, context, text, button1, button2, button3)
         => this.service = service as CompositeService;
 
     /// <inheritdoc/>
     protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellation = default)
     {
         if (service != null)
-            await sender(client, service.Secondary.Id, this.ConsoleText ?? Text, cancellation);
+            await sender(client, service.Secondary.Id, this.ConsoleText ?? Text ?? "", cancellation);
 
         // If service is null, it's either a WhatsApp regular without CLI, or it's pure CLI.
         // In the former case, we don't want to send messages that are CLI-only if the service id 
@@ -69,7 +69,7 @@ public record TextResponse : Response
         // It may not be CLI-only but still provide a CLI-enhanced text.
         return await sender(client, ServiceId,
             // Automatically pick the CLI version of the text if sending to the CLI
-            ServiceId.IsCLI() ? this.ConsoleText ?? Text : Text, cancellation);
+            ServiceId.IsCLI() ? this.ConsoleText ?? Text ?? "" : Text ?? "", cancellation);
     }
 
     Task<string?> SendReplyAsync(IWhatsAppClient client, string serviceId, string text, CancellationToken cancellation)

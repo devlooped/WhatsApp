@@ -49,11 +49,6 @@ public interface IMessage
     long Timestamp { get; }
 
     /// <summary>
-    /// Gets the unique identifier for the current conversation where this message was included
-    /// </summary>
-    string? ConversationId { get; }
-
-    /// <summary>
     /// Optional related message identifier, such as message being replied 
     /// or reacted to, or a status message refers to, or the interactive 
     /// selection is a response to.

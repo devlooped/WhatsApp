@@ -90,7 +90,10 @@ public class PipelineTests(ITestOutputHelper output)
 
         IAsyncEnumerable<Response> messages = new Response[]
         {
-            new TextResponse("123", "456", "Foo", "Bar", "Baz")
+            new TextResponse("123", "456", "Foo", "Bar")
+            {
+                ConversationId = "Baz"
+            }
         }.ToAsyncEnumerable();
 
         var order = new List<string>();
@@ -162,7 +165,10 @@ public class PipelineTests(ITestOutputHelper output)
             .Build();
 
         var storage = new MemoryConversationStorage();
-        var response = AsyncEnum<Response>([new TextResponse(service.Id, user.Number, "1234", null, "Bye")]);
+        var response = AsyncEnum<Response>([new TextResponse(service.Id, user.Number, "1234", null)
+        {
+            ConversationId = "Bye"
+        }]);
         var messages = new List<IMessage[]>();
 
         var handler = new Mock<IWhatsAppHandler>();

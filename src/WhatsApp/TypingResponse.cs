@@ -4,12 +4,12 @@
 /// Represents a typing status update that can be sent in response to a user message.
 /// </summary>
 /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/typing-indicators"/>
-public record TypingResponse(string ServiceId, string UserNumber, string Context, string? ConversationId) : Response(ServiceId, UserNumber, Context, ConversationId)
+public record TypingResponse(string ServiceId, string UserNumber, string Context) : Response(ServiceId, UserNumber, Context)
 {
     readonly CompositeService? service;
 
-    internal TypingResponse(Service service, string userNumber, string context, string? conversationId)
-        : this(service.Id, userNumber, context, conversationId)
+    internal TypingResponse(Service service, string userNumber, string context)
+        : this(service.Id, userNumber, context)
         => this.service = service as CompositeService;
 
     protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellation = default)

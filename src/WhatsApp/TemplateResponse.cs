@@ -13,10 +13,10 @@
 /// <param name="Language">The template language code (i.e. 'es_AR')</param>
 /// <see cref="https://developers.facebook.com/docs/whatsapp/api/messages/message-templates#supported-languages"/>
 /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
-public record TemplateResponse(string ServiceId, string UserNumber, string Context, string? ConversationId, object Template) : Response(ServiceId, UserNumber, Context, ConversationId)
+public record TemplateResponse(string ServiceId, string UserNumber, string Context, object Template) : Response(ServiceId, UserNumber, Context)
 {
-    public TemplateResponse(string ServiceId, string UserNumber, string Context, string? ConversationId, string Name, string Language)
-        : this(UserNumber, ServiceId, Context, ConversationId, new { name = Name, language = new { code = Language } })
+    public TemplateResponse(string ServiceId, string UserNumber, string Context, string Name, string Language)
+        : this(UserNumber, ServiceId, Context, new { name = Name, language = new { code = Language } })
     {
     }
 

@@ -11,6 +11,33 @@ public static partial class MessageExtensions
     extension(IMessage message)
     {
         /// <summary>
+        /// Gets or sets an optional conversation identifier, used in combination with 
+        /// the <see cref="ConversationHandlerExtensions.UseConversation"/> and 
+        /// accompanying <see cref="IConversationStorage"/> suppport. 
+        /// </summary>
+        public string? ConversationId
+        {
+            get => (message.AdditionalProperties ??= []).TryGetValue("ConversationId", out var value) ? value as string : null;
+            set
+            {
+                if (value is not null)
+                {
+                    message.AdditionalProperties ??= [];
+                    message.AdditionalProperties["ConversationId"] = value;
+                }
+                else
+                {
+                    if (message.AdditionalProperties is not null)
+                    {
+                        message.AdditionalProperties.Remove("ConversationId");
+                        if (message.AdditionalProperties.Count == 0)
+                            message.AdditionalProperties = null;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets whether the message was sent from the WhatsApp CLI.
         /// </summary>
         public bool FromConsole => message.AdditionalProperties?.TryGetValue("FromConsole", out var value) is true ? value as bool? ?? default : default;
@@ -30,14 +57,14 @@ public static partial class MessageExtensions
         /// </summary>
         public ReactionResponse React(string emoji)
             => message is UserMessage user
-                ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, emoji)
-                : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, emoji);
+                ? new(user.Service, message.UserNumber, message.Id, emoji)
+                : new(message.ServiceId, message.UserNumber, message.Id, emoji);
 
         /// <summary>
         /// Creates a simple template response for the message.
         /// </summary>
         public TemplateResponse Template(string name, string language)
-            => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, name, language);
+            => new(message.ServiceId, message.UserNumber, message.Id, name, language);
 
         /// <summary>
         /// Creates a complex template response for the message.
@@ -47,7 +74,7 @@ public static partial class MessageExtensions
         /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
         /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
         public TemplateResponse Template(object template)
-            => new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, template);
+            => new(message.ServiceId, message.UserNumber, message.Id, template);
 
         /// <summary>
         /// Sends an interactive call to action response to the user message.
@@ -57,40 +84,40 @@ public static partial class MessageExtensions
         /// <param name="url">The URL to navigate to when the action button is clicked.</param>
         public CallToActionResponse CallToAction(string text, string action, string url)
             => message is UserMessage user
-            ? new(user.Service, message.UserNumber, text, action, url, message.ConversationId)
-            : new(message.ServiceId, message.UserNumber, text, action, url, message.ConversationId);
+            ? new(user.Service, message.UserNumber, text, action, url)
+            : new(message.ServiceId, message.UserNumber, text, action, url);
 
         /// <summary>
         /// Creates a text reply for the message.
         /// </summary>
         public TextResponse Reply(string text)
             => message is UserMessage user
-            ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text)
-            : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text);
+            ? new(user.Service, message.UserNumber, message.Id, text)
+            : new(message.ServiceId, message.UserNumber, message.Id, text);
 
         /// <summary>
         /// Creates a text reply with buttons for the message.
         /// </summary>
         public TextResponse Reply(string text, Button button1, Button? button2 = default, Button? button3 = default)
             => message is UserMessage user
-                ? new(user.Service, message.UserNumber, message.Id, message.ConversationId, text, button1, button2, button3)
-                : new(message.ServiceId, message.UserNumber, message.Id, message.ConversationId, text, button1, button2, button3);
+                ? new(user.Service, message.UserNumber, message.Id, text, button1, button2, button3)
+                : new(message.ServiceId, message.UserNumber, message.Id, text, button1, button2, button3);
 
         /// <summary>
         /// Creates a text response for the originating user, but not a message reply.
         /// </summary>
         public TextResponse Send(string text)
             => message is UserMessage user
-            ? new(user.Service, message.UserNumber, null, message.ConversationId, text)
-            : new(message.ServiceId, message.UserNumber, null, message.ConversationId, text);
+            ? new(user.Service, message.UserNumber, null, text)
+            : new(message.ServiceId, message.UserNumber, null, text);
 
         /// <summary>
         /// Creates a text response for the originating user, but not a message reply.
         /// </summary>
         public TextResponse Send(string text, Button button1, Button? button2 = default, Button? button3 = default)
             => message is UserMessage user
-                ? new(user.Service, message.UserNumber, null, message.ConversationId, text, button1, button2, button3)
-                : new(message.ServiceId, message.UserNumber, null, message.ConversationId, text, button1, button2, button3);
+                ? new(user.Service, message.UserNumber, null, text, button1, button2, button3)
+                : new(message.ServiceId, message.UserNumber, null, text, button1, button2, button3);
     }
 
     extension(UserMessage message)
@@ -99,7 +126,7 @@ public static partial class MessageExtensions
         /// Sends a typing indicator status to signal that there is an ongoing response to the user message.
         /// </summary>
         public TypingResponse Typing()
-            => new(message.Service, message.User.Number, message.Id, message.ConversationId);
+            => new(message.Service, message.User.Number, message.Id);
     }
 
     extension<T>(T message) where T : IMessage

@@ -17,9 +17,13 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
         if (options.ReactOnConversation != null && messages.LastOrDefault() is ContentMessage content)
             yield return content.React(options.ReactOnConversation);
 
+        string? conversationId = null;
+
         foreach (var message in messages)
         {
             var fixup = await SetConversationIdAsync(message, cancellation);
+            conversationId = fixup.ConversationId;
+
             // Now that it's fixed, we can persist the message.
             await storage.SaveAsync(fixup, cancellation);
 
@@ -32,6 +36,8 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
 
         await foreach (var response in base.HandleAsync(conversation, cancellation))
         {
+            response.ConversationId = conversationId;
+
             // We don't care about typing status or reaction messages for conversation storage
             if (response is not TypingResponse or ReactionResponse)
                 await storage.SaveAsync(response, cancellation);
@@ -53,10 +59,11 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
     {
         var shouldReturnInputMessage = true;
 
-        if (!string.IsNullOrEmpty(message.ConversationId))
+        var conversationId = message.ConversationId;
+        if (!string.IsNullOrEmpty(conversationId))
         {
             var conversation = await storage
-                    .GetMessagesAsync(message.UserNumber, message.ConversationId, cancellationToken)
+                    .GetMessagesAsync(message.UserNumber, conversationId, cancellationToken)
                     // We need to sort in-memory since table-storage does not support ordering by timestamp 
                     // unless we're using CosmosDB, which we can't assume. 
                     // Note that conversations in WhatsApp are nevertheless short-lived, so this is acceptable.
@@ -79,8 +86,8 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
 
     async Task<string> GetOrCreateConversationIdAsync(IMessage message, CancellationToken cancellationToken = default)
     {
-        if (!string.IsNullOrEmpty(message.ConversationId))
-            return message.ConversationId;
+        if (message.ConversationId is { Length: > 0 } conversationId)
+            return conversationId;
 
         // If the user is explicitly replying to a given message
         // We should try to use that conversion first
@@ -96,7 +103,7 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
 
         // Use the conversation id for a message processed in the last ConversationWindowInSeconds seconds
         var conversation = await storage.GetActiveConversationAsync(message.UserNumber, cancellationToken);
-        var conversationId = conversation?.Id;
+        conversationId = conversation?.Id;
 
         if (conversationId == null || conversation?.Timestamp < timestamp)
         {
