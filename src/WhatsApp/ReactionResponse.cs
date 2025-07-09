@@ -23,7 +23,7 @@ public record ReactionResponse(string ServiceId, string UserNumber, string Conte
     protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
     {
         if (service != null)
-            await client.ReactAsync(service.Secondary.Id, UserNumber, Context, this.ConsoleText ?? Emoji, cancellationToken);
+            await client.ReactAsync(service.Secondary.Id, UserNumber, Context!, this.ConsoleText ?? Emoji, cancellationToken);
 
         // If service is null, it's either a WhatsApp regular without CLI, or it's pure CLI.
         // In the former case, we don't want to send messages that are CLI-only if the service id 
@@ -32,7 +32,7 @@ public record ReactionResponse(string ServiceId, string UserNumber, string Conte
             return null;
 
         // It may not be CLI-only but still provide a CLI-enhanced text.
-        await client.ReactAsync(ServiceId, UserNumber, Context,
+        await client.ReactAsync(ServiceId, UserNumber, Context!,
             // Automatically pick the CLI version of the text if sending to the CLI
             ServiceId.IsCLI() ? this.ConsoleText ?? Emoji : Emoji);
 
