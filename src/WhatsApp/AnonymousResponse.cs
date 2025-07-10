@@ -19,7 +19,7 @@ public record AnonymousResponse(string ServiceId, string UserNumber,
         : this(message.ServiceId, message.UserNumber, sender) { }
 
     [JsonConstructor]
-    internal AnonymousResponse(string ServiceId, string UserNumber) : this(ServiceId, UserNumber, (client, cancellation) => Task.FromResult<string?>(null))
+    internal AnonymousResponse(string ServiceId, string UserNumber, string? Context = null) : this(ServiceId, UserNumber, (client, cancellation) => Task.FromResult<string?>(null), Context)
     {
     }
 
