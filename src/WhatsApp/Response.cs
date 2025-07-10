@@ -13,6 +13,18 @@ namespace Devlooped.WhatsApp;
 /// <param name="Context">Optional identifier of the message to which this response may be a reply to.</param>
 public abstract partial record Response(string ServiceId, string UserNumber, string? Context) : IMessage
 {
+    /// <summary>
+    /// Creates an anonymous response that uses a function to send the message.
+    /// </summary>
+    public static Response Create(string serviceId, string userNumber, Func<IWhatsAppClient, CancellationToken, Task<string?>> sender, string? context = null)
+        => new AnonymousResponse(serviceId, userNumber, sender, context);
+
+    /// <summary>
+    /// Creates an anonymous response that uses a function to send the message.
+    /// </summary>
+    public static Response Create(IMessage message, Func<IWhatsAppClient, CancellationToken, Task<string?>> sender)
+        => new AnonymousResponse(message, sender);
+
     /// <inheritdoc/>
     [JsonConverter(typeof(AdditionalPropertiesDictionaryConverter))]
     public AdditionalPropertiesDictionary? AdditionalProperties { get; set; }
