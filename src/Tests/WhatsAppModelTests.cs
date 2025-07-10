@@ -13,7 +13,6 @@ public class WhatsAppModelTests(ITestOutputHelper output)
     [InlineData(nameof(ContentType.Video), "813927405162374", "wamid.HBgNMTIwMjU1NTk4NzY1NhUCABIYFjE4QTlDMzU2MkJDOTg3RUY2NDg5RTFEMTIzQzVFRAA==")]
     [InlineData(nameof(MessageType.Unsupported), "837625914708254", "")]
     [InlineData(nameof(MessageType.Error), "729104583621947", "")]
-    [InlineData(nameof(MessageType.Interactive), "123456789012345", "wamid.RandomMessageID", "wamid.RandomContextID")]
     [InlineData(nameof(MessageType.Reaction), "123456789012345", "", "wamid.HBgNMTIzNDU2Nzg5MDEyMzQ1MhUCABEYEkY5QzQxNDNBQjgyRkVENEIzMQA=")]
     // For consistency, status message ID == status context ID.
     [InlineData(nameof(MessageType.Status), "987654321098765", "", "wamid.HBgNNTQ5OTg3NjU0MzIxMDlUCABEYEkLMNVzNDU2Nzg5MAA=")]
@@ -118,9 +117,9 @@ public class WhatsAppModelTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task DeserializeInteractive()
+    public async Task DeserializeInteractiveButton()
     {
-        var json = await File.ReadAllTextAsync($"Content/WhatsApp/Interactive.json");
+        var json = await File.ReadAllTextAsync($"Content/WhatsApp/InteractiveButton.json");
         var message = await Message.DeserializeAsync(json);
 
         var interactive = Assert.IsType<InteractiveMessage>(message);
@@ -129,8 +128,24 @@ public class WhatsAppModelTests(ITestOutputHelper output)
         Assert.NotNull(message.NotificationId);
         Assert.NotNull(message.Service);
         Assert.NotNull(message.User);
-        Assert.Equal("btn_yes", interactive.Button.Id);
-        Assert.Equal("Yes", interactive.Button.Title);
+        Assert.Equal("btn_yes", interactive.Selection.Id);
+        Assert.Equal("Yes", interactive.Selection.Title);
+    }
+
+    [Fact]
+    public async Task DeserializeInteractiveList()
+    {
+        var json = await File.ReadAllTextAsync($"Content/WhatsApp/InteractiveList.json");
+        var message = await Message.DeserializeAsync(json);
+
+        var interactive = Assert.IsType<InteractiveMessage>(message);
+
+        Assert.NotNull(message);
+        Assert.NotNull(message.NotificationId);
+        Assert.NotNull(message.Service);
+        Assert.NotNull(message.User);
+        Assert.Equal("conversation", interactive.Selection.Id);
+        Assert.Equal("Conversación", interactive.Selection.Title);
     }
 
     [Fact]

@@ -3,18 +3,23 @@
 namespace Devlooped.WhatsApp;
 
 /// <summary>
-/// A <see cref="Message"/> containing an interactive button reply.
+/// A <see cref="Message"/> containing an interactive reply for either a button or list message.
 /// </summary>
 /// <param name="Id">The message identifier.</param>
 /// <param name="Service">The service that received the message from the Cloud API.</param>
 /// <param name="User">The user that sent the message.</param>
 /// <param name="Timestamp">Timestamp of the message.</param>
-/// <param name="Button">The button selected by the user.</param>
-public record InteractiveMessage(string Id, Service Service, User User, long Timestamp, Button Button) : UserMessage(Id, Service, User, Timestamp)
+/// <param name="Selection">The button or item selected by the user.</param>
+public record InteractiveMessage(string Id, Service Service, User User, long Timestamp, Selection Selection) : UserMessage(Id, Service, User, Timestamp)
 {
     /// <inheritdoc/>
     [JsonIgnore]
     public override MessageType Type => MessageType.Interactive;
 }
 
-public record Button(string Id, string Title);
+/// <summary>
+/// Selection made by the user in an interactive message, such as a button or list item.
+/// </summary>
+/// <param name="Id">The identifier of the selection.</param>
+/// <param name="Title">The title of the selection.</param>
+public record Selection(string Id, string Title);
