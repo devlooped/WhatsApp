@@ -22,6 +22,7 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(ReactionResponse), "response/reaction")]
 [JsonDerivedType(typeof(TypingResponse), "response/typing")]
 [JsonDerivedType(typeof(CallToActionResponse), "response/cta")]
+[JsonDerivedType(typeof(AnonymousResponse), "response/dynamic")]
 public interface IMessage
 {
     /// <summary>Gets or sets any additional properties associated with the message.</summary>
