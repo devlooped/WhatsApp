@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Text.Json.Nodes;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -96,6 +97,66 @@ public class WhatsAppClientTests(ITestOutputHelper output)
                     }
                 }
             }
+        });
+    }
+
+    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    public async Task SendsListAsync()
+    {
+        var (configuration, client) = Initialize();
+
+        var interactive = JsonNode.Parse(
+            """
+            {
+              "action": {
+                "button": "Elegir agente",
+                "sections": [
+                  {
+                    "rows": [
+                      {
+                        "id": "conversation",
+                        "title": "Conversación",
+                        "description": "Hablar o consultar sobre cualquier tema"
+                      },
+                      {
+                        "id": "tasks",
+                        "title": "Tareas",
+                        "description": "Gestionar listas y tareas"
+                      },
+                      {
+                        "id": "reminder",
+                        "title": "Recordatorios",
+                        "description": "Programar recordatorios"
+                      },
+                      {
+                        "id": "order",
+                        "title": "Pedidos",
+                        "description": "Hacer o gestionar pedidos"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "type": "list",
+              "header": {
+                "text": "¿Sobre qué tema te gustaría saber qué puedo hacer?",
+                "type": "text"
+              },
+              "body": {
+                "text": "Puedo ayudarte con tareas, recordatorios, pedidos, o simplemente conversar. ¡Elegí una opción para continuar!"
+              }
+            }
+            """);
+
+        // Send an interactive message with a JsonNode payload for the interactive node. 
+        // showcases using mixed data in the payload for more flexibility.
+        await client.SendAsync(configuration["SendFrom"]!, new
+        {
+            messaging_product = "whatsapp",
+            recipient_type = "individual",
+            to = configuration["SendTo"]!,
+            type = "interactive",
+            interactive
         });
     }
 

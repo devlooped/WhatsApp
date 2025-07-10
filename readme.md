@@ -41,7 +41,7 @@ builder.Services.AddWhatsApp((messages, cancellation) =>
                 Console.WriteLine($"Error: {error.Error.Message} ({error.Error.Code})");
                 break;
             case InteractiveMessage interactive:
-                Console.WriteLine($"Interactive: {interactive.Button.Title} ({interactive.Button.Id})");
+                Console.WriteLine($"Interactive: {interactive.Selection.Title} ({interactive.Selection.Id})");
                 break;
             case StatusMessage status:
                 Console.WriteLine($"Status: {status.Status}");

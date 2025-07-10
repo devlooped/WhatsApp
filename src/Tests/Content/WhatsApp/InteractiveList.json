@@ -1,0 +1,46 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "1171085018385676",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "15556612189",
+              "phone_number_id": "707538022444240"
+            },
+            "contacts": [
+              {
+                "profile": { "name": "Kzu" },
+                "wa_id": "5491159278282"
+              }
+            ],
+            "messages": [
+              {
+                "context": {
+                  "from": "15556612189",
+                  "id": "wamid.HBgNNTQ5MTE1OTI3ODI4MhUCABEYEkY3MEI1MEI1MjY3Njk4NDU4MQA="
+                },
+                "from": "5491159278282",
+                "id": "wamid.HBgNNTQ5MTE1OTI3ODI4MhUCABIYFjNFQjA3RTZDM0FGMEQwNTNFMkZFQTEA",
+                "timestamp": "1752152853",
+                "type": "interactive",
+                "interactive": {
+                  "type": "list_reply",
+                  "list_reply": {
+                    "id": "conversation",
+                    "title": "Conversaci\u00f3n",
+                    "description": "Hablar o consultar sobre cualquier tema"
+                  }
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}
