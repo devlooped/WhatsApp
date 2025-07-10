@@ -1,4 +1,6 @@
-﻿namespace Devlooped.WhatsApp;
+﻿using System.Text.Json.Serialization;
+
+namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// A response that uses a function to send the message.
@@ -14,6 +16,11 @@ public record AnonymousResponse(string ServiceId, string UserNumber, Func<IWhats
     /// </summary>
     public AnonymousResponse(IMessage message, Func<IWhatsAppClient, CancellationToken, Task<string?>> sender)
         : this(message.ServiceId, message.UserNumber, sender) { }
+
+    [JsonConstructor]
+    internal AnonymousResponse(string ServiceId, string UserNumber) : this(ServiceId, UserNumber, (client, cancellation) => Task.FromResult<string?>(null))
+    {
+    }
 
     protected override Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellation = default) => Sender(client, cancellation);
 }

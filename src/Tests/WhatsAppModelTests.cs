@@ -1,4 +1,6 @@
-﻿namespace Devlooped.WhatsApp;
+﻿using System.Text.Json;
+
+namespace Devlooped.WhatsApp;
 
 public class WhatsAppModelTests(ITestOutputHelper output)
 {
@@ -175,5 +177,18 @@ public class WhatsAppModelTests(ITestOutputHelper output)
         Assert.NotNull(message.Service);
         Assert.NotNull(message.User);
         Assert.Equal("😊", reaction.Emoji);
+    }
+
+    [Fact]
+    public void SerializeAnonymous()
+    {
+        var response = Response.Create("123456789012345", "987654321098765", (client, cancellation) => Task.FromResult<string?>(null));
+
+        var json = JsonSerializer.Serialize(response, JsonContext.DefaultOptions);
+
+        var message = JsonSerializer.Deserialize(json, JsonContext.Default.AnonymousResponse);
+
+        Assert.NotNull(message);
+        Assert.Null(message.Sender);
     }
 }
