@@ -9,7 +9,8 @@ namespace Devlooped.WhatsApp;
 /// <param name="UserNumber">The phone number of the recipient in international format.</param>
 /// <param name="Sender">The function that implements the response sending behavior.</param>
 /// <param name="Context">Optional identifier of the message to which this response may be a reply to.</param>
-public record AnonymousResponse(string ServiceId, string UserNumber, Func<IWhatsAppClient, CancellationToken, Task<string?>> Sender, string? Context = null) : Response(ServiceId, UserNumber, Context)
+public record AnonymousResponse(string ServiceId, string UserNumber,
+    [property: JsonIgnore] Func<IWhatsAppClient, CancellationToken, Task<string?>> Sender, string? Context = null) : Response(ServiceId, UserNumber, Context)
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="AnonymousResponse"/> class using an existing message and a sender function.
