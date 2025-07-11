@@ -1,7 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using System.Reflection.Metadata.Ecma335;
-using Microsoft.Extensions.Logging;
 
 namespace Devlooped.WhatsApp;
 
@@ -87,6 +85,7 @@ public class OpenTelemetryHandler : DelegatingWhatsAppHandler
                 span.SetTag("messaging.destination", "whatsapp");
                 span.SetTag("messaging.operation", "process");
                 span.SetTag("messaging.message.id", message.Id);
+                span.SetTag("messaging.client.id", message.ServiceId);
                 if (message.ConversationId is string conversationId)
                     span.SetTag("messaging.message.conversation_id", conversationId);
             }
@@ -96,8 +95,8 @@ public class OpenTelemetryHandler : DelegatingWhatsAppHandler
             {
                 { "messaging.system", "whatsapp" },
                 { "messaging.operation", "process" },
+                { "messaging.client.id", message.ServiceId },
             };
-
 
             return base.HandleAsync(messages, cancellation).WithErrorHandlingAsync(
                 errorCallback: ex => messagesProcessed.Add(1, span.RecordException(ex, EnableSensitiveData, tags)),
