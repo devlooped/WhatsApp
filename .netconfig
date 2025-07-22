@@ -107,7 +107,11 @@
 	weak
 [file "license.txt"]
 	url = https://github.com/devlooped/oss/blob/main/license.txt
-	skip
+	sha = 0683ee777d7d878d4bf013d7deea352685135a05
+
+	etag = 2c6335b37e4ae05eea7c01f5d0c9d82b49c488f868a8b5ba7bff7c6ff01f3994
+	weak
+	
 [file "src/Directory.Build.props"]
 	url = https://github.com/devlooped/oss/blob/main/src/Directory.Build.props
 	sha = 81d972fd0760c244d134dae7f4b17d6c43cb004a
