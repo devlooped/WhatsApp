@@ -6,10 +6,24 @@
 [![License](https://img.shields.io/github/license/devlooped/WhatsApp.svg?color=blue)](https://github.com//devlooped/WhatsApp/blob/main/license.txt)
 [![Build](https://github.com/devlooped/WhatsApp/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/devlooped/WhatsApp/actions/workflows/build.yml)
 
-<!-- #content -->
 
+<!-- #description -->
 Create agents for WhatsApp using Azure Functions.
+<!-- #description -->
 
+## Open Source Maintenance Fee
+
+To ensure the long-term sustainability of this project, use of SmallSharp requires an 
+[Open Source Maintenance Fee](https://opensourcemaintenancefee.org). While the source 
+code is freely available under the terms of the [MIT License](./license.txt), all other aspects of the 
+project --including opening or commenting on issues, participating in discussions and 
+downloading releases-- require [adherence to the Maintenance Fee](./osmfeula.txt).
+
+In short, if you use this project to generate revenue, the [Maintenance Fee is required](./osmfeula.txt).
+
+To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/devlooped).
+
+<!-- #content -->
 ## Usage
 
 ```csharp
