@@ -37,7 +37,7 @@
     <PackageReference Include="ThisAssembly.Project" Version="2.0.14" PrivateAssets="all" />
     <PackageReference Include="Devlooped.Extensions.DependencyInjection" Version="2.1.0" PrivateAssets="all" />
     <PackageReference Include="NuGet.Protocol" Version="6.14.0" />
-    <PackageReference Include="NuGetizer" Version="1.2.4" PrivateAssets="all" />
+    <PackageReference Include="NuGetizer" Version="1.3.0" PrivateAssets="all" />
     <PackageReference Include="DotNetConfig" Version="1.2.0" />
   </ItemGroup>
 
