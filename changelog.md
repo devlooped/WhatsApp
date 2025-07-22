@@ -1,5 +1,33 @@
 # Changelog
 
+## [v0.7.0](https://github.com/devlooped/WhatsApp/tree/v0.7.0) (2025-07-22)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.6.0...v0.7.0)
+
+:sparkles: Implemented enhancements:
+
+- Add service id telemetry information [\#239](https://github.com/devlooped/WhatsApp/pull/239) (@kzu)
+- Allow polymorphic serialization for anonymous responses [\#236](https://github.com/devlooped/WhatsApp/pull/236) (@kzu)
+- Generalize interactive button to support lists selection too [\#235](https://github.com/devlooped/WhatsApp/pull/235) (@kzu)
+- Allow creating dynamic responses via a provided delegate [\#234](https://github.com/devlooped/WhatsApp/pull/234) (@kzu)
+- Model ConversationId as an extension property instead [\#233](https://github.com/devlooped/WhatsApp/pull/233) (@kzu)
+- Minor CallToAction cleanup [\#230](https://github.com/devlooped/WhatsApp/pull/230) (@kzu)
+- Added support for call to action responses [\#228](https://github.com/devlooped/WhatsApp/pull/228) (@adalon)
+- Restore init-only Text in response message [\#227](https://github.com/devlooped/WhatsApp/pull/227) (@kzu)
+- Add missing Send extension methods for IMessage [\#226](https://github.com/devlooped/WhatsApp/pull/226) (@kzu)
+- Allow 3 button responses that can also not be replies [\#225](https://github.com/devlooped/WhatsApp/pull/225) (@kzu)
+- Upgrade contacts message type to allow multiple contacts [\#220](https://github.com/devlooped/WhatsApp/pull/220) (@kzu)
+- Add missing overloads for three button interactive replies [\#216](https://github.com/devlooped/WhatsApp/pull/216) (@kzu)
+
+:bug: Fixed bugs:
+
+- When sending multiple contacts, handler received only first [\#217](https://github.com/devlooped/WhatsApp/issues/217)
+
+:twisted_rightwards_arrows: Merged:
+
+- Organize extension methods into proper extensions [\#231](https://github.com/devlooped/WhatsApp/pull/231) (@kzu)
+- Delete unused storage handler [\#229](https://github.com/devlooped/WhatsApp/pull/229) (@kzu)
+
 ## [v0.6.0](https://github.com/devlooped/WhatsApp/tree/v0.6.0) (2025-07-02)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.5.0...v0.6.0)
