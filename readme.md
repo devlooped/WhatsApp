@@ -408,32 +408,6 @@ No additional configuration is needed in this case since the
 Azure Functions just take `IMessageProcessor` as a constructor 
 dependency and will automatically pick up your custom implementation.
 
-## License
-
-We offer this project under a dual licensing model, tailored to the needs 
-of commercial distributors and open-source projects.
-
-**For open-source projects and free software developers:**
-
-If you develop free software (FOSS) and want to leverage this project, 
-the open-source version under AGPLv3 is ideal. 
-If you use a FOSS license other than AGPLv3, Devlooped offers an exception, 
-allowing usage without requiring the entire derivative work to fall under 
-AGPLv3, under certain conditions.
-
-See [AGPLv3](https://opensource.org/license/agpl-v3) and 
-[Universal FOSS Exception](https://oss.oracle.com/licenses/universal-foss-exception/).
-
-**For OEMs, ISVs, VARs, and other commercial users:**
-
-If you use this project and distribute or host commercial software without 
-sharing the code under AGPLv3, you must obtain a commercial license from 
-[Devlooped](mailto:hello@devlooped.com). Alternatively, you can sponsor 
-on [GitHub Sponsors](https://github.com/sponsors/devlooped) at the AGPLv3 
-tier or above per developer, which grants you a commercial license for 
-the duration of the sponsorship. You can sponsor through each individual 
-developer's account or through your GitHub organization.
-
 <!-- #content -->
 
 ## WhatsApp CLI
