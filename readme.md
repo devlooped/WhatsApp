@@ -390,9 +390,9 @@ if (builder.Configuration["EventGrid:Topic"] is { Length: > 0 } topic &&
 }
 ```
 
-You can also create your enqueue message processing to your own implementation 
-by providing your own version of the trivial `IMessageProcessor` interface 
-and registering that in the container: 
+You can also create your own enqueue message processing implementation 
+by creating your own `IMessageProcessor` interface 
+and registering it in the container: 
 
 ```csharp
 public interface IMessageProcessor
@@ -404,6 +404,9 @@ public interface IMessageProcessor
 }
 ```
 
+No additional configuration is needed in this case since the 
+Azure Functions just take `IMessageProcessor` as a constructor 
+dependency and will automatically pick up your custom implementation.
 
 ## License
 
