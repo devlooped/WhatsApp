@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.7.1](https://github.com/devlooped/WhatsApp/tree/v0.7.1) (2025-07-24)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.7.0...v0.7.1)
+
 ## [v0.7.0](https://github.com/devlooped/WhatsApp/tree/v0.7.0) (2025-07-22)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.6.0...v0.7.0)
