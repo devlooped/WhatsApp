@@ -161,6 +161,52 @@ public class WhatsAppClientTests(ITestOutputHelper output)
     }
 
     [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    public async Task SendsTemplateAsync()
+    {
+        var (configuration, client) = Initialize();
+
+        // Send an interactive message with three buttons showcasing the payload/value 
+        // being different than the button text
+        await client.SendAsync(configuration["SendFrom"]!, new
+        {
+            messaging_product = "whatsapp",
+            recipient_type = "individual",
+            to = configuration["SendTo"]!,
+            type = "template",
+            template = new
+            {
+                name = "reminder",
+                language = new
+                {
+                    code = "es"
+                },
+                components = new[]
+                {
+                    new
+                    {
+                        type = "body",
+                        parameters = new[]
+                        {
+                            new
+                            {
+                                type = "text",
+                                parameter_name = "reminder_text",
+                                text = "Dentista"
+                            },
+                            new
+                            {
+                                type = "text",
+                                parameter_name = "reminder_datetime",
+                                text = "3pm"
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
     public async Task SendsCallToActionAsync()
     {
         var (configuration, client) = Initialize();
