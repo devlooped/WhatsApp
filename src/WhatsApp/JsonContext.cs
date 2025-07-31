@@ -28,7 +28,8 @@ namespace Devlooped.WhatsApp;
     UnmappedMemberHandling = JsonUnmappedMemberHandling.Skip,
     PropertyNameCaseInsensitive = true,
     PropertyNamingPolicy = JsonKnownNamingPolicy.SnakeCaseLower,
-    WriteIndented = true
+    WriteIndented = true,
+    GenerationMode = JsonSourceGenerationMode.Metadata
     )]
 [JsonSerializable(typeof(Message))]
 [JsonSerializable(typeof(ContentMessage))]
@@ -40,9 +41,25 @@ namespace Devlooped.WhatsApp;
 [JsonSerializable(typeof(MediaReference))]
 [JsonSerializable(typeof(Conversation))]
 [JsonSerializable(typeof(AdditionalPropertiesDictionary))]
+[JsonSerializable(typeof(MessageTemplate))]
+[JsonSerializable(typeof(TemplateParameter))]
+[JsonSerializable(typeof(TemplateComponent))]
+[JsonSerializable(typeof(HeaderComponent))]
+[JsonSerializable(typeof(BodyComponent))]
+[JsonSerializable(typeof(ButtonComponent))]
+[JsonSerializable(typeof(ButtonParameter))]
+[JsonSerializable(typeof(PayloadButtonParameter))]
+[JsonSerializable(typeof(TextButtonParameter))]
+[JsonSerializable(typeof(TextParameter))]
+[JsonSerializable(typeof(CurrencyParameter))]
+[JsonSerializable(typeof(DateTimeParameter))]
+[JsonSerializable(typeof(ImageParameter))]
+[JsonSerializable(typeof(VideoParameter))]
+[JsonSerializable(typeof(DocumentParameter))]
+[JsonSerializable(typeof(LocationParameter))]
 public partial class JsonContext : JsonSerializerContext
 {
-    static readonly Lazy<JsonSerializerOptions> options = new(() => CreateDefaultOptions());
+    static readonly Lazy<JsonSerializerOptions> options = new(CreateDefaultOptions);
 
     /// <summary>
     /// Provides a pre-configured instance of <see cref="JsonSerializerOptions"/> that aligns with the context's settings.
@@ -55,6 +72,21 @@ public partial class JsonContext : JsonSerializerContext
     {
         JsonSerializerOptions options = new(Default.Options)
         {
+            Converters =
+            {
+                new MessageTemplateConverter(),
+                new HeaderConverter(),
+                new BodyConverter(),
+                new TemplateParameterConverter(),
+                new TextParameterConverter(),
+                new CurrencyParameterConverter(),
+                new DateTimeParameterConverter(),
+                new ImageParameterConverter(),
+                new VideoParameterConverter(),
+                new DocumentParameterConverter(),
+                new LocationParameterConverter(),
+                new ButtonParameterConverter(),
+            },
             Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             WriteIndented = true,
         };

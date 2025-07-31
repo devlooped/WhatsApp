@@ -55,7 +55,7 @@ builder.Services.AddWhatsApp((messages, cancellation) =>
                 Console.WriteLine($"Error: {error.Error.Message} ({error.Error.Code})");
                 break;
             case InteractiveMessage interactive:
-                Console.WriteLine($"Interactive: {interactive.Selection.Title} ({interactive.Selection.Id})");
+                Console.WriteLine($"Interactive: {interactive.Selection.Text} ({interactive.Selection.Value})");
                 break;
             case StatusMessage status:
                 Console.WriteLine($"Status: {status.Status}");
@@ -346,6 +346,49 @@ builder.Services.AddWhatsApp<MyWhatsAppHandler>()
     .UseLogging()
     .UseIgnore()  // 👈 Ignore status+unsupported messages. We do log them.
     .UseConversation();
+```
+
+Finally, the pipeline handlers are encouraged to use the `Response` model 
+for sending messages, instead of invoking the `IWhatsAppClient` directly. 
+This allows the pipeline to automatically manage the sending and integrate 
+better with persistence or other cross-cutting concerns, while allowing for 
+flexible in-progress message generation (i.e. notify user that processing 
+is ongoing via reactions, etc.). 
+
+For example, to send the typing indicator when starting processing messages 
+in a handler:
+
+```csharp
+public override async IAsyncEnumerable<Response> HandleAsync(IEnumerable<IMessage> messages, [EnumeratorCancellation] CancellationToken cancellation = default)
+{
+    foreach (var message in messages)
+    {
+        if (message is UserMessage user)
+            yield return user.Typing();
+        
+        // Do some processing, send final response
+
+        yield return message.Reply("Processing complete!");
+    }
+}
+```
+
+The response model supports all the common WhatsApp message types, including 
+plain text responses, interactive buttons, reactions and templates, such as:
+
+```csharp
+    yield return message.Template(new MessageTemplate("order", "en")
+    {
+        Buttons =
+        [
+            // i.e. template button get tracking info for an order
+            ButtonComponent.Payload(orderId),
+            // i.e. a template url button to navigate to the order page
+            ButtonComponent.Url(orderId),
+            // i.e. a template catalog button to view the WhatsApp business catalog
+            ButtonComponent.Catalog()
+        ]
+    });
 ```
 
 ### OpenTelemetry

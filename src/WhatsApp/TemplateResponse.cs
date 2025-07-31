@@ -9,14 +9,11 @@
 /// <param name="ServiceId">The identifier of the service handling the message.</param>
 /// <param name="UserNumber">The phone number of the recipient in international format.</param>
 /// <param name="Context">The unique identifier of the message to which the reaction is being sent.</param>
-/// <param name="Name">The template name</param>
-/// <param name="Language">The template language code (i.e. 'es_AR')</param>
-/// <see cref="https://developers.facebook.com/docs/whatsapp/api/messages/message-templates#supported-languages"/>
-/// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
-public record TemplateResponse(string ServiceId, string UserNumber, string Context, object Template) : Response(ServiceId, UserNumber, Context)
+/// <param name="Template">The message template, components and parameters.</param>
+public record TemplateResponse(string ServiceId, string UserNumber, string Context, MessageTemplate Template) : Response(ServiceId, UserNumber, Context)
 {
     public TemplateResponse(string ServiceId, string UserNumber, string Context, string Name, string Language)
-        : this(UserNumber, ServiceId, Context, new { name = Name, language = new { code = Language } })
+        : this(UserNumber, ServiceId, Context, new MessageTemplate(Name, Language))
     {
     }
 

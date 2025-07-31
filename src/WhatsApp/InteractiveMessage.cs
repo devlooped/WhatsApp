@@ -20,6 +20,6 @@ public record InteractiveMessage(string Id, Service Service, User User, long Tim
 /// <summary>
 /// Selection made by the user in an interactive message, such as a button or list item.
 /// </summary>
-/// <param name="Id">The identifier of the selection.</param>
-/// <param name="Title">The title of the selection.</param>
-public record Selection(string Id, string Title);
+/// <param name="Text">The selection text (i.e. button or list item text).</param>
+/// <param name="Value">The value associated with the selection (i.e. button id or payload).</param>
+public record Selection(string Text, string Value);
