@@ -10,7 +10,7 @@
    ($msg.type as $msgType |
     # Compute context once for all message types
     (if $msgType == "reaction" then $msg.reaction.message_id else ($msg.context.id // null) end) as $context |
-    if $msgType == "interactive" then
+    if $msgType == "interactive" or $msgType == "button" then
       {
         "$type": "interactive",
         "notification": $notification,
@@ -26,8 +26,8 @@
           "number": $msg.from
         },
         "selection": {
-          "id": ($msg.interactive.button_reply?.id // $msg.interactive.list_reply?.id),
-          "title": ($msg.interactive.button_reply?.title // $msg.interactive.list_reply?.title)
+          "text": ($msg.interactive.button_reply?.title // $msg.interactive.list_reply?.title // $msg.button.text),
+          "value": ($msg.interactive.button_reply?.id // $msg.interactive.list_reply?.id // $msg.button.payload)
         }
       }
     elif $msgType == "reaction" then

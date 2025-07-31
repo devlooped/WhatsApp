@@ -73,7 +73,7 @@ public static partial class MessageExtensions
         /// <see cref="https://developers.facebook.com/docs/whatsapp/api/messages/message-templates#supported-languages"/>
         /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
         /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
-        public TemplateResponse Template(object template)
+        public TemplateResponse Template(MessageTemplate template)
             => new(message.ServiceId, message.UserNumber, message.Id, template);
 
         /// <summary>

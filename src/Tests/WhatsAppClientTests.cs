@@ -165,35 +165,87 @@ public class WhatsAppClientTests(ITestOutputHelper output)
     {
         var (configuration, client) = Initialize();
 
-        await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, new
+        await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, new MessageTemplate("reminder", "es")
         {
-            name = "reminder",
-            language = new
-            {
-                code = "es"
-            },
-            components = new[]
-            {
-                new
-                {
-                    type = "body",
-                    parameters = new[]
-                    {
-                        new
-                        {
-                            type = "text",
-                            parameter_name = "reminder_text",
-                            text = "Dentista"
-                        },
-                        new
-                        {
-                            type = "text",
-                            parameter_name = "reminder_datetime",
-                            text = "3pm"
-                        }
-                    }
-                }
-            }
+            Body = new BodyComponent([
+                new TextParameter("🦷", "emoji"),
+                new TextParameter("Dentista", "text"),
+                new TextParameter("3pm", "when")
+            ])
+        });
+    }
+
+    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    public async Task SendsTemplateMeetingAsync()
+    {
+        var (configuration, client) = Initialize();
+
+        await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, new MessageTemplate("meeting", "es")
+        {
+            Header = new HeaderComponent(new LocationParameter(37.483307, -122.148981, "Pablo Morales", "1 Hacker Way, Menlo Park, CA 94025")),
+            Body = new BodyComponent(
+                [
+                    new TextParameter("kzu", "who"),
+                    new TextParameter("office", "where"),
+                    new TextParameter("15'", "when")
+                ])
+        });
+    }
+
+    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    public async Task SendsTemplate2Async()
+    {
+        var (configuration, client) = Initialize();
+
+        await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, new MessageTemplate("reminder2", "en")
+        {
+            Header = new HeaderComponent(new LocationParameter(37.483307, -122.148981, "Pablo Morales", "1 Hacker Way, Menlo Park, CA 94025")),
+            Body = new BodyComponent(
+            [
+                new TextParameter("🦷", "emoji"),
+                new TextParameter("Dentista", "text"),
+                new TextParameter("3pm", "when")
+            ])
+        });
+    }
+
+    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    public async Task SendsTemplateUrlAsync()
+    {
+        var (configuration, client) = Initialize();
+
+        await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, new MessageTemplate("variables", "en")
+        {
+            Header = new HeaderComponent(new TextParameter("kzu", "name")),
+            Body = new BodyComponent(
+            [
+                new TextParameter("dotnet", "tag"),
+            ]),
+            Buttons =
+            [
+                ButtonComponent.Url("dotnet"),
+                ButtonComponent.Default
+            ]
+        });
+    }
+
+    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    public async Task SendsTemplateButtonsAsync()
+    {
+        var (configuration, client) = Initialize();
+
+        await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, new MessageTemplate("buttons", "en")
+        {
+            Buttons =
+            [
+                ButtonComponent.Payload("id1"),
+                //NOTE: we can omit the buttons if we don't need custom payloads for them. 
+                // the webhook will get the payload == button text in that case.
+                //ButtonComponent.Text("id2"),
+                // Since we omitted the second button, we'll need to specify the index in this case.
+                // otherwise, it defaults to its index in the array.
+                ButtonComponent.Url("dotnet", index: 2),
+            ]
         });
     }
 
@@ -265,6 +317,24 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         await Assert.ThrowsAsync<NotSupportedException>(() => client.ResolveMediaAsync(
             new ContentMessage("asdf", new Service("asdf", "1234"), new User("kzu", "2134"), 0,
                 new UnknownContent(new System.Text.Json.JsonElement()))));
+    }
+
+    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    public async Task SendsTemplateWithMessageTemplateObjectAsync()
+    {
+        var (configuration, client) = Initialize();
+
+        // Using the new MessageTemplate object instead of anonymous object
+        var template = new MessageTemplate("reminder", "es")
+        {
+            Body = new BodyComponent([
+                new TextParameter("🦷", "emoji"),
+                new TextParameter("Dentista", "text"),
+                new TextParameter("3pm", "when")
+            ])
+        };
+
+        await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, template);
     }
 
     record Media(string Url, string MimeType, long FileSize);

@@ -89,7 +89,7 @@ public static partial class WhatsAppClientExtensions
     /// <see cref="https://developers.facebook.com/docs/whatsapp/api/messages/message-templates#supported-languages"/>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
-    public static Task SendTemplateAsync(this IWhatsAppClient client, string serviceId, string userNumber, object template, CancellationToken cancellation = default)
+    public static Task SendTemplateAsync(this IWhatsAppClient client, string serviceId, string userNumber, MessageTemplate template, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
