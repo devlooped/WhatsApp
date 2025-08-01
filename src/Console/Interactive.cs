@@ -250,7 +250,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                     if (message.Type == Client.MessageType.Reaction && text.Length == 0)
                         return;
 
-                    if (message.Type is Client.MessageType.Content or Client.MessageType.Interactive)
+                    if (message.Type is (Client.MessageType.Content or Client.MessageType.Interactive or Client.MessageType.Template))
                         typingCancellation?.Cancel();
 
                     var parts = text.Split('|');
@@ -278,6 +278,8 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
 
                     if (message is Client.InteractiveMessage interactive && interactive.Interactive.Action is { } node)
                         grid.AddRow(new Markup(" "), new Markup(DictionaryConverter.Parse(node.ToString()).ToYaml(true)));
+                    if (message is TemplateMessage template && template.Template is { } data)
+                        grid.AddRow(new Markup(" "), new Markup(DictionaryConverter.Parse(data.ToString()).ToYaml(true)));
 
                     AnsiConsole.Write(new Panel(grid)
                         .Border(BoxBorder.None)

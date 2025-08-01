@@ -17,6 +17,7 @@ namespace Devlooped.WhatsApp.Client;
     )]
 [JsonSerializable(typeof(ClientMessage))]
 [JsonSerializable(typeof(ContentMessage))]
+[JsonSerializable(typeof(TemplateMessage))]
 [JsonSerializable(typeof(ReactionMessage))]
 [JsonSerializable(typeof(InteractiveMessage))]
 partial class ClientContext : JsonSerializerContext
@@ -56,12 +57,14 @@ enum MessageType
     Content = 1,
     Interactive = 2,
     Reaction = 4,
-    Typing = 8
+    Typing = 8,
+    Template = 16,
 }
 
 [JsonPolymorphic]
 [JsonDerivedType(typeof(ContentMessage), "text")]
 [JsonDerivedType(typeof(InteractiveMessage), "interactive")]
+[JsonDerivedType(typeof(TemplateMessage), "template")]
 [JsonDerivedType(typeof(ReactionMessage), "reaction")]
 [JsonDerivedType(typeof(TypingMessage), "typing")]
 abstract record ClientMessage
@@ -102,3 +105,10 @@ record Interactive(Body Body, JsonNode? Action);
 record Body(string Text);
 
 record Context(string MessageId);
+
+record TemplateMessage(JsonNode Template) : ClientMessage
+{
+    public override MessageType Type => MessageType.Template;
+
+    public override string ToString() => "📃";
+}
