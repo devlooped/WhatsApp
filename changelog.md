@@ -1,5 +1,15 @@
 # Changelog
 
+## [v0.8.0](https://github.com/devlooped/WhatsApp/tree/v0.8.0) (2025-08-01)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.7.1...v0.8.0)
+
+:sparkles: Implemented enhancements:
+
+- Add message template rendering to the CLI [\#264](https://github.com/devlooped/WhatsApp/pull/264) (@kzu)
+- Introduce factory methods for TemplateParameter [\#263](https://github.com/devlooped/WhatsApp/pull/263) (@kzu)
+- Add full template model support [\#262](https://github.com/devlooped/WhatsApp/pull/262) (@kzu)
+
 ## [v0.7.1](https://github.com/devlooped/WhatsApp/tree/v0.7.1) (2025-07-24)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.7.0...v0.7.1)
