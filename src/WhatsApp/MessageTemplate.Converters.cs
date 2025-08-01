@@ -3,11 +3,224 @@ using System.Text.Json.Serialization;
 
 namespace Devlooped.WhatsApp;
 
+/// <summary>Converter for MessageTemplate.</summary>
+class MessageTemplateConverter : JsonConverter<MessageTemplate>
+{
+    public override MessageTemplate Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        using var document = JsonDocument.ParseValue(ref reader);
+        var root = document.RootElement;
+
+        var name = root.GetProperty("name").GetString() ?? throw new JsonException("Missing 'name' property.");
+        var languageCode = root.GetProperty("language").GetProperty("code").GetString() ?? throw new JsonException("Missing 'language.code' property.");
+
+        HeaderComponent? header = null;
+        BodyComponent? body = null;
+        List<ButtonComponent> buttons = [];
+
+        if (root.TryGetProperty("components", out var componentsElement))
+        {
+            foreach (var component in componentsElement.EnumerateArray())
+            {
+                var type = component.GetProperty("type").GetString();
+                switch (type)
+                {
+                    case "header":
+                        header = JsonSerializer.Deserialize<HeaderComponent>(component, options);
+                        break;
+                    case "body":
+                        body = JsonSerializer.Deserialize<BodyComponent>(component, options);
+                        break;
+                    case "button":
+                        var subType = component.GetProperty("sub_type").GetString() switch
+                        {
+                            null => throw new JsonException("Missing 'sub_type' property."),
+                            "quick_reply" => ButtonSubType.QuickReply,
+                            "url" => ButtonSubType.Url,
+                            "catalog" => ButtonSubType.Catalog,
+                            var other => throw new JsonException($"Unsupported button sub_type: {other}")
+                        };
+
+                        List<ButtonParameter> parameters = [];
+                        if (component.TryGetProperty("parameters", out var parametersElement))
+                        {
+                            parameters = JsonSerializer.Deserialize<List<ButtonParameter>>(parametersElement, options) ?? [];
+                        }
+
+                        buttons.Add(new ButtonComponent(subType, parameters));
+                        break;
+                }
+            }
+        }
+
+        return new MessageTemplate(name, languageCode)
+        {
+            Header = header,
+            Body = body,
+            Buttons = buttons.Count != 0 ? buttons : null
+        };
+    }
+
+    public override void Write(Utf8JsonWriter writer, MessageTemplate value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        writer.WriteString("name", value.Name);
+
+        writer.WritePropertyName("language");
+        writer.WriteStartObject();
+        writer.WriteString("code", value.Language);
+        writer.WriteEndObject();
+
+        if (value.Header is not null || value.Body is not null || value.Buttons is { Count: > 0 })
+        {
+            writer.WritePropertyName("components");
+            writer.WriteStartArray();
+
+            if (value.Header is not null)
+                JsonSerializer.Serialize(writer, value.Header, options);
+
+            if (value.Body is not null)
+                JsonSerializer.Serialize(writer, value.Body, options);
+
+            if (value.Buttons != null)
+            {
+                for (var i = 0; i < value.Buttons.Count; i++)
+                {
+                    var button = value.Buttons[i];
+                    writer.WriteStartObject();
+                    writer.WriteString("type", "button");
+                    var subType = button.SubType switch
+                    {
+                        ButtonSubType.QuickReply => "quick_reply",
+                        ButtonSubType.Url => "url",
+                        ButtonSubType.Catalog => "catalog",
+                        _ => throw new JsonException($"Unsupported ButtonSubType: {button.SubType}")
+                    };
+                    writer.WriteString("sub_type", subType);
+                    writer.WriteNumber("index", button.Index ?? i);
+                    writer.WritePropertyName("parameters");
+                    JsonSerializer.Serialize(writer, button.Parameters ?? [], options);
+                    writer.WriteEndObject();
+                }
+            }
+
+            writer.WriteEndArray();
+        }
+
+        writer.WriteEndObject();
+    }
+}
+
+/// <summary>Converter for HeaderComponent.</summary>
+class HeaderConverter : JsonConverter<HeaderComponent>
+{
+    public override HeaderComponent Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        using var document = JsonDocument.ParseValue(ref reader);
+        var root = document.RootElement;
+
+        // Verify this is a header component
+        var type = root.GetProperty("type").GetString();
+        if (type != "header")
+            throw new JsonException($"Expected header component, got {type}");
+
+        // Extract parameters if they exist
+        List<TemplateParameter> parameters = [];
+        if (root.TryGetProperty("parameters", out var parametersElement))
+        {
+            parameters = JsonSerializer.Deserialize<List<TemplateParameter>>(parametersElement, options) ?? [];
+        }
+
+        return new HeaderComponent(parameters);
+    }
+
+    public override void Write(Utf8JsonWriter writer, HeaderComponent value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        writer.WriteString("type", value.Type);
+        writer.WritePropertyName("parameters");
+        JsonSerializer.Serialize(writer, value.Parameters, options);
+        writer.WriteEndObject();
+    }
+}
+
+/// <summary>Converter for BodyComponent.</summary>
+class BodyConverter : JsonConverter<BodyComponent>
+{
+    public override BodyComponent Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        using var document = JsonDocument.ParseValue(ref reader);
+        var root = document.RootElement;
+
+        // Verify this is a body component
+        var type = root.GetProperty("type").GetString();
+        if (type != "body")
+            throw new JsonException($"Expected body component, got {type}");
+
+        // Extract parameters if they exist
+        List<TemplateParameter> parameters = [];
+        if (root.TryGetProperty("parameters", out var parametersElement))
+        {
+            parameters = JsonSerializer.Deserialize<List<TemplateParameter>>(parametersElement, options) ?? [];
+        }
+
+        return new BodyComponent(parameters);
+    }
+
+    public override void Write(Utf8JsonWriter writer, BodyComponent value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        writer.WriteString("type", value.Type);
+        writer.WritePropertyName("parameters");
+        JsonSerializer.Serialize(writer, value.Parameters, options);
+        writer.WriteEndObject();
+    }
+}
+
+/// <summary>Converter for ButtonParameter subclasses.</summary>
+class ButtonParameterConverter : JsonConverter<ButtonParameter>
+{
+    public override ButtonParameter? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        using var document = JsonDocument.ParseValue(ref reader);
+        var root = document.RootElement;
+
+        var type = root.GetProperty("type").GetString() ?? throw new JsonException("Missing 'type' property in button parameter.");
+
+        return type switch
+        {
+            "payload" => new PayloadButtonParameter(root.GetProperty("payload").GetString() ?? throw new JsonException("Missing 'payload' property.")),
+            "text" => new TextButtonParameter(root.GetProperty("text").GetString() ?? throw new JsonException("Missing 'text' property.")),
+            _ => throw new JsonException($"Unsupported button parameter type: {type}")
+        };
+    }
+
+    public override void Write(Utf8JsonWriter writer, ButtonParameter value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        writer.WriteString("type", value.Type);
+
+        switch (value)
+        {
+            case PayloadButtonParameter payload:
+                writer.WriteString("payload", payload.Payload);
+                break;
+            case TextButtonParameter text:
+                writer.WriteString("text", text.Text);
+                break;
+            default:
+                throw new JsonException($"Unsupported button parameter type: {value.GetType().Name}");
+        }
+
+        writer.WriteEndObject();
+    }
+}
+
 /// <summary>
 /// Base converter class for TemplateParameter types that can handle both polymorphic and concrete type scenarios.
 /// </summary>
 /// <typeparam name="T">The specific TemplateParameter type to convert</typeparam>
-public abstract class TemplateParameterConverter<T> : JsonConverter<T> where T : TemplateParameter
+abstract class TemplateParameterConverter<T> : JsonConverter<T> where T : TemplateParameter
 {
     /// <summary>
     /// Gets the JSON property name for this parameter type (e.g., "text", "currency", "image", etc.).
@@ -142,7 +355,7 @@ public abstract class TemplateParameterConverter<T> : JsonConverter<T> where T :
         switch (value)
         {
             case TextParameter text:
-                writer.WriteString("text", text.Text);
+                writer.WriteString("text", text.Value);
                 if (text.Name is not null)
                 {
                     writer.WriteString("parameter_name", text.Name);
@@ -204,7 +417,7 @@ public abstract class TemplateParameterConverter<T> : JsonConverter<T> where T :
 /// <summary>
 /// Polymorphic converter for the base TemplateParameter type.
 /// </summary>
-public class TemplateParameterConverter : TemplateParameterConverter<TemplateParameter>
+class TemplateParameterConverter : TemplateParameterConverter<TemplateParameter>
 {
     protected override TemplateParameter ReadConcrete(JsonElement root)
     {
@@ -217,7 +430,7 @@ public class TemplateParameterConverter : TemplateParameterConverter<TemplatePar
 /// <summary>
 /// Converter for TextParameter.
 /// </summary>
-public class TextParameterConverter : TemplateParameterConverter<TextParameter>
+class TextParameterConverter : TemplateParameterConverter<TextParameter>
 {
     protected override string? PropertyName => null; // TextParameter reads from root, not a sub-property
 
@@ -236,7 +449,7 @@ public class TextParameterConverter : TemplateParameterConverter<TextParameter>
 /// <summary>
 /// Converter for CurrencyParameter.
 /// </summary>
-public class CurrencyParameterConverter : TemplateParameterConverter<CurrencyParameter>
+class CurrencyParameterConverter : TemplateParameterConverter<CurrencyParameter>
 {
     protected override string PropertyName => "currency";
 
@@ -252,7 +465,7 @@ public class CurrencyParameterConverter : TemplateParameterConverter<CurrencyPar
 /// <summary>
 /// Converter for DateTimeParameter.
 /// </summary>
-public class DateTimeParameterConverter : TemplateParameterConverter<DateTimeParameter>
+class DateTimeParameterConverter : TemplateParameterConverter<DateTimeParameter>
 {
     protected override string PropertyName => "date_time";
 
@@ -267,7 +480,7 @@ public class DateTimeParameterConverter : TemplateParameterConverter<DateTimePar
 /// Base converter for media parameters that handles shared link/id parsing logic.
 /// </summary>
 /// <typeparam name="T">The specific MediaTemplateParameter type to convert</typeparam>
-public abstract class MediaParameterConverter<T> : TemplateParameterConverter<T> where T : MediaTemplateParameter
+abstract class MediaParameterConverter<T> : TemplateParameterConverter<T> where T : MediaTemplateParameter
 {
     /// <summary>
     /// Creates an instance from a media ID.
@@ -303,7 +516,7 @@ public abstract class MediaParameterConverter<T> : TemplateParameterConverter<T>
 /// <summary>
 /// Converter for ImageParameter.
 /// </summary>
-public class ImageParameterConverter : MediaParameterConverter<ImageParameter>
+class ImageParameterConverter : MediaParameterConverter<ImageParameter>
 {
     protected override string PropertyName => "image";
     protected override ImageParameter CreateFromId(string id) => new(id);
@@ -313,7 +526,7 @@ public class ImageParameterConverter : MediaParameterConverter<ImageParameter>
 /// <summary>
 /// Converter for VideoParameter.
 /// </summary>
-public class VideoParameterConverter : MediaParameterConverter<VideoParameter>
+class VideoParameterConverter : MediaParameterConverter<VideoParameter>
 {
     protected override string PropertyName => "video";
     protected override VideoParameter CreateFromId(string id) => new(id);
@@ -323,7 +536,7 @@ public class VideoParameterConverter : MediaParameterConverter<VideoParameter>
 /// <summary>
 /// Converter for DocumentParameter.
 /// </summary>
-public class DocumentParameterConverter : MediaParameterConverter<DocumentParameter>
+class DocumentParameterConverter : MediaParameterConverter<DocumentParameter>
 {
     protected override string PropertyName => "document";
     protected override DocumentParameter CreateFromId(string id) => new(id);
@@ -333,7 +546,7 @@ public class DocumentParameterConverter : MediaParameterConverter<DocumentParame
 /// <summary>
 /// Converter for LocationParameter.
 /// </summary>
-public class LocationParameterConverter : TemplateParameterConverter<LocationParameter>
+class LocationParameterConverter : TemplateParameterConverter<LocationParameter>
 {
     protected override string PropertyName => "location";
 
