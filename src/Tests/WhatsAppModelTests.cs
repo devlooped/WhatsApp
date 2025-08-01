@@ -217,7 +217,7 @@ public class WhatsAppModelTests(ITestOutputHelper output)
         var deserialized = JsonSerializer.Deserialize<TextParameter>(json, JsonContext.DefaultOptions);
         Assert.NotNull(deserialized);
         var typed = Assert.IsType<TextParameter>(deserialized);
-        Assert.Equal("Hello", typed.Text);
+        Assert.Equal("Hello", typed.Value);
         Assert.Equal("message", typed.Name);
     }
 
@@ -230,7 +230,7 @@ public class WhatsAppModelTests(ITestOutputHelper output)
         var deserialized = JsonSerializer.Deserialize<TextParameter>(json, JsonContext.DefaultOptions);
         Assert.NotNull(deserialized);
         var typed = Assert.IsType<TextParameter>(deserialized);
-        Assert.Equal("Hello World", typed.Text);
+        Assert.Equal("Hello World", typed.Value);
         Assert.Null(typed.Name);
     }
 
@@ -387,7 +387,7 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         // Verify the values are preserved
         var textParam = (TextParameter)deserialized[0];
-        Assert.Equal("Hello", textParam.Text);
+        Assert.Equal("Hello", textParam.Value);
         Assert.Equal("greeting", textParam.Name);
 
         var currencyParam = (CurrencyParameter)deserialized[1];
@@ -421,7 +421,7 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         var text = JsonSerializer.Deserialize<TextParameter>(textJson, JsonContext.DefaultOptions);
         Assert.NotNull(text);
-        Assert.Equal("Hello World", text.Text);
+        Assert.Equal("Hello World", text.Value);
         Assert.Equal("greeting", text.Name);
 
         // Test polymorphic deserialization still works
@@ -516,7 +516,7 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         var text = JsonSerializer.Deserialize<TextParameter>(textJson, JsonContext.Default.Options);
         Assert.NotNull(text);
-        Assert.Equal("Hello World", text.Text);
+        Assert.Equal("Hello World", text.Value);
         Assert.Equal("greeting", text.Name);
     }
 
@@ -749,7 +749,7 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         var firstParam = template.Body.Parameters[0] as TextParameter;
         Assert.NotNull(firstParam);
-        Assert.Equal("🦷", firstParam.Text);
+        Assert.Equal("🦷", firstParam.Value);
         Assert.Equal("emoji", firstParam.Name);
     }
 
@@ -873,7 +873,7 @@ public class WhatsAppModelTests(ITestOutputHelper output)
 
         // Verify body parameters
         var textParam = Assert.IsType<TextParameter>(template.Body.Parameters[0]);
-        Assert.Equal("TEXT_STRING", textParam.Text);
+        Assert.Equal("TEXT_STRING", textParam.Value);
         Assert.Null(textParam.Name); // No parameter_name provided in JSON
 
         var currencyParam = Assert.IsType<CurrencyParameter>(template.Body.Parameters[1]);
