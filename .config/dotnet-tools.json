@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "dotnet-env": {
+      "version": "1.0.0",
+      "commands": [
+        "dotnet-env"
+      ],
+      "rollForward": false
+    }
+  }
+}
