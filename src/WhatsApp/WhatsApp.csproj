@@ -45,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Tests" />
+    <InternalsVisibleTo Include="Devlooped.WhatsApp.Tests" />
     <EmbeddedResource Include="Message.jq" Kind="Text" />
   </ItemGroup>
 
