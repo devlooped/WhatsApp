@@ -33,6 +33,8 @@
     <PackageReference Include="Devlooped.TableStorage" Version="5.4.0" />
 
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
+
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NuGetizer" Version="1.3.0" />
     <PackageReference Include="PolySharp" Version="1.15.0" />
     <PackageReference Include="ThisAssembly.AssemblyInfo" Version="2.0.14" PrivateAssets="all" />
