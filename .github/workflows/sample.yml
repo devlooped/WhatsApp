@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: ⚙ dotnet
-        uses: ./.github/actions/dotnet
+        uses: devlooped/actions-dotnet-env@v1
 
       - name: 🔓 login
         uses: azure/login@v2
