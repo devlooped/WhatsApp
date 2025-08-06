@@ -9,5 +9,5 @@ public static class WhatsAppHandlerExtensions
     /// </summary>
     public static async Task HandleAsync(this IWhatsAppHandler handler, Message message, CancellationToken cancellation = default)
         => await handler.HandleAsync([message with { Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() }], cancellation)
-            .ToListAsync(cancellation);
+            .ToListAsync();
 }

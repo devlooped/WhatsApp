@@ -1,4 +1,5 @@
 ﻿extern alias CodeAnalysis;
+#pragma warning disable CS0436 // Type conflicts with imported type
 using Microsoft.CodeAnalysis.CSharp.Testing;
 using Microsoft.CodeAnalysis.Testing;
 using Analyzer = Microsoft.CodeAnalysis.CSharp.Testing.CSharpAnalyzerVerifier<CodeAnalysis.Devlooped.WhatsApp.SendStringAnalyzer, Microsoft.CodeAnalysis.Testing.DefaultVerifier>;
@@ -13,7 +14,16 @@ public class AnalyzerTests
     {
         var test = new CSharpAnalyzerTest<SendStringAnalyzer, DefaultVerifier>
         {
+#if NET8_0
             ReferenceAssemblies = ReferenceAssemblies.Net.Net80,
+#else
+            ReferenceAssemblies = new ReferenceAssemblies(
+                        "net10.0",
+                        new PackageIdentity(
+                            "Microsoft.NETCore.App.Ref",
+                            ThisAssembly.Project.BundledNETCoreAppPackageVersion),
+                        Path.Combine("ref", "net10.0")),
+#endif
             TestCode =
                 $$"""
                 using System.Threading.Tasks;
