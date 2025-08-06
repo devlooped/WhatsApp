@@ -1,5 +1,17 @@
 # Changelog
 
+## [v0.8.1](https://github.com/devlooped/WhatsApp/tree/v0.8.1) (2025-08-06)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.8.0...v0.8.1)
+
+:sparkles: Implemented enhancements:
+
+- Avoid polluting other Test projects with internals from WhatsApp [\#268](https://github.com/devlooped/WhatsApp/pull/268) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Fix integration tests [\#275](https://github.com/devlooped/WhatsApp/pull/275) (@kzu)
+
 ## [v0.8.0](https://github.com/devlooped/WhatsApp/tree/v0.8.0) (2025-08-01)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.7.1...v0.8.0)
