@@ -7,7 +7,7 @@ public static class WhatsAppHandlerExtensions
     /// responses for the purpose of full pipeline execution only. It also sets the timestamp 
     /// of the message to the current UTC time.
     /// </summary>
-    public static Task HandleAsync(this IWhatsAppHandler handler, Message message, CancellationToken cancellation = default)
-        => handler.HandleAsync([message with { Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() }], cancellation)
-            .ForEachAsync(x => { }, cancellation);
+    public static async Task HandleAsync(this IWhatsAppHandler handler, Message message, CancellationToken cancellation = default)
+        => await handler.HandleAsync([message with { Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() }], cancellation)
+            .ToListAsync(cancellation);
 }

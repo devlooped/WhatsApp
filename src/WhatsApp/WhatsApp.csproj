@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk"> 
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
     <AssemblyName>Devlooped.WhatsApp</AssemblyName>
     <Description>WhatsApp agents for Azure Functions</Description>
     <PackageId>Devlooped.WhatsApp</PackageId>
