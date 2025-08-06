@@ -8,6 +8,11 @@ public class ConversationStorageTests
     [Fact]
     public async Task StoreAndLoadAdditionalProperties()
     {
+        CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient()
+            .CreateTableIfNotExists("WhatsAppMessages");
+        CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient()
+            .CreateTableIfNotExists("WhatsAppConversations");
+
         var storage = new ConversationStorage(CloudStorageAccount.DevelopmentStorageAccount);
         var messageId = Ulid.NewUlid().ToString();
         var conversationId = Ulid.NewUlid().ToString();
