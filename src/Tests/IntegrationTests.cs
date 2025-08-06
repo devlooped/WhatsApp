@@ -36,6 +36,12 @@ public class IntegrationTests : IDisposable
         var services = new ServiceCollection()
             .AddSingleton(CloudStorageAccount.DevelopmentStorageAccount)
             .AddSingleton<IConfiguration>(configuration);
+
+        CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient()
+            .CreateTableIfNotExists("WhatsAppMessages");
+        CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient()
+            .CreateTableIfNotExists("WhatsAppConversations");
+
         IEnumerable<IMessage>? messages = null;
 
         services
