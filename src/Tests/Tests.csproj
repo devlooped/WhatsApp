@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4" />
-    <PackageReference Include="Devlooped.TableStorage.Memory" Version="5.3.1" />
+    <PackageReference Include="Devlooped.TableStorage.Memory" Version="5.4.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.13.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.7" />
@@ -42,7 +42,7 @@
 
   <ItemGroup>
     <Content Include="Content\**\*.*" CopyToOutputDirectory="PreserveNewest" />
-    <ProjectProperty Include="BundledNETCoreAppPackageVersion"/>
+    <ProjectProperty Include="BundledNETCoreAppPackageVersion" />
   </ItemGroup>
 
 </Project>

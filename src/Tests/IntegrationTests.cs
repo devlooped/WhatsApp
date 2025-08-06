@@ -33,14 +33,10 @@ public class IntegrationTests : IDisposable
                 { "Meta:Numbers:1234567890", "test-access-token" }
             })
             .Build();
-        var services = new ServiceCollection()
-            .AddSingleton(CloudStorageAccount.DevelopmentStorageAccount)
-            .AddSingleton<IConfiguration>(configuration);
 
-        CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient()
-            .CreateTableIfNotExists("WhatsAppMessages");
-        CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient()
-            .CreateTableIfNotExists("WhatsAppConversations");
+        var services = new ServiceCollection()
+            .AddSingleton<IConfiguration>(configuration)
+            .AddSingleton<IConversationStorage>(new TestConversationStorage(CloudStorageAccount.DevelopmentStorageAccount));
 
         IEnumerable<IMessage>? messages = null;
 

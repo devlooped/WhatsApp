@@ -1,5 +1,17 @@
 ﻿namespace Devlooped.WhatsApp;
 
+class TestConversationStorage : ConversationStorage
+{
+    public TestConversationStorage(CloudStorageAccount storage) : base(storage) { }
+
+    protected override IDocumentRepository<IMessage> CreateMessagesRepository()
+        => new MemoryRepository<IMessage>("WhatsAppMessages", x => x.UserNumber, x => x.Id);
+    protected override ITableStorage<Conversation> CreateConversationsRepository()
+        => new MemoryRepository<Conversation>("WhatsAppConversations");
+    protected override IDocumentRepository<Conversation> CreateActiveConversationRepository()
+        => new MemoryRepository<Conversation>("WhatsAppActiveConversations", partitionKey: null, rowKey: _ => "active");
+}
+
 public class ConversationStorageTests
 {
     readonly static Service service = new("1234", "1234");
@@ -8,12 +20,7 @@ public class ConversationStorageTests
     [Fact]
     public async Task StoreAndLoadAdditionalProperties()
     {
-        CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient()
-            .CreateTableIfNotExists("WhatsAppMessages");
-        CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient()
-            .CreateTableIfNotExists("WhatsAppConversations");
-
-        var storage = new ConversationStorage(CloudStorageAccount.DevelopmentStorageAccount);
+        var storage = new TestConversationStorage(CloudStorageAccount.DevelopmentStorageAccount);
         var messageId = Ulid.NewUlid().ToString();
         var conversationId = Ulid.NewUlid().ToString();
 
