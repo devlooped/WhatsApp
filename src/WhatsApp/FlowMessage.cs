@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Options;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -24,6 +25,12 @@ public class FlowCryptography : IDisposable
     const int StandardNonceLength = 12;
 
     readonly RSA rsa;
+
+    /// <summary>Initializes the class with the provided RSA private key from options.</summary>
+    public FlowCryptography(IOptions<MetaOptions> options)
+        : this(Throw.IfNullOrEmpty(options.Value.PrivateKey, "PrivateKey"))
+    {
+    }
 
     /// <summary>Initializes the class with the provided RSA private key in PEM format.</summary>
     public FlowCryptography(string privatePem)

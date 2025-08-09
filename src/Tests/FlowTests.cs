@@ -5,14 +5,17 @@ namespace Devlooped.WhatsApp;
 
 public class FlowTests(ITestOutputHelper output)
 {
-    [SecretsFact("Meta:PrivateKey", "Meta:PublicKey")]
+    [SecretsFact("Meta:PrivateKey")]
     public void VerifyFlowRequest()
     {
         var configuration = new ConfigurationBuilder()
             .AddUserSecrets<FlowTests>()
             .Build();
 
-        var crypto = new FlowCryptography(configuration["Meta:PrivateKey"]!);
+        var options = configuration.GetSection("Meta").Get<MetaOptions>();
+        Assert.NotNull(options?.PrivateKey);
+
+        var crypto = new FlowCryptography(options.PrivateKey);
 
         var request = new EncryptedFlowData(
             "0zMVQ5xXwGZ8nViXojCYovFRvrTB3dx2bDA4AhXoPhFirbNlsN9Gi7JYDDoBZ44W6g==",
