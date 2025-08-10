@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.Json;
 using Azure.Data.Tables;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -32,6 +33,28 @@ class AzureFunctionsWebhook(
         using var reader = new StreamReader(req.Body, Encoding.UTF8);
         var json = await reader.ReadToEndAsync();
         logger.LogDebug("Received WhatsApp message: {Message}.", json);
+
+        // Detect encrypted flow request setup for flows endpoints
+        if (JsonSerializer.Deserialize<EncryptedFlowData>(json) is { } encrypted)
+        {
+            if (string.IsNullOrEmpty(metaOptions.Value.PrivateKey))
+                return new StatusCodeResult(421);
+
+            var crypto = new FlowCryptography(metaOptions.Value.PrivateKey);
+            if (!crypto.TryDecrypt(encrypted, out var data) || data is null)
+                return new StatusCodeResult(421);
+
+            if (data.Data.TryGetProperty("action", out var action) &&
+                action.ValueKind == JsonValueKind.String &&
+                action.GetString() == "ping")
+            {
+                // This satisfies the flow publishing requirement that the endpoint is active.
+                return new OkObjectResult(crypto.Encrypt(data.With(
+                    new { data = new { status = "active" } })));
+            }
+
+            // TODO: else, how do we handle flow actions?
+        }
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
         {
