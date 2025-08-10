@@ -16,7 +16,15 @@ public record EncryptedFlowData(
     [property: JsonPropertyName("initial_vector")] string IV);
 
 /// <summary>Parsed flow data containing decrypted JSON and AES key/IV.</summary>
-public record FlowData(JsonElement Data, byte[] Key, byte[] IV);
+public record FlowData<TData>(TData Data, byte[] Key, byte[] IV);
+
+/// <summary>Represents flow data with decrypted JSON content, AES key, and IV.</summary>
+public record FlowData(JsonElement Data, byte[] Key, byte[] IV) : FlowData<JsonElement>(Data, Key, IV)
+{
+    /// <summary>Creates a new instance of <see cref="FlowData{TData}"/> with the specified data.</summary>
+    public FlowData<TData> With<TData>(TData data) =>
+        new(data, Key, IV);
+}
 
 /// <summary>Implements the flow message encryption and decryption for the WhatsApp Business API.</summary>
 public class FlowCryptography : IDisposable
@@ -44,6 +52,43 @@ public class FlowCryptography : IDisposable
     {
         rsa = RSA.Create();
         rsa.ImportFromEncryptedPem(privatePem, passphrase);
+    }
+
+    /// <summary>Decrypts the provided encrypted flow data into a <see cref="FlowData"/> object.</summary>
+    public FlowData Decrypt(EncryptedFlowData data)
+    {
+        // Inline decode & decrypt pipeline (Base64 -> RSA -> AES-GCM -> JSON)
+        var aesKey = rsa.Decrypt(Convert.FromBase64String(data.Key), RSAEncryptionPadding.OaepSHA256);
+        var iv = Convert.FromBase64String(data.IV);
+        var cipher = Convert.FromBase64String(data.Data);
+        var plaintext = AesGcmDecrypt(aesKey, iv, cipher);
+        var json = JsonSerializer.Deserialize<JsonElement>(Encoding.UTF8.GetString(plaintext));
+        return new FlowData(json, aesKey, iv);
+    }
+
+    /// <summary>Decrypts the provided encrypted flow data into a <see cref="FlowData"/> object, returning false on failure.</summary>
+    public bool TryDecrypt(EncryptedFlowData data, out FlowData? result)
+    {
+        try
+        {
+            result = Decrypt(data);
+            return true;
+        }
+        catch (CryptographicException)
+        {
+            result = null;
+            return false;
+        }
+    }
+
+    /// <summary>Encrypts the provided flow data into a Base64-encoded string.</summary>
+    public string Encrypt<TData>(FlowData<TData> data)
+    {
+        // Derive nonce via bit-flip (encapsulated) and serialize JSON directly to UTF-8 bytes.
+        var flippedIv = FlipIvBits(data.IV);
+        var payload = JsonSerializer.SerializeToUtf8Bytes(data.Data);
+        var cipherWithTag = AesGcmEncrypt(data.Key, flippedIv, payload);
+        return Convert.ToBase64String(cipherWithTag);
     }
 
     /// <summary>Disposes the inner RSA key.</summary>
@@ -101,27 +146,5 @@ public class FlowCryptography : IDisposable
         for (int i = 0; i < iv.Length; i++)
             flipped[i] = (byte)~iv[i];
         return flipped;
-    }
-
-    /// <summary>Decrypts the provided encrypted flow data into a <see cref="FlowData"/> object.</summary>
-    public FlowData Decrypt(EncryptedFlowData data)
-    {
-        // Inline decode & decrypt pipeline (Base64 -> RSA -> AES-GCM -> JSON)
-        var aesKey = rsa.Decrypt(Convert.FromBase64String(data.Key), RSAEncryptionPadding.OaepSHA256);
-        var iv = Convert.FromBase64String(data.IV);
-        var cipher = Convert.FromBase64String(data.Data);
-        var plaintext = AesGcmDecrypt(aesKey, iv, cipher);
-        var json = JsonSerializer.Deserialize<JsonElement>(Encoding.UTF8.GetString(plaintext));
-        return new FlowData(json, aesKey, iv);
-    }
-
-    /// <summary>Encrypts the provided flow data into a Base64-encoded string.</summary>
-    public string Encrypt(FlowData data)
-    {
-        // Derive nonce via bit-flip (encapsulated) and serialize JSON directly to UTF-8 bytes.
-        var flippedIv = FlipIvBits(data.IV);
-        var payload = JsonSerializer.SerializeToUtf8Bytes(data.Data);
-        var cipherWithTag = AesGcmEncrypt(data.Key, flippedIv, payload);
-        return Convert.ToBase64String(cipherWithTag);
     }
 }
