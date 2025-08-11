@@ -58,6 +58,7 @@ var whatsapp = builder.Services
     .UseOpenTelemetry(builder.Environment.ApplicationName)
     .UseLogging()
     .Use(EchoAndHandle)
+    .UseFlowsDemo()
     .UseConversation(conversationWindowSeconds: 300 /* default */)
     .UseConsole();
 // Uncomment next line to render a JSON of text message/responses 

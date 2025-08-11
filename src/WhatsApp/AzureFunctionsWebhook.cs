@@ -54,6 +54,21 @@ class AzureFunctionsWebhook(
             }
 
             // TODO: else, how do we handle flow actions?
+            return new OkObjectResult(crypto.Encrypt(data.With(
+                new
+                {
+                    screen = "SUCCESS",
+                    data = new
+                    {
+                        extension_message_response = new Dictionary<string, object>
+                        {
+                            ["params"] = new
+                            {
+                                flow_token = "unused"
+                            }
+                        }
+                    }
+                })));
         }
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
