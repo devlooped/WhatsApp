@@ -1,0 +1,46 @@
+{
+  "object": "whatsapp_business_account",
+  "entry": [
+    {
+      "id": "539235785933710",
+      "changes": [
+        {
+          "value": {
+            "messaging_product": "whatsapp",
+            "metadata": {
+              "display_phone_number": "14252004598",
+              "phone_number_id": "478908188647460"
+            },
+            "contacts": [
+              {
+                "profile": { "name": "Kzu" },
+                "wa_id": "5491159278282"
+              }
+            ],
+            "messages": [
+              {
+                "context": {
+                  "from": "14252004598",
+                  "id": "wamid.HBgNNTQ5MTE1OTI3ODI4MhUCABEYEjMzNDQxMkFFN0YwNTNENTA5RQA="
+                },
+                "from": "5491159278282",
+                "id": "wamid.HBgNNTQ5MTE1OTI3ODI4MhUCABIYIDg5NkVCRDMyNTBGMTgwMUUyQkMyMTIxMTZDMTE2NzY5AA==",
+                "timestamp": "1755623610",
+                "type": "interactive",
+                "interactive": {
+                  "type": "nfm_reply",
+                  "nfm_reply": {
+                    "response_json": "{\"comment\":\"Hola\",\"flow_token\":\"service:478908188647460;user:541159278282;flow:data;token:01K31N40NM6JPJYY0CCWVKN8HE\"}",
+                    "body": "Sent",
+                    "name": "flow"
+                  }
+                }
+              }
+            ]
+          },
+          "field": "messages"
+        }
+      ]
+    }
+  ]
+}

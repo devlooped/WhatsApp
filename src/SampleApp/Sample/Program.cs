@@ -15,7 +15,8 @@ using Response = Devlooped.WhatsApp.Response;
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 builder.AddServiceDefaults();
-builder.Configuration.AddUserSecrets<Program>();
+builder.Configuration.AddUserSecrets<Program>()
+    .AddJsonFile("local.settings.json", optional: false);
 
 #if CI || RELEASE
 builder.Environment.EnvironmentName = "Production";

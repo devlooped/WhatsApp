@@ -11,7 +11,7 @@ namespace Devlooped.WhatsApp;
 /// <param name="ServiceId">The identifier of the service to use to send the response through.</param>
 /// <param name="UserNumber">The phone number of the recipient in international format.</param>
 /// <param name="Context">Optional identifier of the message to which this response may be a reply to.</param>
-public abstract partial record Response(string ServiceId, string UserNumber, string? Context) : IMessage
+public abstract partial record Response(string ServiceId, string UserNumber, string? Context = null) : IMessage
 {
     /// <summary>
     /// Creates an anonymous response that uses a function to send the message.

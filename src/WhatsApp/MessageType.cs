@@ -14,9 +14,17 @@ public enum MessageType
     /// </summary>
     Error,
     /// <summary>
-    /// Message contains a button reply.
+    /// The message is a flow endpoint data exchange.
+    /// </summary>
+    FlowData,
+    /// <summary>
+    /// Message contains a button or list selection reply.
     /// </summary>
     Interactive,
+    /// <summary>
+    /// Message contains the final reply after completing an interactive flow.
+    /// </summary>
+    InteractiveFlow,
     /// <summary>
     /// Message contains a reaction to a message.
     /// </summary>

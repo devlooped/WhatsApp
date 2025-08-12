@@ -15,6 +15,7 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(ContentMessage), "content")]
 [JsonDerivedType(typeof(ErrorMessage), "error")]
 [JsonDerivedType(typeof(InteractiveMessage), "interactive")]
+[JsonDerivedType(typeof(InteractiveFlowMessage), "flow")]
 [JsonDerivedType(typeof(ReactionMessage), "reaction")]
 [JsonDerivedType(typeof(StatusMessage), "status")]
 [JsonDerivedType(typeof(UnsupportedMessage), "unsupported")]
@@ -56,7 +57,7 @@ public abstract partial record Message(string Id, Service Service, User User, lo
         var jq = await JQ.ExecuteAsync(json, ThisAssembly.Resources.Message.Text);
         if (!string.IsNullOrEmpty(jq))
         {
-            var message = JsonSerializer.Deserialize(jq, JsonContext.Default.Message);
+            var message = JsonSerializer.Deserialize<Message>(jq, JsonContext.DefaultOptions);
 
             // Fix empty id for system messages
             if (message is not null && string.IsNullOrEmpty(message.Id))

@@ -1,0 +1,9 @@
+{
+  "data": {
+    "foo": "bar"
+  },
+  "flow_token": "service:478908188647460;user:541159278282;flow:data;token:asdf1234",
+  "screen": "Welcome",
+  "action": "data_exchange",
+  "version": "3.0"
+}

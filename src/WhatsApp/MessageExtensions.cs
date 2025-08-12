@@ -82,10 +82,37 @@ public static partial class MessageExtensions
         /// <param name="text">The content of the message calling to action.</param>
         /// <param name="action">The action button text.</param>
         /// <param name="url">The URL to navigate to when the action button is clicked.</param>
-        public CallToActionResponse CallToAction(string text, string action, string url)
+        public CallToActionResponse CallToAction(string text, string action, Uri uri)
             => message is UserMessage user
-            ? new(user.Service, message.UserNumber, text, action, url)
-            : new(message.ServiceId, message.UserNumber, text, action, url);
+            ? new(user.Service, message.UserNumber, text, action, uri.AbsoluteUri)
+            : new(message.ServiceId, message.UserNumber, text, action, uri.AbsoluteUri);
+
+        /// <summary>
+        /// Sends an interactive call to initiate a flow response to the user message.
+        /// </summary>
+        /// <param name="text">The content of the message calling to action.</param>
+        /// <param name="action">The action button text.</param>
+        /// <param name="flowName">The name of the flow to initiate.</param>
+        public CallToFlowResponse CallToAction(string text, string action, string flowName, bool draft = false)
+            => new(message.ServiceId, message.UserNumber, text, action, new FlowParameters(flowName) { Mode = draft ? FlowMode.Draft : FlowMode.Published });
+
+        /// <summary>
+        /// Sends an interactive call to initiate a flow response to the user message.
+        /// </summary>
+        /// <param name="text">The content of the message calling to action.</param>
+        /// <param name="action">The action button text.</param>
+        /// <param name="flowId">The id of the flow to initiate.</param>
+        public CallToFlowResponse CallToAction(string text, string action, long flowId, bool draft = false)
+            => new(message.ServiceId, message.UserNumber, text, action, new FlowParameters(flowId) { Mode = draft ? FlowMode.Draft : FlowMode.Published });
+
+        /// <summary>
+        /// Sends an interactive call to initiate a flow response to the user message.
+        /// </summary>
+        /// <param name="text">The content of the message calling to action.</param>
+        /// <param name="action">The action button text.</param>
+        /// <param name="flowId">The id of the flow to initiate.</param>
+        public CallToFlowResponse CallToAction(string text, string action, FlowParameters flow)
+            => new(message.ServiceId, message.UserNumber, text, action, flow);
 
         /// <summary>
         /// Creates a text reply for the message.

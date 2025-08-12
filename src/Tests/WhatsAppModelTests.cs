@@ -168,6 +168,23 @@ public class WhatsAppModelTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public async Task DeserializeInteractiveFlow()
+    {
+        var json = await File.ReadAllTextAsync($"Content/WhatsApp/InteractiveFlow.json");
+        var message = await Message.DeserializeAsync(json);
+
+        var interactive = Assert.IsType<InteractiveFlowMessage>(message);
+
+        Assert.NotNull(message);
+        Assert.NotNull(message.NotificationId);
+        Assert.NotNull(message.Service);
+        Assert.NotNull(message.User);
+        Assert.Equal("Hola", interactive.Data.GetProperty("comment").GetString());
+        Assert.NotNull(interactive.Source);
+        Assert.Equal("data", interactive.Source.Flow);
+    }
+
+    [Fact]
     public async Task DeserializeUnsupported()
     {
         var json = await File.ReadAllTextAsync($"Content/WhatsApp/Unsupported.json");
