@@ -43,7 +43,7 @@
 
   <ItemGroup>
     <Content Include="Content\**\*.*" CopyToOutputDirectory="PreserveNewest" />
-    <EmbeddedResource Include="rsa_public_key.pem" Kind="Text" />
+    <EmbeddedResource Include="Content\*.pem" Kind="Text" />
     <ProjectProperty Include="BundledNETCoreAppPackageVersion" />
   </ItemGroup>
 

@@ -15,4 +15,14 @@ public record ContentMessage(string Id, Service Service, User User, long Timesta
     /// <inheritdoc/>
     [JsonIgnore]
     public override MessageType Type => MessageType.Content;
+
+    /// <summary>
+    /// Creates a simple text message with the given service ID, user number, and text content.
+    /// </summary>
+    public static ContentMessage Create(string serviceId, string userNumber, string text) => new ContentMessage(
+        Ulid.NewUlid().ToString(),
+        new Service(serviceId, serviceId),
+        new User(userNumber, userNumber),
+        DateTimeOffset.UtcNow.ToUnixTimeSeconds(),
+        new TextContent(text));
 }

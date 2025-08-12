@@ -1,9 +1,13 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Azure.Data.Tables;
+using Devlooped.WhatsApp.Flows;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -20,9 +24,12 @@ namespace Devlooped.WhatsApp;
 class AzureFunctionsWebhook(
     TableServiceClient tableClient,
     IMessageProcessor messageProcessor,
+    PipelineRunner runner,
     IWhatsAppClient whatsapp,
+    IWhatsAppHandler handler,
     IOptions<MetaOptions> metaOptions,
     IOptions<WhatsAppOptions> functionOptions,
+    IHostEnvironment hosting,
     ILogger<AzureFunctionsWebhook> logger)
 {
     readonly WhatsAppOptions functionOptions = functionOptions.Value;
@@ -53,21 +60,56 @@ class AzureFunctionsWebhook(
                     new { data = new { status = "active" } })));
             }
 
-            // TODO: else, how do we handle flow actions?
+            if (!data.Data.TryGetProperty("flow_token", out var t) ||
+                t.ValueKind != JsonValueKind.String || t.GetString() is not { Length: > 0 } value ||
+                !FlowToken.TryDecode(value, out var token))
+            {
+                logger.LogWarning("Received flow request without a valid flow_token.");
+                return new BadRequestObjectResult("Missing or invalid flow_token.");
+            }
+
+            var node = JsonObject.Create(data.Data);
+            Debug.Assert(node != null, "Node should not be null after decryption.");
+
+            node.Add("service", token.ServiceId);
+            node.Add("user", token.UserNumber);
+
+            var flow = JsonSerializer.Deserialize<FlowDataRequest>(node, JsonContext.DefaultOptions);
+            if (flow?.Flow is null)
+            {
+                logger.LogWarning("Failed to deserialize flow message from: {Json}", json);
+                return new BadRequestObjectResult("Invalid flow message format.");
+            }
+
+            FlowDataResponse? flowResponse = default;
+
+            await foreach (var response in handler.HandleAsync([flow]))
+            {
+                if (response is FlowDataResponse fdr)
+                {
+                    if (flowResponse is not null)
+                    {
+                        logger.LogWarning("At most one flow data response can be provided for {Token}", token.RawToken);
+                        return new ConflictObjectResult("Multiple flow data responses are not allowed.");
+                    }
+                    else
+                    {
+                        flowResponse = fdr;
+                    }
+                }
+            }
+
+            if (flowResponse is null)
+            {
+                logger.LogWarning("No flow data response provided for {Token}", token.RawToken);
+                return new NotFoundObjectResult("No flow data response provided.");
+            }
+
             return new OkObjectResult(crypto.Encrypt(data.With(
                 new
                 {
-                    screen = "SUCCESS",
-                    data = new
-                    {
-                        extension_message_response = new Dictionary<string, object>
-                        {
-                            ["params"] = new
-                            {
-                                flow_token = "unused"
-                            }
-                        }
-                    }
+                    screen = flowResponse.Screen,
+                    data = flowResponse.Data
                 })));
         }
 
@@ -90,8 +132,12 @@ class AzureFunctionsWebhook(
             if (functionOptions.ReactOnMessage != null && message.Type == MessageType.Content)
                 await message.React(functionOptions.ReactOnMessage).SendAsync(whatsapp).Ignore();
 
-            // Otherwise, enqueue the message processing
-            await messageProcessor.EnqueueAsync(json);
+            if (hosting.IsDevelopment())
+                // Process inline to speed up local devloop
+                await runner.ProcessAsync(json);
+            else
+                // Otherwise, enqueue the message processing
+                await messageProcessor.EnqueueAsync(json);
         }
         else
         {

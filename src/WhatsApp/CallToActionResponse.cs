@@ -9,7 +9,7 @@
 /// <param name="Text">The content of the message calling to action.</param>
 /// <param name="Action">The action button text.</param>
 /// <param name="Url">The URL to navigate to when the action button is clicked.</param>
-public record CallToActionResponse(string ServiceId, string UserNumber, string Text, string Action, string Url) : Response(ServiceId, UserNumber, null)
+public record CallToActionResponse(string ServiceId, string UserNumber, string Text, string Action, string Url) : Response(ServiceId, UserNumber)
 {
     readonly CompositeService? service;
 

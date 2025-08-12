@@ -7,19 +7,19 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
 
-namespace Devlooped.WhatsApp;
+namespace Devlooped.WhatsApp.Flows;
 
 /// <summary>Represents an encrypted flow message exchanged with WhatsApp Business API.</summary>
-public record EncryptedFlowData(
+record EncryptedFlowData(
     [property: JsonPropertyName("encrypted_flow_data")] string Data,
     [property: JsonPropertyName("encrypted_aes_key")] string Key,
     [property: JsonPropertyName("initial_vector")] string IV);
 
 /// <summary>Parsed flow data containing decrypted JSON and AES key/IV.</summary>
-public record FlowData<TData>(TData Data, byte[] Key, byte[] IV);
+record FlowData<TData>(TData Data, byte[] Key, byte[] IV);
 
 /// <summary>Represents flow data with decrypted JSON content, AES key, and IV.</summary>
-public record FlowData(JsonElement Data, byte[] Key, byte[] IV) : FlowData<JsonElement>(Data, Key, IV)
+record FlowData(JsonElement Data, byte[] Key, byte[] IV) : FlowData<JsonElement>(Data, Key, IV)
 {
     /// <summary>Creates a new instance of <see cref="FlowData{TData}"/> with the specified data.</summary>
     public FlowData<TData> With<TData>(TData data) =>
@@ -27,7 +27,7 @@ public record FlowData(JsonElement Data, byte[] Key, byte[] IV) : FlowData<JsonE
 }
 
 /// <summary>Implements the flow message encryption and decryption for the WhatsApp Business API.</summary>
-public class FlowCryptography : IDisposable
+class FlowCryptography : IDisposable
 {
     const int TagLengthBytes = 16;
     const int StandardNonceLength = 12;
@@ -44,14 +44,14 @@ public class FlowCryptography : IDisposable
     public FlowCryptography(string privatePem)
     {
         rsa = RSA.Create();
-        rsa.ImportFromPem(privatePem);
+        rsa.ImportFromPem(Throw.IfNullOrEmpty(privatePem));
     }
 
     /// <summary>Initializes the class with the provided RSA private key in PEM format and a passphrase for decryption.</summary>
     public FlowCryptography(string privatePem, string passphrase)
     {
         rsa = RSA.Create();
-        rsa.ImportFromEncryptedPem(privatePem, passphrase);
+        rsa.ImportFromEncryptedPem(Throw.IfNullOrEmpty(privatePem), passphrase);
     }
 
     /// <summary>Decrypts the provided encrypted flow data into a <see cref="FlowData"/> object.</summary>
@@ -123,7 +123,8 @@ public class FlowCryptography : IDisposable
         }
     }
 
-    static byte[] AesGcmEncrypt(byte[] key, byte[] iv, byte[] plain)
+    // Made internal so tests can reuse the exact implementation for client-side payload generation without duplicating logic.
+    internal static byte[] AesGcmEncrypt(byte[] key, byte[] iv, byte[] plain)
     {
         if (iv.Length < StandardNonceLength)
             throw new ArgumentException("IV must be at least 12 bytes.");

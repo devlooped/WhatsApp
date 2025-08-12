@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
+using Devlooped.WhatsApp.Flows;
 
 namespace Devlooped.WhatsApp;
 
@@ -15,6 +16,7 @@ namespace Devlooped.WhatsApp;
 [JsonSerializable(typeof(ErrorResponse))]
 [JsonSerializable(typeof(SendResponse))]
 [JsonSerializable(typeof(MessageId))]
+[JsonSerializable(typeof(EncryptedFlowData))]
 partial class InternalJsonContext : JsonSerializerContext
 {
 }

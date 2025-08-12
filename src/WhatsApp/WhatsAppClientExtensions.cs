@@ -577,7 +577,7 @@ public static partial class WhatsAppClientExtensions
                     parameters = new
                     {
                         display_text = action,
-                        url = url
+                        url
                     }
                 }
             }

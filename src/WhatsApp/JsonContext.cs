@@ -3,6 +3,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using Devlooped.WhatsApp.Flows;
 using Microsoft.Extensions.AI;
 
 namespace Devlooped.WhatsApp;
@@ -34,6 +35,8 @@ namespace Devlooped.WhatsApp;
 [JsonSerializable(typeof(Message))]
 [JsonSerializable(typeof(ContentMessage))]
 [JsonSerializable(typeof(ErrorMessage))]
+[JsonSerializable(typeof(FlowDataRequest))]
+[JsonSerializable(typeof(FlowToken))]
 [JsonSerializable(typeof(InteractiveMessage))]
 [JsonSerializable(typeof(ReactionMessage))]
 [JsonSerializable(typeof(StatusMessage))]
@@ -96,7 +99,7 @@ public partial class JsonContext : JsonSerializerContext
             // If reflection-based serialization is enabled by default, use it as a fallback for all other types.
             // Also turn on string-based enum serialization for all unknown enums.
             options.TypeInfoResolverChain.Add(new DefaultJsonTypeInfoResolver());
-            options.Converters.Add(new JsonStringEnumConverter());
+            //options.Converters.Add(new JsonStringEnumConverter());
         }
 
         options.MakeReadOnly();
