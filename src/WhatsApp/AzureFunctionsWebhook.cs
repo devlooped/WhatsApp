@@ -35,7 +35,7 @@ class AzureFunctionsWebhook(
         logger.LogDebug("Received WhatsApp message: {Message}.", json);
 
         // Detect encrypted flow request setup for flows endpoints
-        if (JsonSerializer.Deserialize<EncryptedFlowData>(json) is { } encrypted)
+        if (JsonSerializer.Deserialize<EncryptedFlowData>(json) is { Data.Length: > 0, IV.Length: > 0, Key.Length: > 0 } encrypted)
         {
             if (string.IsNullOrEmpty(metaOptions.Value.PrivateKey))
                 return new StatusCodeResult(421);
