@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Moq;
 
 namespace Devlooped.WhatsApp;
 
@@ -196,16 +197,20 @@ public class WhatsAppModelTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public void SerializeAnonymous()
+    public async Task SerializeAnonymous()
     {
-        var response = Response.Create("123456789012345", "987654321098765", (client, cancellation) => Task.FromResult<string?>(null));
+        var response = Response.Create("123456789012345", "987654321098765", (client, cancellation) => Task.FromResult<string?>("asdf"));
 
         var json = JsonSerializer.Serialize(response, JsonContext.DefaultOptions);
 
         var message = JsonSerializer.Deserialize(json, JsonContext.Default.AnonymousResponse);
 
         Assert.NotNull(message);
-        Assert.Null(message.Sender);
+
+        // the value is either null due to not being deserialized, or it's a dummy function that returns null
+        // since that's the default impl. in the [JsonConstructor]
+        if (message.Sender != null)
+            Assert.Null(await message.Sender.Invoke(Mock.Of<IWhatsAppClient>(), default));
     }
 
     [Fact]
