@@ -96,49 +96,43 @@ public class FlowTests(ITestOutputHelper output)
 
         var message = ContentMessage.Create(configuration["SendFrom"]!, configuration["SendTo"]!, "Hello");
 
-        //message.CallToFlow()
-
-        await client.SendAsync(configuration["SendFrom"]!, new
+        // Showcases sending an invisible non-whitespace char (https://invisible-characters.com/115F-HANGUL-CHOSEONG-FILLER.html)
+        var response = message.CallToAction("ᅟ", "Show Flow", new FlowParameters("data")
         {
-            messaging_product = "whatsapp",
-            recipient_type = "individual",
-            to = configuration["SendTo"]!,
-            type = "interactive",
-            interactive = new
+            Token = Ulid.NewUlid().ToString(),
+            Action = FlowAction.Navigate,
+            Mode = FlowMode.Draft,
+            Payload = JsonSerializer.SerializeToElement(new
             {
-                type = "flow",
-                body = new
+                screen = "welcome_screen",
+                data = new
                 {
-                    text = "Agent Data Demo"
+                    agent = "list",
+                    service = "5678",
+                    user = "pga",
+                    flow = "data",
                 },
-                action = new
-                {
-                    name = "flow",
-                    parameters = new
-                    {
-                        flow_message_version = "3",
-                        flow_cta = "Show Data",
-                        flow_name = "data",
-                        mode = "draft",
-                        flow_token = "agent:list;service:5678;user:pga;flow:data;token:asdf1234",
-                        flow_action = "navigate",
-                        flow_action_payload = new
-                        {
-                            screen = "welcome_screen",
-                            data = new
-                            {
-                                agent = "list",
-                                service = "5678",
-                                user = "pga",
-                                flow = "data",
-                            },
-                        }
-                    }
-                }
-            }
+            })
         });
+
+        var sent = await response.SendAsync(client);
+
+        Assert.NotEqual(response, sent);
     }
 
+    [SecretsFact("Meta:PrivateKey", "SendFrom", "SendTo")]
+    public async Task SendBlankNavigate()
+    {
+        var (configuration, client) = Initialize();
+
+        var message = ContentMessage.Create(configuration["SendFrom"]!, configuration["SendTo"]!, "Hello");
+
+        // Showcases sending an invisible non-whitespace char (https://invisible-characters.com/115F-HANGUL-CHOSEONG-FILLER.html)
+        var response = message.CallToAction("ᅟ", "Ver/Editar", "simple");
+        var sent = await response.SendAsync(client);
+
+        Assert.NotEqual(response, sent);
+    }
 
     [SecretsFact("Meta:PrivateKey")]
     public async Task SendFlowWithData()

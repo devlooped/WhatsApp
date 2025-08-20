@@ -16,18 +16,13 @@ The following components are supported:
 * [Dropdown](#drop)
 * [EmbeddedLink](#embed)
 * [DatePicker](#dp)
-
 * [CalendarPicker](#calendarpicker)
-
 * [Image](#img)
 * [If](#if)
 * [Switch](#switch)
 * [Media upload](#media_upload)
-
 * [NavigationList](#navlist)
-
 * [Chips Selector](#chips_selector)
-
 * [Image Carousel](#image_carousel)
 
 ## Text Components

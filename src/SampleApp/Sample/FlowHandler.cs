@@ -1,8 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Devlooped.WhatsApp.Flows;
-using Microsoft.Azure.Amqp.Framing;
-using Microsoft.Extensions.Options;
 
 namespace Devlooped.WhatsApp;
 
@@ -77,9 +75,6 @@ static class FlowExtensions
 
         Response MockList(FlowDataRequest flow) => flow.DataResponse("SELECT_LIST", new
         {
-            agent = "list",
-            user = flow.UserNumber,
-            service = flow.ServiceId,
             lists = new[]
             {
                 new
