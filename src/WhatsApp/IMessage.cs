@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Devlooped.WhatsApp.Flows;
 using Microsoft.Extensions.AI;
 
 namespace Devlooped.WhatsApp;
@@ -22,8 +23,11 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(ReactionResponse), "response/reaction")]
 [JsonDerivedType(typeof(TypingResponse), "response/typing")]
 [JsonDerivedType(typeof(CallToActionResponse), "response/cta")]
-[JsonDerivedType(typeof(CallToFlowResponse), "response/flow")]
 [JsonDerivedType(typeof(AnonymousResponse), "response/dynamic")]
+[JsonDerivedType(typeof(CallToFlowResponse), "response/flow")] // initiates flow
+[JsonDerivedType(typeof(InteractiveFlowMessage), "flow")]      // flow final response
+[JsonDerivedType(typeof(FlowDataRequest), "flow/int")]         // flow data_exchange input
+[JsonDerivedType(typeof(FlowDataResponse), "flow/out")]        // flow data_exchange output
 public interface IMessage
 {
     /// <summary>Gets or sets any additional properties associated with the message.</summary>
