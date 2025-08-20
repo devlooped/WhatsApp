@@ -131,8 +131,8 @@ public class WhatsAppModelTests(ITestOutputHelper output)
         Assert.NotNull(message.NotificationId);
         Assert.NotNull(message.Service);
         Assert.NotNull(message.User);
-        Assert.Equal("btn_yes", interactive.Selection.Value);
-        Assert.Equal("Yes", interactive.Selection.Text);
+        Assert.Equal("btn_yes", interactive.Selection.Id);
+        Assert.Equal("Yes", interactive.Selection.Title);
     }
 
     [Fact]
@@ -147,8 +147,8 @@ public class WhatsAppModelTests(ITestOutputHelper output)
         Assert.NotNull(message.NotificationId);
         Assert.NotNull(message.Service);
         Assert.NotNull(message.User);
-        Assert.Equal("id1", interactive.Selection.Value);
-        Assert.Equal("Track", interactive.Selection.Text);
+        Assert.Equal("id1", interactive.Selection.Id);
+        Assert.Equal("Track", interactive.Selection.Title);
     }
 
     [Fact]
@@ -163,8 +163,8 @@ public class WhatsAppModelTests(ITestOutputHelper output)
         Assert.NotNull(message.NotificationId);
         Assert.NotNull(message.Service);
         Assert.NotNull(message.User);
-        Assert.Equal("conversation", interactive.Selection.Value);
-        Assert.Equal("Conversación", interactive.Selection.Text);
+        Assert.Equal("conversation", interactive.Selection.Id);
+        Assert.Equal("Conversación", interactive.Selection.Title);
     }
 
     [Fact]
