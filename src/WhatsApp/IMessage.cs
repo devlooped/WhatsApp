@@ -22,6 +22,7 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(ReactionResponse), "response/reaction")]
 [JsonDerivedType(typeof(TypingResponse), "response/typing")]
 [JsonDerivedType(typeof(CallToActionResponse), "response/cta")]
+[JsonDerivedType(typeof(CallToFlowResponse), "response/flow")]
 [JsonDerivedType(typeof(AnonymousResponse), "response/dynamic")]
 public interface IMessage
 {
