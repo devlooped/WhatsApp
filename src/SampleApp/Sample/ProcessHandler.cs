@@ -31,8 +31,8 @@ class ProcessHandler(ILogger<Program> logger, JsonSerializerOptions options) : I
         }
         else if (message is InteractiveMessage interactive)
         {
-            logger.LogWarning("👤 chose {Id} ({Title})", interactive.Selection.Value, interactive.Selection.Text);
-            yield return interactive.Reply($"👤 chose: {interactive.Selection.Text} ({interactive.Selection.Value})");
+            logger.LogWarning("👤 chose {Id} ({Title})", interactive.Selection.Id, interactive.Selection.Title);
+            yield return interactive.Reply($"👤 chose: {interactive.Selection.Title} ({interactive.Selection.Id})");
         }
         else if (message is ReactionMessage reaction)
         {

@@ -46,8 +46,8 @@
           "number": $msg.from
         },
         "selection": {
-          "text": ($msg.interactive.button_reply?.title // $msg.interactive.list_reply?.title // $msg.button.text),
-          "value": ($msg.interactive.button_reply?.id // $msg.interactive.list_reply?.id // $msg.button.payload)
+          "id": ($msg.interactive.button_reply?.id // $msg.interactive.list_reply?.id // $msg.button.payload),
+          "title": ($msg.interactive.button_reply?.title // $msg.interactive.list_reply?.title // $msg.button.text)
         }
       }
     elif $msgType == "reaction" then
