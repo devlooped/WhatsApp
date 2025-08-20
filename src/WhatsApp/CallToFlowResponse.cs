@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using Devlooped.WhatsApp.Flows;
 
 namespace Devlooped.WhatsApp;
@@ -13,6 +14,7 @@ namespace Devlooped.WhatsApp;
 /// <param name="Action">The action button text.</param>
 public record CallToFlowResponse : Response
 {
+    [JsonConstructor]
     internal CallToFlowResponse(string serviceId, string userNumber, string text, string action, FlowParameters flow) : base(serviceId, userNumber)
     {
         Text = text;
@@ -96,6 +98,9 @@ public record CallToFlowResponse : Response
 /// <summary>Parameters for initiating or continuing a flow.</summary>
 public record FlowParameters
 {
+    [JsonConstructor]
+    internal FlowParameters(long? id = default, string? name = default) => (Id, Name) = (id, name);
+
     /// <summary>Initializes a new instance of the <see cref="FlowParameters"/> record using a flow identifier.</summary>
     public FlowParameters(long flowId) => Id = flowId;
 

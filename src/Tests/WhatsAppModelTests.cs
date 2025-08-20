@@ -797,6 +797,38 @@ public class WhatsAppModelTests(ITestOutputHelper output)
     }
 
     [Fact]
+    public void RoundtripCallToFlowResponse()
+    {
+        var expected = new CallToFlowResponse("1234", "5687", "text", "action", new FlowParameters("flow"));
+
+        var json = JsonSerializer.Serialize<IMessage>(expected, JsonContext.DefaultOptions);
+        output.WriteLine(json);
+
+        var actual = JsonSerializer.Deserialize<IMessage>(json, JsonContext.DefaultOptions);
+
+        Assert.NotNull(actual);
+        var value = Assert.IsType<CallToFlowResponse>(actual);
+
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
+    public void RoundtripCallToActionResponse()
+    {
+        var expected = new CallToActionResponse("1234", "5687", "text", "action", "http://foo");
+
+        var json = JsonSerializer.Serialize<IMessage>(expected, JsonContext.DefaultOptions);
+        output.WriteLine(json);
+
+        var actual = JsonSerializer.Deserialize<IMessage>(json, JsonContext.DefaultOptions);
+
+        Assert.NotNull(actual);
+        var value = Assert.IsType<CallToActionResponse>(actual);
+
+        Assert.Equal(expected, value);
+    }
+
+    [Fact]
     public void MatchMessageJsonTemplate()
     {
         var json =
