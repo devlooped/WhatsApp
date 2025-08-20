@@ -102,10 +102,10 @@ public record FlowParameters
     /// <summary>Initializes a new instance of the <see cref="FlowParameters"/> record using a flow name.</summary>
     public FlowParameters(string flowName) => Name = flowName;
 
-    /// <summary>Gets the flow identifier, if the instance was constructed with it.</summary>
+    /// <summary>Gets the flow identifier, if the instance was constructed with a number.</summary>
     public long? Id { get; }
 
-    /// <summary>Gets the flow name, if the instance was constructed with it.</summary>
+    /// <summary>Gets the flow name, if the instance was constructed with a string.</summary>
     public string? Name { get; }
 
     /// <summary>Indicates the action to perform when the flow is initiated. Defaults to <see cref="FlowAction.Navigate"/>.</summary>

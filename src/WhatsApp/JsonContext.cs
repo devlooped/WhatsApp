@@ -60,6 +60,13 @@ namespace Devlooped.WhatsApp;
 [JsonSerializable(typeof(VideoParameter))]
 [JsonSerializable(typeof(DocumentParameter))]
 [JsonSerializable(typeof(LocationParameter))]
+[JsonSerializable(typeof(CallToActionResponse))]
+[JsonSerializable(typeof(CallToFlowResponse))]
+[JsonSerializable(typeof(FlowDataResponse))]
+[JsonSerializable(typeof(ReactionResponse))]
+[JsonSerializable(typeof(TemplateResponse))]
+[JsonSerializable(typeof(TextResponse))]
+[JsonSerializable(typeof(TypingResponse))]
 public partial class JsonContext : JsonSerializerContext
 {
     static readonly Lazy<JsonSerializerOptions> options = new(CreateDefaultOptions);
