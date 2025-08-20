@@ -133,11 +133,25 @@ class AzureFunctionsWebhook(
                 await message.React(functionOptions.ReactOnMessage).SendAsync(whatsapp).Ignore();
 
             if (hosting.IsDevelopment())
-                // Process inline to speed up local devloop
-                await runner.ProcessAsync(json);
+            {
+                // Avoid enqueing to speed up local devloop
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await runner.ProcessAsync(json);
+                    }
+                    catch (Exception e)
+                    {
+                        logger.LogError(e, "Failed to process message");
+                    }
+                });
+            }
             else
+            {
                 // Otherwise, enqueue the message processing
                 await messageProcessor.EnqueueAsync(json);
+            }
         }
         else
         {
