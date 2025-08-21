@@ -29,7 +29,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
 
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
-    <PackageReference Include="Devlooped.JQ" Version="1.7.1.8" PackExclude="contentFiles" />
+    <PackageReference Include="Devlooped.JQ" Version="1.8.1-beta" PackExclude="contentFiles" />
     <PackageReference Include="Devlooped.TableStorage" Version="5.4.0" />
 
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />

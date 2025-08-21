@@ -21,7 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Devlooped.JQ" Version="1.7.1.8" />
+    <PackageReference Include="Devlooped.JQ" Version="1.8.1-beta" />
     <PackageReference Include="DotNetConfig.Configuration" Version="1.2.0" />
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.6" />
