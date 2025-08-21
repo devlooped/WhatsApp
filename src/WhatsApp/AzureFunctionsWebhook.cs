@@ -44,73 +44,7 @@ class AzureFunctionsWebhook(
         // Detect encrypted flow request setup for flows endpoints
         if (JsonSerializer.Deserialize<EncryptedFlowData>(json) is { Data.Length: > 0, IV.Length: > 0, Key.Length: > 0 } encrypted)
         {
-            if (string.IsNullOrEmpty(metaOptions.Value.PrivateKey))
-                return new StatusCodeResult(421);
-
-            var crypto = new FlowCryptography(metaOptions.Value.PrivateKey);
-            if (!crypto.TryDecrypt(encrypted, out var data) || data is null)
-                return new StatusCodeResult(421);
-
-            if (data.Data.TryGetProperty("action", out var action) &&
-                action.ValueKind == JsonValueKind.String &&
-                action.GetString() == "ping")
-            {
-                // This satisfies the flow publishing requirement that the endpoint is active.
-                return new OkObjectResult(crypto.Encrypt(data.With(
-                    new { data = new { status = "active" } })));
-            }
-
-            if (!data.Data.TryGetProperty("flow_token", out var t) ||
-                t.ValueKind != JsonValueKind.String || t.GetString() is not { Length: > 0 } value ||
-                !FlowToken.TryDecode(value, out var token))
-            {
-                logger.LogWarning("Received flow request without a valid flow_token.");
-                return new BadRequestObjectResult("Missing or invalid flow_token.");
-            }
-
-            var node = JsonObject.Create(data.Data);
-            Debug.Assert(node != null, "Node should not be null after decryption.");
-
-            node.Add("service", token.ServiceId);
-            node.Add("user", token.UserNumber);
-
-            var flow = JsonSerializer.Deserialize<FlowDataRequest>(node, JsonContext.DefaultOptions);
-            if (flow?.Flow is null)
-            {
-                logger.LogWarning("Failed to deserialize flow message from: {Json}", json);
-                return new BadRequestObjectResult("Invalid flow message format.");
-            }
-
-            FlowDataResponse? flowResponse = default;
-
-            await foreach (var response in handler.HandleAsync([flow]))
-            {
-                if (response is FlowDataResponse fdr)
-                {
-                    if (flowResponse is not null)
-                    {
-                        logger.LogWarning("At most one flow data response can be provided for {Token}", token.RawToken);
-                        return new ConflictObjectResult("Multiple flow data responses are not allowed.");
-                    }
-                    else
-                    {
-                        flowResponse = fdr;
-                    }
-                }
-            }
-
-            if (flowResponse is null)
-            {
-                logger.LogWarning("No flow data response provided for {Token}", token.RawToken);
-                return new NotFoundObjectResult("No flow data response provided.");
-            }
-
-            return new OkObjectResult(crypto.Encrypt(data.With(
-                new
-                {
-                    screen = flowResponse.Screen,
-                    data = flowResponse.Data
-                })));
+            return await ProcessFlowDataAsync(json, encrypted);
         }
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
@@ -159,6 +93,78 @@ class AzureFunctionsWebhook(
         }
 
         return new OkResult();
+    }
+
+
+    async Task<IActionResult> ProcessFlowDataAsync(string json, EncryptedFlowData encrypted)
+    {
+        if (string.IsNullOrEmpty(metaOptions.Value.PrivateKey))
+            return new StatusCodeResult(421);
+
+        var crypto = new FlowCryptography(metaOptions.Value.PrivateKey);
+        if (!crypto.TryDecrypt(encrypted, out var data) || data is null)
+            return new StatusCodeResult(421);
+
+        if (data.Data.TryGetProperty("action", out var action) &&
+            action.ValueKind == JsonValueKind.String &&
+            action.GetString() == "ping")
+        {
+            // This satisfies the flow publishing requirement that the endpoint is active.
+            return new OkObjectResult(crypto.Encrypt(data.With(
+                new { data = new { status = "active" } })));
+        }
+
+        if (!data.Data.TryGetProperty("flow_token", out var t) ||
+            t.ValueKind != JsonValueKind.String || t.GetString() is not { Length: > 0 } value ||
+            !FlowToken.TryDecode(value, out var token))
+        {
+            logger.LogWarning("Received flow request without a valid flow_token.");
+            return new BadRequestObjectResult("Missing or invalid flow_token.");
+        }
+
+        var node = JsonObject.Create(data.Data);
+        Debug.Assert(node != null, "Node should not be null after decryption.");
+
+        node.Add("service", token.ServiceId);
+        node.Add("user", token.UserNumber);
+
+        var flow = JsonSerializer.Deserialize<FlowDataRequest>(node, JsonContext.DefaultOptions);
+        if (flow?.Flow is null)
+        {
+            logger.LogWarning("Failed to deserialize flow message from: {Json}", json);
+            return new BadRequestObjectResult("Invalid flow message format.");
+        }
+
+        FlowDataResponse? flowResponse = default;
+
+        await foreach (var response in handler.HandleAsync([flow]))
+        {
+            if (response is FlowDataResponse fdr)
+            {
+                if (flowResponse is not null)
+                {
+                    logger.LogWarning("At most one flow data response can be provided for {Token}", token.RawToken);
+                    return new ConflictObjectResult("Multiple flow data responses are not allowed.");
+                }
+                else
+                {
+                    flowResponse = fdr;
+                }
+            }
+        }
+
+        if (flowResponse is null)
+        {
+            logger.LogWarning("No flow data response provided for {Token}", token.RawToken);
+            return new NotFoundObjectResult("No flow data response provided.");
+        }
+
+        return new OkObjectResult(crypto.Encrypt(data.With(
+            new
+            {
+                screen = flowResponse.Screen,
+                data = flowResponse.Data
+            })));
     }
 
     [Function("whatsapp_register")]
