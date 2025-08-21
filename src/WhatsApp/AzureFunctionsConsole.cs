@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.Json;
+using System.Xml;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -18,6 +19,12 @@ class AzureFunctionsConsole(
     ILogger<AzureFunctionsWebhook> logger,
     IHostEnvironment environment)
 {
+    static readonly JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
+    {
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true
+    };
+
     [Function("whatsapp_console")]
     public async Task<IActionResult> MessageConsole([HttpTrigger(AuthorizationLevel.Anonymous, ["post", "get"], Route = "whatsappcli")] HttpRequest req)
     {
@@ -47,7 +54,9 @@ class AzureFunctionsConsole(
 
         using var reader = new StreamReader(req.Body, Encoding.UTF8);
         var json = await reader.ReadToEndAsync();
-        logger.LogDebug("Received WhatsApp message: {Message}.", json);
+        logger.LogDebug("Received WhatsApp message: {Message}.",
+            environment.IsProduction() ? json :
+            JsonSerializer.Serialize(JsonSerializer.Deserialize<JsonElement>(json), options));
 
         // Try to deserialize the message sent by the console
         if (JsonSerializer.Deserialize(json, JsonContext.Default.Message) is Message message)

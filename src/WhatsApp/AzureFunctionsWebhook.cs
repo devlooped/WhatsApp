@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -10,6 +11,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace Devlooped.WhatsApp;
 
@@ -32,6 +34,12 @@ class AzureFunctionsWebhook(
     IHostEnvironment hosting,
     ILogger<AzureFunctionsWebhook> logger)
 {
+    static readonly JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
+    {
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true
+    };
+
     readonly WhatsAppOptions functionOptions = functionOptions.Value;
 
     [Function("whatsapp_message")]
@@ -39,7 +47,10 @@ class AzureFunctionsWebhook(
     {
         using var reader = new StreamReader(req.Body, Encoding.UTF8);
         var json = await reader.ReadToEndAsync();
-        logger.LogDebug("Received WhatsApp message: {Message}.", json);
+
+        logger.LogDebug("Received WhatsApp message: {Message}.",
+            hosting.IsProduction() ? json :
+            JsonSerializer.Serialize(JsonSerializer.Deserialize<JsonElement>(json), options));
 
         // Detect encrypted flow request setup for flows endpoints
         if (JsonSerializer.Deserialize<EncryptedFlowData>(json) is { Data.Length: > 0, IV.Length: > 0, Key.Length: > 0 } encrypted)
