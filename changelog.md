@@ -1,5 +1,29 @@
 # Changelog
 
+## [v0.8.2](https://github.com/devlooped/WhatsApp/tree/v0.8.2) (2025-08-21)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.8.1...v0.8.2)
+
+:sparkles: Implemented enhancements:
+
+- Add polymorphic serialization for flow messages [\#287](https://github.com/devlooped/WhatsApp/pull/287) (@kzu)
+- Add support for interactive flows [\#281](https://github.com/devlooped/WhatsApp/pull/281) (@kzu)
+- Make flow encryption more flexible, reply ping [\#277](https://github.com/devlooped/WhatsApp/pull/277) (@kzu)
+- Add support for flow data encryption/decryption [\#276](https://github.com/devlooped/WhatsApp/pull/276) (@kzu)
+
+:bug: Fixed bugs:
+
+- In development, run in a separate thread from webhook [\#289](https://github.com/devlooped/WhatsApp/pull/289) (@kzu)
+- Fix condition for considering message a flow encrypted message [\#278](https://github.com/devlooped/WhatsApp/pull/278) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Refactor flows endpoint processing [\#291](https://github.com/devlooped/WhatsApp/pull/291) (@kzu)
+- Flow sample and tests tweaks [\#288](https://github.com/devlooped/WhatsApp/pull/288) (@kzu)
+- Rename selection\(text, value\) \> selection\(id, title\) [\#286](https://github.com/devlooped/WhatsApp/pull/286) (@kzu)
+- Annotate flow responses as polymorphic of IMessage [\#285](https://github.com/devlooped/WhatsApp/pull/285) (@kzu)
+- Add responses to JsonContext serialization options [\#284](https://github.com/devlooped/WhatsApp/pull/284) (@kzu)
+
 ## [v0.8.1](https://github.com/devlooped/WhatsApp/tree/v0.8.1) (2025-08-06)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.8.0...v0.8.1)
