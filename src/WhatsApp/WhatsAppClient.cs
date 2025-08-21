@@ -73,7 +73,7 @@ public class WhatsAppClient(IHttpClientFactory httpFactory, IOptions<MetaOptions
         http.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", $"Bearer {token}");
         http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        var result = await http.PostAsJsonAsync($"https://graph.facebook.com/{options.ApiVersion}/{numberId}/messages", payload, cancellationToken);
+        var result = await http.PostAsJsonAsync($"https://graph.facebook.com/{options.ApiVersion}/{numberId}/messages", payload, jsonOptions, cancellationToken);
 
         if (!result.IsSuccessStatusCode)
         {
