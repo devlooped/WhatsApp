@@ -1,8 +1,8 @@
 # Changelog
 
-## [v0.8.2](https://github.com/devlooped/WhatsApp/tree/v0.8.2) (2025-08-21)
+## [v0.9.0](https://github.com/devlooped/WhatsApp/tree/v0.9.0) (2025-08-21)
 
-[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.8.1...v0.8.2)
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.8.1...v0.9.0)
 
 :sparkles: Implemented enhancements:
 
