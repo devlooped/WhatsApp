@@ -21,6 +21,15 @@ namespace Devlooped.WhatsApp;
 
 public class FlowTests(ITestOutputHelper output)
 {
+    static readonly JsonSerializerOptions jsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        DefaultIgnoreCondition =
+            System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault |
+            System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+        WriteIndented = true,
+    };
+
     [Fact]
     public void VerifyFlowRequest()
     {
@@ -108,11 +117,11 @@ public class FlowTests(ITestOutputHelper output)
                 data = new
                 {
                     agent = "list",
-                    service = "5678",
-                    user = "pga",
+                    service = "5678📝🧮",
+                    user = "pgaña",
                     flow = "data",
                 },
-            })
+            }, jsonOptions)
         });
 
         var sent = await response.SendAsync(client);
