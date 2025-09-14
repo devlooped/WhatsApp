@@ -22,11 +22,11 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http" Version="3.3.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.ServiceBus" Version="5.23.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage.Queues" Version="5.5.2" />
-    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.7.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="8.10.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.9.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.9.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
 
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
     <PackageReference Include="Devlooped.JQ" Version="1.8.1" PackExclude="contentFiles" />
@@ -54,6 +54,10 @@
 
   <ItemGroup>
     <None Include="..\..\osmfeula.txt" Link="osmfeula.txt" PackagePath="OSMFEULA.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Ulid" Version="1.4.1" />
   </ItemGroup>
 
 </Project>
