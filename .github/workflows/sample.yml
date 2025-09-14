@@ -13,18 +13,29 @@ env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
-  build-and-deploy:
-    runs-on: windows-latest
+  sample:
+    runs-on: ubuntu-latest
     permissions:
       id-token: write #This is required for requesting the JWT
       contents: read #This is required for actions/checkout
-
     steps:
       - name: 🤘 checkout
         uses: actions/checkout@v4
 
       - name: ⚙ dotnet
         uses: devlooped/actions-dotnet-env@v1
+
+      - name: 📦 publish
+        working-directory: src/SampleApp/Sample
+        run: |
+          dotnet restore
+          dotnet publish -c Release -o ./publish
+          chmod 755 ./publish/lib/jq-linux-amd64
+
+      - name: 🗜️ flex zip
+        working-directory: src/SampleApp/Sample/publish
+        run: |
+          zip -r "$GITHUB_WORKSPACE/released-package.zip" .
 
       - name: 🔓 login
         uses: azure/login@v2
@@ -33,9 +44,9 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_08449B8A3C6E4F18B37203B67E099362 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_F97F119894404180A100F53C19B8D1B7 }}
 
-      - name: ⚙ func 4.x
-        run: npm i -g azure-functions-core-tools@4 --unsafe-perm true  
-
       - name: 🚀 deploy
-        working-directory: src/SampleApp/Sample
-        run: func azure functionapp publish devlooped-whatsapp --dotnet-isolated
+        run: |
+            az functionapp deployment source config-zip \
+                --name devlooped-whatsapp \
+                --resource-group oss \
+                --src "$GITHUB_WORKSPACE/released-package.zip"
