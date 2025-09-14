@@ -65,7 +65,7 @@ public class FlowToken
         return true;
     }
 
-    class FlowTokenConverter : JsonConverter<FlowToken>
+    internal class FlowTokenConverter : JsonConverter<FlowToken>
     {
         public override FlowToken Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             => reader.TokenType != JsonTokenType.String || !TryDecode(reader.GetString()!, out var token) ?
