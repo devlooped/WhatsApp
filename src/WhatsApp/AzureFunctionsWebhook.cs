@@ -11,6 +11,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using static Microsoft.IO.RecyclableMemoryStreamManager;
 
 namespace Devlooped.WhatsApp;
@@ -181,8 +182,9 @@ class AzureFunctionsWebhook(
     [Function("whatsapp_register")]
     public IActionResult Register([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "whatsapp")] HttpRequest req)
     {
+        StringValues token = default;
         if (req.Query.TryGetValue("hub.mode", out var mode) && mode == "subscribe" &&
-            req.Query.TryGetValue("hub.verify_token", out var token) && token == metaOptions.Value.VerifyToken &&
+            req.Query.TryGetValue("hub.verify_token", out token) && token == metaOptions.Value.VerifyToken &&
             req.Query.TryGetValue("hub.challenge", out var values) &&
             values.ToString() is { } challenge)
         {
@@ -191,6 +193,7 @@ class AzureFunctionsWebhook(
             return new OkObjectResult(challenge);
         }
 
+        logger.LogError("Received token {ACTUAL} but expected {EXPECTED}.", token, metaOptions.Value.VerifyToken);
         return new BadRequestObjectResult("Received verification token doesn't match the configured one.");
     }
 }
