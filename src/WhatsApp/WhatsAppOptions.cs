@@ -31,7 +31,7 @@ public class WhatsAppOptions
     /// <summary>
     /// Send a typing indicator status when message processing begins.
     /// </summary>
-    public bool? TypingOnProcess { get; set; }
+    public bool? TypingOnProcess { get; set; } = true;
 
     /// <summary>
     /// An optional emoji to react with when a message is received 
