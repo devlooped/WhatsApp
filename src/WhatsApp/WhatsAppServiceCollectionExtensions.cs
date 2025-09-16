@@ -1,6 +1,7 @@
 ﻿using Azure.Data.Tables;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Devlooped.WhatsApp;
 
@@ -232,6 +233,8 @@ public static class WhatsAppServiceCollectionExtensions
     static WhatsAppHandlerBuilder ConfigureServices(IServiceCollection services, WhatsAppHandlerBuilder builder, ServiceLifetime lifetime, Action<WhatsAppOptions>? configure)
     {
         services.AddHttpClient("whatsapp").AddStandardResilienceHandler();
+        services.AddHybridCache();
+        services.AddSingleton<Idempotency>();
 
         if (services.FirstOrDefault(x => x.ServiceType == typeof(IWhatsAppClient)) == null)
             services.Add(new ServiceDescriptor(typeof(IWhatsAppClient), typeof(WhatsAppClient), lifetime));

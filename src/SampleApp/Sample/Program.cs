@@ -6,6 +6,7 @@ using Azure.Storage.Queues;
 using Devlooped;
 using Devlooped.WhatsApp;
 using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

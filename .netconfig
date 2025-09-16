@@ -158,3 +158,13 @@
 
 	weak
 	etag = 371342087cec0269473a91f7fc295fd1049e21f016a1b7113614f2c4e3eefe5f
+[file "src/WhatsApp/Extensions/AsyncLazy.cs"]
+	url = https://github.com/devlooped/catbag/blob/main/System/Threading/Tasks/AsyncLazy.cs
+	sha = 9f3330f09713aa5f746047e3a50ee839147a5797
+	etag = 73320600b7a18e0eb25cadc3d687c69dc79181b0458facf526666e150c634782
+	weak
+[file "src/WhatsApp/Extensions/Base62.cs"]
+	url = https://github.com/devlooped/catbag/blob/main/System/Base62.cs
+	sha = cf76df0d6a218c26ebe117339fe3445050b0532a
+	etag = aed711a45e051edfddfcb76d9f8021d30f9817c342cfe8d1cc38f2af37b47aa8
+	weak
