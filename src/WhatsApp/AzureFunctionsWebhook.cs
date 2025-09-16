@@ -1,9 +1,7 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Azure.Data.Tables;
 using Devlooped.WhatsApp.Flows;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +22,7 @@ namespace Devlooped.WhatsApp;
 /// <param name="handler">The message handler that will process incoming messages.</param>
 /// <param name="logger">The logger.</param>
 class AzureFunctionsWebhook(
-    TableServiceClient tableClient,
+    Idempotency idempotency,
     IMessageProcessor messageProcessor,
     PipelineRunner runner,
     IWhatsAppClient whatsapp,
@@ -65,19 +63,13 @@ class AzureFunctionsWebhook(
             if (message is UserMessage user)
                 await user.SendProgress(whatsapp, functionOptions.ReadOnMessage is true, functionOptions.TypingOnMessage is true).Ignore();
 
-            // Ensure idempotent processing
-            var table = tableClient.GetTableClient("WhatsAppWebhook");
-            await table.CreateIfNotExistsAsync();
-            if (await table.GetEntityIfExistsAsync<TableEntity>(message.User.Number, message.NotificationId) is { HasValue: true } existing)
-            {
-                logger.LogInformation("Skipping already handled message {Id}", message.Id);
-                return new OkResult();
-            }
-
             if (functionOptions.ReactOnMessage != null && message.Type == MessageType.Content)
                 await message.React(functionOptions.ReactOnMessage).SendAsync(whatsapp).Ignore();
 
-            if (hosting.IsDevelopment())
+            // NOTE: development speed-up does check for idempotency so we avoid re-entering the pipeline while we're 
+            // debugging and WhatsApp may interpret that as a failing callback and invoke us again. In production, though, 
+            // we don't need to incur that cost here since the pipeline will do it before running.
+            if (hosting.IsDevelopment() && await idempotency.IsProcessedAsync(message, json) != true)
             {
                 // Avoid enqueing to speed up local devloop
                 _ = Task.Run(async () =>
