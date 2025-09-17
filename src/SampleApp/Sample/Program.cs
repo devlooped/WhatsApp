@@ -66,16 +66,20 @@ var whatsapp = builder.Services
 // Uncomment next line to render a JSON of text message/responses 
 //.UseConsoleRender();
 
-// If event grid is set up, switch to processing messages using that
-if (builder.Configuration["EventGrid:Topic"] is { Length: > 0 } topic &&
-    builder.Configuration["EventGrid:Key"] is { Length: > 0 } key)
+if (builder.Environment.IsProduction())
 {
-    whatsapp.UseEventGridProcessor(new EventGridPublisherClient(
-        new Uri(topic), new Azure.AzureKeyCredential(key)));
+    // If event grid is set up, switch to processing messages using that
+    if (builder.Configuration["EventGrid:Topic"] is { Length: > 0 } topic &&
+        builder.Configuration["EventGrid:Key"] is { Length: > 0 } key)
+    {
+        whatsapp.UseEventGridProcessor(new EventGridPublisherClient(
+            new Uri(topic), new Azure.AzureKeyCredential(key)));
+    }
 }
-
-if (builder.Environment.IsDevelopment())
+else
 {
+    whatsapp.UseTaskSchedulerProcessor();
+
     // Make sure we never timeout when calling back to the console
     builder.Services.AddHttpClient()
         .ConfigureHttpClientDefaults(client => client.ConfigureHttpClient(http =>

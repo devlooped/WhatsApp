@@ -22,9 +22,7 @@ namespace Devlooped.WhatsApp;
 /// <param name="handler">The message handler that will process incoming messages.</param>
 /// <param name="logger">The logger.</param>
 class AzureFunctionsWebhook(
-    Idempotency idempotency,
     IMessageProcessor messageProcessor,
-    PipelineRunner runner,
     IWhatsAppClient whatsapp,
     IWhatsAppHandler handler,
     IOptions<MetaOptions> metaOptions,
@@ -66,29 +64,7 @@ class AzureFunctionsWebhook(
             if (functionOptions.ReactOnMessage != null && message.Type == MessageType.Content)
                 await message.React(functionOptions.ReactOnMessage).SendAsync(whatsapp).Ignore();
 
-            // NOTE: development speed-up does check for idempotency so we avoid re-entering the pipeline while we're 
-            // debugging and WhatsApp may interpret that as a failing callback and invoke us again. In production, though, 
-            // we don't need to incur that cost here since the pipeline will do it before running.
-            if (hosting.IsDevelopment() && await idempotency.IsProcessedAsync(message, json) != true)
-            {
-                // Avoid enqueing to speed up local devloop
-                _ = Task.Run(async () =>
-                {
-                    try
-                    {
-                        await runner.ProcessAsync(json);
-                    }
-                    catch (Exception e)
-                    {
-                        logger.LogError(e, "Failed to process message");
-                    }
-                });
-            }
-            else
-            {
-                // Otherwise, enqueue the message processing
-                await messageProcessor.EnqueueAsync(json);
-            }
+            await messageProcessor.EnqueueAsync(json);
         }
         else
         {
