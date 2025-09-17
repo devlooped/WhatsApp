@@ -38,7 +38,7 @@ partial class AdditionalPropertiesDictionaryConverter : JsonConverter<Additional
     {
         writer.WriteStartObject();
 
-        foreach (var kvp in value.Where(x => x.Value is not null))
+        foreach (var kvp in value.Where(x => x.Value is not null && !x.Key.StartsWith("__", StringComparison.Ordinal)))
         {
             writer.WritePropertyName(kvp.Key);
             JsonSerializer.Serialize(writer, kvp.Value, options);

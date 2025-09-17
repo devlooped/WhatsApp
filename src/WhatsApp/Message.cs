@@ -21,6 +21,9 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(UnsupportedMessage), "unsupported")]
 public abstract partial record Message(string Id, Service Service, User User, long Timestamp) : IMessage
 {
+    /// <summary>For debugging purposes, exposes the original JSON used to deserialize this instance, if any.</summary>
+    internal string? Json => AdditionalProperties?.GetValueOrDefault("__json") as string;
+
     /// <inheritdoc/>
     [JsonConverter(typeof(AdditionalPropertiesDictionaryConverter))]
     public AdditionalPropertiesDictionary? AdditionalProperties { get; set; }
@@ -59,10 +62,14 @@ public abstract partial record Message(string Id, Service Service, User User, lo
         {
             var message = JsonSerializer.Deserialize<Message>(jq, JsonContext.DefaultOptions);
 
-            // Fix empty id for system messages
-            if (message is not null && string.IsNullOrEmpty(message.Id))
+            if (message is not null)
             {
-                message = message with { Id = Ulid.NewUlid().ToString() };
+                message.AdditionalProperties ??= [];
+                message.AdditionalProperties["__json"] = json;
+
+                // Fix empty id for system messages that don't have a message id otherwise
+                if (string.IsNullOrEmpty(message.Id))
+                    message = message with { Id = Ulid.NewUlid().ToString() };
             }
 
             return message;
