@@ -48,4 +48,14 @@ public class WhatsAppOptions
     /// An optional emoji to react with when restoring conversation context.
     /// </summary>
     public string? ReactOnConversation { get; set; }
+
+    /// <summary>
+    /// Optional secret to enable direct POST processing of webhook-formatted 
+    /// payloads without going through a queue. 
+    /// </summary>
+    /// <remarks>
+    /// If used, the incoming POST request must have the X-WHATSAPP-SECRET 
+    /// header set and it must match exactly the value of this option.
+    /// </remarks>
+    public string? Secret { get; set; }
 }
