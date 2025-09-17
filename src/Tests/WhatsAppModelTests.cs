@@ -29,7 +29,7 @@ public class WhatsAppModelTests(ITestOutputHelper output)
         // If id was empty, it should be automatically fixed and generated
         if (id == string.Empty)
         {
-            Assert.False(string.IsNullOrEmpty(message.Id));
+            Assert.False(string.IsNullOrEmpty(message.Id)); ;
         }
         else
         {
