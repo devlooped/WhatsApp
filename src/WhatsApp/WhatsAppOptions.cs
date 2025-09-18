@@ -57,5 +57,5 @@ public class WhatsAppOptions
     /// If used, the incoming POST request must have the X-WHATSAPP-SECRET 
     /// header set and it must match exactly the value of this option.
     /// </remarks>
-    public string? Secret { get; set; }
+    public string? ProcessSecret { get; set; }
 }

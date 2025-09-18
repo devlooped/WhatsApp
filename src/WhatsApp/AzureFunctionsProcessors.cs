@@ -33,9 +33,9 @@ class AzureFunctionsProcessors(PipelineRunner runner, IOptions<WhatsAppOptions> 
     public async Task<IActionResult> ProcessAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp/process")] HttpRequest req)
     {
-        if (string.IsNullOrEmpty(options.Secret) ||
+        if (string.IsNullOrEmpty(options.ProcessSecret) ||
             !req.Headers.TryGetValue("X-WHATSAPP-SECRET", out var values) ||
-            !options.Secret.Equals(values.ToString(), StringComparison.Ordinal))
+            !options.ProcessSecret.Equals(values.ToString(), StringComparison.Ordinal))
             return new UnauthorizedResult();
 
         using var reader = new StreamReader(req.Body, Encoding.UTF8);
