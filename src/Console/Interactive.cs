@@ -33,7 +33,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
     {
         if (string.IsNullOrEmpty(service))
         {
-            service = AnsiConsole.Ask("Enter WhatsApp functions endpoint", "http://localhost:4242/whatsappcli");
+            service = AnsiConsole.Ask("Enter WhatsApp functions endpoint", "http://localhost:4242/whatsapp/cli");
             Config.Build(ConfigLevel.Global)
                 .SetString("whatsapp", "endpoint", service);
         }

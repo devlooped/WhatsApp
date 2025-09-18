@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using System.Text.Json;
-using System.Xml;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -25,10 +24,13 @@ class AzureFunctionsConsole(
         WriteIndented = true
     };
 
-    [Function("whatsapp_console")]
-    public async Task<IActionResult> MessageConsole([HttpTrigger(AuthorizationLevel.Anonymous, ["post", "get"], Route = "whatsappcli")] HttpRequest req)
-    {
+    [Function("whatsapp_console_legacy")]
+    public IActionResult MessageConsoleLegacy([HttpTrigger(AuthorizationLevel.Anonymous, ["post", "get"], Route = "whatsappcli")] HttpRequest req)
+        => new RedirectResult(req.Path.Value.Replace("whatsappcli", "whatsapp/cli"), true, true);
 
+    [Function("whatsapp_console")]
+    public async Task<IActionResult> MessageConsole([HttpTrigger(AuthorizationLevel.Anonymous, ["post", "get"], Route = "whatsapp/cli")] HttpRequest req)
+    {
         // This endpoint is only available in development environments, since it allows sending messages from the debug console.
         if (environment.IsProduction())
             return new UnauthorizedResult();

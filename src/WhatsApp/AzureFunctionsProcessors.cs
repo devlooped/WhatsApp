@@ -21,7 +21,7 @@ class AzureFunctionsProcessors(PipelineRunner runner, IOptions<WhatsAppOptions> 
 #if CI || RELEASE
         [EventGridTrigger] EventGridEvent e)
 #else
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp/eventgrid")]
         [Microsoft.Azure.Functions.Worker.Http.FromBody] EventGridEvent e)
 #endif
     {
@@ -31,7 +31,7 @@ class AzureFunctionsProcessors(PipelineRunner runner, IOptions<WhatsAppOptions> 
 
     [Function("whatsapp_process")]
     public async Task<IActionResult> ProcessAsync(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp/process")] HttpRequest req)
     {
         if (string.IsNullOrEmpty(options.Secret) ||
             !req.Headers.TryGetValue("X-WHATSAPP-SECRET", out var values) ||
