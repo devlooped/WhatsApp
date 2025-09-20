@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Devlooped.WhatsApp;
 
@@ -6,6 +7,7 @@ namespace Devlooped.WhatsApp;
 /// Provides the <see cref="AsBuilder"/> extension method to build a pipeline 
 /// around a given handler.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Never)]
 public static class WhatsAppHandlerExtensions
 {
     /// <summary>

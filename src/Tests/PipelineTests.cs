@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -122,6 +123,7 @@ public class PipelineTests(ITestOutputHelper output)
             .Callback(() => order.Add("storage:save"));
 
         var services = new ServiceCollection()
+            .AddSingleton<IFunctionContextAccessor>(Mock.Of<IFunctionContextAccessor>())
             .AddSingleton<IConfiguration>(configuration)
             .AddSingleton(conversation.Object);
 
@@ -183,6 +185,7 @@ public class PipelineTests(ITestOutputHelper output)
             });
 
         var services = new ServiceCollection()
+            .AddSingleton<IFunctionContextAccessor>(Mock.Of<IFunctionContextAccessor>())
             .AddSingleton<IConfiguration>(configuration)
             .AddSingleton<IConversationStorage>(storage);
 
@@ -237,6 +240,7 @@ public class PipelineTests(ITestOutputHelper output)
             });
 
         var services = new ServiceCollection()
+            .AddSingleton<IFunctionContextAccessor>(Mock.Of<IFunctionContextAccessor>())
             .AddSingleton<IConfiguration>(configuration);
 
         var sent = 0;

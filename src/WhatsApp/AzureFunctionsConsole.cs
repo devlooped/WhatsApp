@@ -14,7 +14,7 @@ namespace Devlooped.WhatsApp;
 /// </summary>
 class AzureFunctionsConsole(
     IWhatsAppClient client,
-    IWhatsAppHandler handler,
+    Func<IWhatsAppHandler> handler,
     ILogger<AzureFunctionsWebhook> logger,
     IHostEnvironment environment)
 {
@@ -70,7 +70,7 @@ class AzureFunctionsConsole(
 
             // Await all responses
             // No action needed, just make sure all items are processed
-            _ = Task.Run(() => handler.HandleAsync([message]).ToArrayAsync().AsTask()).Ignore();
+            _ = Task.Run(() => handler().HandleAsync([message]).ToArrayAsync().AsTask()).Ignore();
         }
         else
         {

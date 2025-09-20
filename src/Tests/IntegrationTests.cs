@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 namespace Devlooped.WhatsApp;
 
@@ -35,6 +37,7 @@ public class IntegrationTests : IDisposable
             .Build();
 
         var services = new ServiceCollection()
+            .AddSingleton<IFunctionContextAccessor>(Mock.Of<IFunctionContextAccessor>())
             .AddSingleton<IConfiguration>(configuration)
             .AddSingleton<IConversationStorage>(new TestConversationStorage(CloudStorageAccount.DevelopmentStorageAccount));
 
