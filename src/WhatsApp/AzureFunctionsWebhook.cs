@@ -24,7 +24,7 @@ namespace Devlooped.WhatsApp;
 class AzureFunctionsWebhook(
     IMessageProcessor messageProcessor,
     IWhatsAppClient whatsapp,
-    IWhatsAppHandler handler,
+    Func<IWhatsAppHandler> handler,
     IOptions<MetaOptions> metaOptions,
     IOptions<WhatsAppOptions> functionOptions,
     IHostEnvironment hosting,
@@ -116,7 +116,7 @@ class AzureFunctionsWebhook(
 
         FlowDataResponse? flowResponse = default;
 
-        await foreach (var response in handler.HandleAsync([flow]))
+        await foreach (var response in handler().HandleAsync([flow]))
         {
             if (response is FlowDataResponse fdr)
             {

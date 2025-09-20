@@ -48,6 +48,8 @@ builder.Services.AddSingleton(services => builder.Environment.IsDevelopment() ?
     storage :
     CloudStorageAccount.Parse(builder.Configuration["AzureWebJobsStorage"]));
 
+builder.UseWhatsApp();
+
 var whatsapp = builder.Services
     .AddWhatsApp<ProcessHandler>(configure: options =>
     {

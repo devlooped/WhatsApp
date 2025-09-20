@@ -1,4 +1,6 @@
-﻿using Azure.Data.Tables;
+﻿using System.ComponentModel;
+using Azure.Data.Tables;
+using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -9,6 +11,7 @@ namespace Devlooped.WhatsApp;
 /// Provides extension methods for registering <see cref="IWhatsAppClient"/> and 
 /// <see cref="IWhatsAppHandler"/> with a <see cref="IServiceCollection"/>.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Never)]
 public static class WhatsAppServiceCollectionExtensions
 {
     /// <summary>Registers a singleton <see cref="IWhatsAppClient"/> and <see cref="IWhatsAppHandler"/> in the <see cref="IServiceCollection"/>.</summary>
@@ -232,6 +235,9 @@ public static class WhatsAppServiceCollectionExtensions
     }
     static WhatsAppHandlerBuilder ConfigureServices(IServiceCollection services, WhatsAppHandlerBuilder builder, ServiceLifetime lifetime, Action<WhatsAppOptions>? configure)
     {
+        if (services.AsEnumerable().FirstOrDefault(x => x.ServiceType == typeof(IFunctionContextAccessor)) == null)
+            throw new InvalidOperationException("Function context accessor is missing. Please ensure you call UseWhatsApp() on the functions application builder to register IFunctionContextAccessor.");
+
         services.AddHttpClient("whatsapp").AddStandardResilienceHandler();
         services.AddHybridCache();
         services.AddSingleton<Idempotency>();
@@ -273,6 +279,20 @@ public static class WhatsAppServiceCollectionExtensions
 
         services.Add(new ServiceDescriptor(typeof(IWhatsAppHandler), builder.Build, lifetime));
         services.Add(new ServiceDescriptor(typeof(PipelineRunner), typeof(PipelineRunner), lifetime));
+
+        services.Add(new ServiceDescriptor(typeof(Func<IWhatsAppHandler>), services => () =>
+        {
+            var accessor = services.GetRequiredService<IFunctionContextAccessor>();
+            var ctx = accessor.FunctionContext ?? throw new InvalidOperationException("FunctionContext is not available. Ensure UseWhatsApp() has been called on the application builder.");
+            return ctx.InstanceServices.GetRequiredService<IWhatsAppHandler>();
+        }, lifetime));
+
+        services.Add(new ServiceDescriptor(typeof(Func<PipelineRunner>), services => () =>
+        {
+            var accessor = services.GetRequiredService<IFunctionContextAccessor>();
+            var ctx = accessor.FunctionContext ?? throw new InvalidOperationException("FunctionContext is not available. Ensure UseWhatsApp() has been called on the application builder.");
+            return ctx.InstanceServices.GetRequiredService<PipelineRunner>();
+        }, lifetime));
 
         // By default we use the queue processor, but it's idempotent if 
         // called subsequently

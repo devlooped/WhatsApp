@@ -30,6 +30,9 @@ To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/devlo
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
+builder.UseWhatsApp(); // 👈 setup middleware
+
+// add your messages handler here 👇 
 builder.Services.AddWhatsApp<MyWhatsAppHandler>();
 
 builder.Build().Run();

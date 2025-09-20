@@ -1,8 +1,11 @@
-﻿namespace Devlooped.WhatsApp;
+﻿using System.ComponentModel;
+
+namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// Usability extensions for common messaging scenarios for WhatsApp.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Never)]
 public static partial class WhatsAppClientExtensions
 {
     /// <summary>

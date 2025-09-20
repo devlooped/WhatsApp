@@ -8,13 +8,13 @@ using Microsoft.Extensions.Options;
 
 namespace Devlooped.WhatsApp;
 
-class AzureFunctionsProcessors(PipelineRunner runner, IOptions<WhatsAppOptions> options)
+class AzureFunctionsProcessors(Func<PipelineRunner> runner, IOptions<WhatsAppOptions> options)
 {
     readonly WhatsAppOptions options = options.Value;
 
     [Function("whatsapp_dequeue")]
     public Task DequeueAsync([QueueTrigger("whatsappwebhook", Connection = "AzureWebJobsStorage")] string json)
-        => runner.ProcessAsync(json);
+        => runner().ProcessAsync(json);
 
     [Function("whatsapp_eventgrid")]
     public async Task<IActionResult> HandleEventGrid(
@@ -25,7 +25,7 @@ class AzureFunctionsProcessors(PipelineRunner runner, IOptions<WhatsAppOptions> 
         [Microsoft.Azure.Functions.Worker.Http.FromBody] EventGridEvent e)
 #endif
     {
-        await runner.ProcessAsync(Regex.Unescape(e.Data.ToString()).Trim('"'));
+        await runner().ProcessAsync(Regex.Unescape(e.Data.ToString()).Trim('"'));
         return new OkResult();
     }
 
@@ -41,7 +41,7 @@ class AzureFunctionsProcessors(PipelineRunner runner, IOptions<WhatsAppOptions> 
         using var reader = new StreamReader(req.Body, Encoding.UTF8);
         var json = await reader.ReadToEndAsync();
 
-        await runner.ProcessAsync(json);
+        await runner().ProcessAsync(json);
         return new OkResult();
     }
 }

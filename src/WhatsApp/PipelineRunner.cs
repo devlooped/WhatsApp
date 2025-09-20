@@ -7,7 +7,7 @@ namespace Devlooped.WhatsApp;
 class PipelineRunner(
     Idempotency idempotency,
     IWhatsAppClient whatsapp,
-    IWhatsAppHandler handler,
+    Func<IWhatsAppHandler> handler,
     IOptions<WhatsAppOptions> functionOptions,
     ILogger<PipelineRunner> logger)
 {
@@ -45,7 +45,7 @@ class PipelineRunner(
             {
                 // Await all responses
                 // No action needed, just make sure all items are processed
-                await handler.HandleAsync([message]).ToArrayAsync();
+                await handler().HandleAsync([message]).ToArrayAsync();
                 logger.LogInformation($"Completed work item: {message.Id}");
             }
             catch (Exception e)

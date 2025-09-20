@@ -27,7 +27,7 @@ public static class TaskSchedulerProcessorExtensions
         return builder;
     }
 
-    class TaskSchedulerMessageProcessor(PipelineRunner runner, TaskScheduler scheduler) : IMessageProcessor
+    class TaskSchedulerMessageProcessor(Func<PipelineRunner> runner, TaskScheduler scheduler) : IMessageProcessor
     {
         public Task EnqueueAsync(string json, CancellationToken cancellation = default)
         {
@@ -40,6 +40,6 @@ public static class TaskSchedulerProcessorExtensions
             return Task.CompletedTask;
         }
 
-        async Task ProcessAsync(string json) => await runner.ProcessAsync(json);
+        async Task ProcessAsync(string json) => await runner().ProcessAsync(json);
     }
 }
