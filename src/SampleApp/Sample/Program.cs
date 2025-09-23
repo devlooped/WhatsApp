@@ -75,7 +75,8 @@ if (builder.Environment.IsProduction())
         builder.Configuration["EventGrid:Key"] is { Length: > 0 } key)
     {
         whatsapp.UseEventGridProcessor(new EventGridPublisherClient(
-            new Uri(topic), new Azure.AzureKeyCredential(key)));
+            new Uri(topic), new Azure.AzureKeyCredential(key)),
+            options => builder.Configuration.Bind("EventGrid", options));
     }
 }
 else

@@ -1,5 +1,6 @@
 ﻿using Azure.Messaging.EventGrid;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Devlooped.WhatsApp;
 
@@ -27,7 +28,7 @@ public static class EventGridProcessorExtensions
 
         builder.Services.AddSingleton<IMessageProcessor>(services =>
         {
-            var options = new EventGridOptions();
+            var options = services.GetService<IOptions<EventGridOptions>>()?.Value ?? new();
             configure?.Invoke(options);
             return new EventGridProcessor(publisher ??
                 services.GetRequiredService<EventGridPublisherClient>(),
