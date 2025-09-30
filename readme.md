@@ -404,6 +404,28 @@ this repository:
 
 ![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/aspire.png)
 
+The spans/activites created by the `OpenTelemetryHandler` follow the [OpenTelemetry Semantic Conventions for Messaging Spans](https://opentelemetry.io/docs/specs/semconv/messaging/messaging-spans/). 
+Specifically, it uses a [consumer span](https://opentelemetry.io/docs/specs/semconv/messaging/messaging-spans/#consumer-spans) 
+named "process whatsapp" to track the processing of incoming WhatsApp messages.
+
+| Attribute/Tag | Value | Description | OTEL Convention |
+|-----------|-------|-------------|-----------------|
+| `messaging.system` | `whatsapp` | Identifies the messaging system being used. | [messaging.system](https://opentelemetry.io/docs/specs/semconv/registry/attributes/messaging/) |
+| `messaging.operation.name` | `process` | The name of the operation performed on the message, indicating processing of incoming messages. | [messaging.operation.name](https://opentelemetry.io/docs/specs/semconv/registry/attributes/messaging/) |
+| `messaging.destination.name` | Service ID (e.g., WhatsApp Business Account phone number) | The name of the destination to which the message is sent. In this context, it's the service identifier for the WhatsApp endpoint. | [messaging.destination.name](https://opentelemetry.io/docs/specs/semconv/registry/attributes/messaging/) |
+| `messaging.client.id` | User phone number | The identifier of the client that sent the message. | [messaging.client.id](https://opentelemetry.io/docs/specs/semconv/registry/attributes/messaging/) |
+| `messaging.message.id` | Message ID | The unique identifier of the message being processed. | [messaging.message.id](https://opentelemetry.io/docs/specs/semconv/registry/attributes/messaging/) |
+| `messaging.message.conversation_id` | Conversation ID (if available) | The identifier of the conversation the message belongs to, if applicable. | [messaging.message.conversation_id](https://opentelemetry.io/docs/specs/semconv/registry/attributes/messaging/) |
+
+These attributes provide detailed context for tracing message processing flows in distributed systems.
+
+In addition to spans, the handler emits metrics:
+- `messaging.process.duration` (histogram): Duration of WhatsApp message processing in seconds. See [OTEL convention](https://opentelemetry.io/docs/specs/semconv/messaging/messaging-metrics/#metric-messagingprocessduration)
+- `messaging.client.consumed.messages` (counter): Number of WhatsApp messages processed. See [OTEL convention](https://opentelemetry.io/docs/specs/semconv/messaging/messaging-metrics/#metric-messagingclientconsumedmessages)
+
+These metrics also carry the same tags as the spans for correlation.
+
+<!-- #content -->
 
 ## Scalability and Performance
 
