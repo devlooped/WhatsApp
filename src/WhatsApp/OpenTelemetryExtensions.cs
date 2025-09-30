@@ -22,7 +22,7 @@ static class OpenTelemetryExtensions
         activity.AddTag("error.type", e.GetType().FullName);
         activity.SetStatus(ActivityStatusCode.Error, e.Message);
 
-        activity.AddEvent(new ActivityEvent("exception", tags: new(tags)));
+        activity.AddEvent(new ActivityEvent("exception", tags: [.. tags]));
 
         return tags;
     }

@@ -78,14 +78,14 @@ public class OpenTelemetryHandler : DelegatingWhatsAppHandler
         }
         else
         {
-            using var span = activitySource.StartActivity("whatsapp process", ActivityKind.Consumer);
+            using var span = activitySource.StartActivity("process whatsapp", ActivityKind.Consumer);
             if (span != null)
             {
                 span.SetTag("messaging.system", "whatsapp");
-                span.SetTag("messaging.destination", "whatsapp");
-                span.SetTag("messaging.operation", "process");
+                span.SetTag("messaging.operation.name", "process");
+                span.SetTag("messaging.destination.name", message.ServiceId);
+                span.SetTag("messaging.client.id", message.UserNumber);
                 span.SetTag("messaging.message.id", message.Id);
-                span.SetTag("messaging.client.id", message.ServiceId);
                 if (message.ConversationId is string conversationId)
                     span.SetTag("messaging.message.conversation_id", conversationId);
             }
@@ -94,8 +94,9 @@ public class OpenTelemetryHandler : DelegatingWhatsAppHandler
             var tags = new TagList
             {
                 { "messaging.system", "whatsapp" },
-                { "messaging.operation", "process" },
-                { "messaging.client.id", message.ServiceId },
+                { "messaging.operation.name", "process" },
+                { "messaging.destination.name", message.ServiceId },
+                { "messaging.client.id", message.UserNumber },
             };
 
             return base.HandleAsync(messages, cancellation).WithErrorHandlingAsync(
