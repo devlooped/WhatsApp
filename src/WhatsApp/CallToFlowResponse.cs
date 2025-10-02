@@ -14,8 +14,9 @@ namespace Devlooped.WhatsApp;
 /// <param name="Action">The action button text.</param>
 public record CallToFlowResponse : Response
 {
+    /// <summary>Initializes a new instance of the <see cref="CallToFlowResponse"/> record.</summary>
     [JsonConstructor]
-    internal CallToFlowResponse(string serviceId, string userNumber, string text, string action, FlowParameters flow) : base(serviceId, userNumber)
+    public CallToFlowResponse(string serviceId, string userNumber, string text, string action, FlowParameters flow) : base(serviceId, userNumber)
     {
         Text = text;
         Action = action;
