@@ -2,6 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.AI;
+using Microsoft.Identity.Client;
 
 namespace Devlooped.WhatsApp;
 
@@ -52,8 +53,31 @@ public record ContactsContent(Contact[] Contacts) : Content
 /// <summary>
 /// Contact information.
 /// </summary>
-public record Contact(string Name, string Surname, string[] Numbers)
+public class Contact(string name, string surname, string[] numbers)
 {
+    public string Name { get; set; } = name;
+    public string Surname { get; set; } = surname;
+    public string[] Numbers => numbers;
+    [JsonPropertyName("fullname")]
+    public string FullName
+    {
+        get => string.IsNullOrWhiteSpace(Surname) ? Name : $"{Name} {Surname}";
+        set
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                var parts = value.Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 2)
+                {
+                    if (string.IsNullOrEmpty(Name))
+                        Name = parts[0];
+                    if (string.IsNullOrEmpty(Surname))
+                        Surname = string.Join(' ', parts[1..]);
+                }
+            }
+        }
+    }
+
     public override string ToString() => $"{Name} {Surname} ({string.Join(", ", Numbers)})";
 }
 
