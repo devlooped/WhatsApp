@@ -97,6 +97,7 @@
               "contacts": $msg.contacts | map({
                   "name": .name.first_name,
                   "surname": .name.last_name,
+                  "fullname": .name.formatted_name,
                   "numbers": [.phones[] | select(.wa_id? != null) | .wa_id]
               })
             }
