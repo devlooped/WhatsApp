@@ -1,5 +1,32 @@
 # Changelog
 
+## [v1.0.0-rc.14](https://github.com/devlooped/WhatsApp/tree/v1.0.0-rc.14) (2025-10-02)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.9.0...v1.0.0-rc.14)
+
+:sparkles: Implemented enhancements:
+
+- Add support for contacts' formatted name [\#312](https://github.com/devlooped/WhatsApp/pull/312) (@kzu)
+- Align better with OTEL messaging conventions [\#310](https://github.com/devlooped/WhatsApp/pull/310) (@kzu)
+- Speed-up initial webhook response times by going lazy init [\#306](https://github.com/devlooped/WhatsApp/pull/306) (@kzu)
+- Improve URL paths for sub-commands [\#305](https://github.com/devlooped/WhatsApp/pull/305) (@kzu)
+- Simplify webhook by introducing Task-based processor [\#302](https://github.com/devlooped/WhatsApp/pull/302) (@kzu)
+- Improve speed of idempotency checks by using HybridCache [\#301](https://github.com/devlooped/WhatsApp/pull/301) (@kzu)
+- Default to typing on process too [\#300](https://github.com/devlooped/WhatsApp/pull/300) (@kzu)
+- Log non-matching verification tokens in registration [\#297](https://github.com/devlooped/WhatsApp/pull/297) (@kzu)
+- Render formatted JSON in development [\#292](https://github.com/devlooped/WhatsApp/pull/292) (@kzu)
+
+:bug: Fixed bugs:
+
+- Fix generation of JSON serialization for FlowToken [\#298](https://github.com/devlooped/WhatsApp/pull/298) (@kzu)
+- Preserve relaxed JSON encoding [\#293](https://github.com/devlooped/WhatsApp/pull/293) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Allow dev processing event grid as webhook subscription [\#307](https://github.com/devlooped/WhatsApp/pull/307) (@kzu)
+- Allow invoking the processing behavior directly via HTTP POST [\#304](https://github.com/devlooped/WhatsApp/pull/304) (@kzu)
+- Allow inspecting the originating JSON for a message [\#303](https://github.com/devlooped/WhatsApp/pull/303) (@kzu)
+
 ## [v0.9.0](https://github.com/devlooped/WhatsApp/tree/v0.9.0) (2025-08-21)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v0.8.1...v0.9.0)
