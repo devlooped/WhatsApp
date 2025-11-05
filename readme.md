@@ -67,7 +67,8 @@ builder.Services.AddWhatsApp((messages, cancellation) =>
     }
 
     return AsyncEnumerable.Empty<Response>();
-});```
+});
+```
 
 If the handler needs additional services, they can be provided directly 
 as generic parameters of the `UseWhatsApp` method, such as:
