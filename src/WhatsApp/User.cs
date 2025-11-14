@@ -23,11 +23,6 @@ public record User
     public User(string name, string number)
     {
         Name = name;
-        Number = NormalizeNumber(number);
+        Number = number.NormalizeNumber();
     }
-
-    static string NormalizeNumber(string number) =>
-        // On the web, we don't get the 9 after 54 \o/
-        // so for Argentina numbers, we need to remove the 9.
-        number.StartsWith("549", StringComparison.Ordinal) ? "54" + number[3..] : number;
 }
