@@ -32,6 +32,7 @@ public class IntegrationTests : IDisposable
             .AddInMemoryCollection(new Dictionary<string, string?>()
             {
                 { "Meta:VerifyToken", "test-challenge" },
+                { "Meta:Accounts:1234567890", "test-access-token" },
                 { "Meta:Numbers:1234567890", "test-access-token" }
             })
             .Build();
