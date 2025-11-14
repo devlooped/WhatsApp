@@ -14,6 +14,7 @@ public class MetaOptionsTests
             .AddInMemoryCollection(new Dictionary<string, string?>()
             {
                 { "Meta:VerifyToken", "test-challenge" },
+                { "Meta:Accounts:1234567890", "test-access-token" },
                 { "Meta:Numbers:1234567890", "test-access-token" }
             }).Build());
 
@@ -28,6 +29,7 @@ public class MetaOptionsTests
         Assert.NotNull(options);
         Assert.Equal("test-challenge", options.VerifyToken);
         Assert.Equal("test-access-token", options.Numbers["1234567890"]);
+        Assert.Equal("test-access-token", options.Accounts["1234567890"]);
         Assert.Equal("v22.0", options.ApiVersion);
     }
 
@@ -38,6 +40,7 @@ public class MetaOptionsTests
             .AddSingleton<IConfiguration>(new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>()
             {
+                { "Meta:Accounts:1234567890", "test-access-token" },
                 { "Meta:Numbers:1234567890", "test-access-token" }
             }).Build());
 
@@ -61,6 +64,7 @@ public class MetaOptionsTests
             .AddSingleton<IConfiguration>(new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>()
             {
+                { "Meta:Accounts:1234567890", "test-access-token" },
                 { "Meta:VerifyToken", "test-challenge" },
             }).Build());
 

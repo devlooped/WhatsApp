@@ -19,6 +19,10 @@ public class MetaOptions
     [Required(ErrorMessage = "Meta:VerifyToken is required to properly register with WhatsApp for Business webhooks.")]
     public required string VerifyToken { get; set; }
 
+    /// <summary>Contains pairs of account ID > access token for WhatsApp for Business phone numbers.</summary>
+    [MinLength(1, ErrorMessage = "At least one account ID > access token pair is required, i.e. Meta:Accounts:12345=asdf")]
+    public IDictionary<string, string> Accounts { get; set; } = new Dictionary<string, string>();
+
     /// <summary>Contains pairs of number ID > access token for WhatsApp for Business phone numbers.</summary>
     [MinLength(1, ErrorMessage = "At least one number ID > access token pair is required, i.e. Meta:Numbers:12345=asdf")]
     public IDictionary<string, string> Numbers { get; set; } = new Dictionary<string, string>();

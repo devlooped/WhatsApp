@@ -72,7 +72,7 @@ public static partial class WhatsAppClientExtensions
         {
             messaging_product = "whatsapp",
             recipient_type = "individual",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "reaction",
             reaction = new
             {
@@ -96,7 +96,7 @@ public static partial class WhatsAppClientExtensions
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "template",
             template
         }, cancellation);
@@ -118,7 +118,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "text",
             context = new
             {
@@ -148,7 +148,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "interactive",
             context = new
             {
@@ -159,7 +159,7 @@ public static partial class WhatsAppClientExtensions
                 type = "button",
                 body = new
                 {
-                    text = text
+                    text
                 },
                 action = new
                 {
@@ -190,7 +190,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "interactive",
             context = new
             {
@@ -234,7 +234,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "interactive",
             context = new
             {
@@ -328,7 +328,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(message.User.Number),
+            to = message.User.Number.NormalizeNumber(),
             type = "text",
             context = new
             {
@@ -356,7 +356,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(message.User.Number),
+            to = message.User.Number.NormalizeNumber(),
             type = "interactive",
             context = new
             {
@@ -396,7 +396,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(message.User.Number),
+            to = message.User.Number.NormalizeNumber(),
             type = "interactive",
             context = new
             {
@@ -438,7 +438,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(message.User.Number),
+            to = message.User.Number.NormalizeNumber(),
             type = "interactive",
             context = new
             {
@@ -532,7 +532,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "text",
             text = new
             {
@@ -557,7 +557,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "interactive",
             interactive = new
             {
@@ -594,7 +594,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "interactive",
             interactive = new
             {
@@ -633,7 +633,7 @@ public static partial class WhatsAppClientExtensions
             messaging_product = "whatsapp",
             preview_url = false,
             recipient_type = "individual",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "interactive",
             interactive = new
             {
@@ -699,7 +699,7 @@ public static partial class WhatsAppClientExtensions
         {
             messaging_product = "whatsapp",
             recipient_type = "individual",
-            to = NormalizeNumber(userNumber),
+            to = userNumber.NormalizeNumber(),
             type = "interactive",
             interactive = new
             {
@@ -719,9 +719,4 @@ public static partial class WhatsAppClientExtensions
                 }
             }
         }, cancellation);
-
-    static string NormalizeNumber(string number) =>
-        // On the web, we don't get the 9 after 54 \o/
-        // so for Argentina numbers, we need to remove the 9.
-        number.StartsWith("549", StringComparison.Ordinal) ? "54" + number[3..] : number;
 }

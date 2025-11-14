@@ -82,7 +82,7 @@ public class FlowTests(ITestOutputHelper output)
     [InlineData("data")]
     public async Task SendFlow(string flow)
     {
-        var (configuration, client) = Initialize();
+        var (configuration, client, _) = Initialize();
 
         var message = ContentMessage.Create(configuration["SendFrom"]!, configuration["SendTo"]!, "Hello");
 
@@ -101,7 +101,7 @@ public class FlowTests(ITestOutputHelper output)
     [SecretsFact("Meta:PrivateKey", "SendFrom", "SendTo")]
     public async Task SendFlowNavigateData()
     {
-        var (configuration, client) = Initialize();
+        var (configuration, client, _) = Initialize();
 
         var message = ContentMessage.Create(configuration["SendFrom"]!, configuration["SendTo"]!, "Hello");
 
@@ -132,7 +132,7 @@ public class FlowTests(ITestOutputHelper output)
     [SecretsFact("Meta:PrivateKey", "SendFrom", "SendTo")]
     public async Task SendBlankNavigate()
     {
-        var (configuration, client) = Initialize();
+        var (configuration, client, _) = Initialize();
 
         var message = ContentMessage.Create(configuration["SendFrom"]!, configuration["SendTo"]!, "Hello");
 
@@ -146,7 +146,7 @@ public class FlowTests(ITestOutputHelper output)
     [SecretsFact("Meta:PrivateKey")]
     public async Task SendFlowWithData()
     {
-        var (configuration, client) = Initialize();
+        var (configuration, client, _) = Initialize();
 
         await client.SendAsync(configuration["SendFrom"]!, new
         {
@@ -329,6 +329,104 @@ public class FlowTests(ITestOutputHelper output)
         Assert.Equal("bar", message.Data.GetProperty("foo").GetString());
     }
 
+    [SecretsFact("Meta:Accounts:539235785933710")]
+    public async Task ListFlows()
+    {
+        var (_, _, client) = Initialize();
+        var flows = await client.GetFlowsAsync("539235785933710").ToArrayAsync();
+
+        Assert.NotEmpty(flows);
+    }
+
+
+    [SecretsTheory("Meta:Accounts:539235785933710")]
+    [InlineData("539235785933710")]
+    public async Task FlowCrud(string accountId)
+    {
+        var (_, _, client) = Initialize();
+
+        var json =
+            /* lang=json */
+            """
+            {
+                "version": "7.2",
+                "screens": [
+                    {
+                        "id": "WELCOME_SCREEN",
+                        "title": "Welcome",
+                        "terminal": true,
+                        "success": true,
+                        "data": {},
+                        "layout": {
+                            "type": "SingleColumnLayout",
+                            "children": [
+                                {
+                                    "type": "TextHeading",
+                                    "text": "Hello World"
+                                },
+                                {
+                                    "type": "TextBody",
+                                    "text": "Let's start building things!"
+                                },
+                                {
+                                    "type": "TextInput",
+                                    "name": "first",
+                                    "required": true,
+                                    "input-type": "text",
+                                    "label": "First Name"
+                                },
+                                {
+                                    "type": "TextInput",
+                                    "name": "last",
+                                    "required": true,
+                                    "input-type": "text",
+                                    "label": "Last Name"
+                                },                    
+                                {
+                                    "type": "Footer",
+                                    "label": "Complete",
+                                    "on-click-action": {
+                                        "name": "complete",
+                                        "payload": {}
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+            """;
+
+        var flow = await client.CreateFlowAsync(accountId, new("01K70DB6XT9KQ2HYXM1FNZP8GF", ["OTHER"], json));
+        Assert.NotNull(flow);
+        Assert.True(flow.Success);
+
+        var flows = await client.GetFlowsAsync(accountId).ToArrayAsync();
+        Assert.Contains(flows, x => x.Id == flow.Id);
+
+        var name = Ulid.NewUlid().ToString();
+        Assert.True(await client.UpdateFlowAsync(accountId, new(flow.Id, Name: name)));
+        var updated = await client.GetFlowAsync(accountId, flow.Id);
+
+        Assert.Equal(name, updated.Name);
+        Assert.Equal(FlowStatus.Draft, updated.Status);
+
+        var flowUpdate = await client.UpdateFlowJsonAsync(accountId, flow.Id, json.Replace("Hello World", "Hola Mundo"));
+        Assert.True(flowUpdate.Success);
+
+        var preview = await client.GetFlowPreviewAsync(accountId, flow.Id);
+        output.WriteLine(preview.PreviewUrl);
+
+        // NOTE: published flows cannot be deleted, only deprecated. 
+        // This has been manually tested to work already, but we don't want to polute the account with 
+        // deprecated flows every time we run tests.
+        // Assert.True(await client.PublishFlowAsync(accountId, flow.Id));
+        // Assert.True(await client.DeprecateFlowAsync(accountId, flow.Id));
+
+        var deleted = await client.DeleteFlowAsync(accountId, flow.Id);
+        Assert.True(deleted);
+    }
+
     static AsymmetricCipherKeyPair GenerateRsaKeyPair()
     {
         var keyGen = new RsaKeyPairGenerator();
@@ -360,7 +458,7 @@ public class FlowTests(ITestOutputHelper output)
         return oaep.ProcessBlock(data, 0, data.Length);
     }
 
-    (IConfiguration configuration, WhatsAppClient client) Initialize()
+    (IConfiguration configuration, IWhatsAppClient client, IWhatsAppFlowsClient flows) Initialize()
     {
         var configuration = new ConfigurationBuilder()
             .AddUserSecrets<WhatsAppClientTests>()
@@ -376,8 +474,9 @@ public class FlowTests(ITestOutputHelper output)
             .ValidateDataAnnotations();
 
         collection.AddSingleton<WhatsAppClient>();
+        collection.AddSingleton<WhatsAppFlowsClient>();
 
         var services = collection.BuildServiceProvider();
-        return (configuration, services.GetRequiredService<WhatsAppClient>());
+        return (configuration, services.GetRequiredService<WhatsAppClient>(), services.GetRequiredService<WhatsAppFlowsClient>());
     }
 }
