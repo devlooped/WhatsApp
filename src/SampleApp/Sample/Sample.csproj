@@ -23,8 +23,8 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.14.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
-    <PackageReference Include="System.Linq.Async" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.1.0" />
+    <PackageReference Include="System.Linq.AsyncEnumerable" Version="10.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\WhatsApp\WhatsApp.csproj" />
