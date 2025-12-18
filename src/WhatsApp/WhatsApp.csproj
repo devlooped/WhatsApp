@@ -24,10 +24,10 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Storage.Queues" Version="5.5.3" />
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="9.9.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="9.9.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.9.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="9.0.9" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.1" />
 
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
     <PackageReference Include="Devlooped.JQ" Version="1.8.1" PackExclude="contentFiles" />
