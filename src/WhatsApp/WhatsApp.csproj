@@ -33,7 +33,7 @@
     <PackageReference Include="Devlooped.JQ" Version="1.8.1" PackExclude="contentFiles" />
     <PackageReference Include="Devlooped.TableStorage" Version="5.5.0" />
 
-    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.76.0" />
 
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="NuGetizer" Version="1.4.6" />
