@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <AssemblyName>Devlooped.WhatsApp.AspNetCore</AssemblyName>
+    <Description>WhatsApp agents integration for ASP.NET Core</Description>
+    <PackageId>Devlooped.WhatsApp.AspNetCore</PackageId>
+    <PackContent>false</PackContent>
+    <LangVersion>Preview</LangVersion>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseFile>OSMFEULA.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageTags>dotnet csharp whatsapp aspnetcore</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NuGetizer" Version="1.4.6" />
+    <PackageReference Include="PolySharp" Version="1.15.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodeAnalysis\CodeAnalysis.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\WhatsApp\WhatsApp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Devlooped.WhatsApp.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\osmfeula.txt" Link="osmfeula.txt" PackagePath="OSMFEULA.txt" />
+  </ItemGroup>
+
+</Project>

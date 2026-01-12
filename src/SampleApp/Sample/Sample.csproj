@@ -27,7 +27,7 @@
     <PackageReference Include="System.Linq.AsyncEnumerable" Version="10.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\WhatsApp\WhatsApp.csproj" />
+    <ProjectReference Include="..\..\WhatsApp.Functions\WhatsApp.Functions.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json" CopyToOutputDirectory="PreserveNewest" />
