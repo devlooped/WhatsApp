@@ -7,4 +7,6 @@
   <Project Path="src/Console/Console.csproj" Id="9b6aa258-0564-43f2-84ed-bd2dabe9d690" />
   <Project Path="src/Tests/Tests.csproj" />
   <Project Path="src/WhatsApp/WhatsApp.csproj" />
+  <Project Path="src/WhatsApp.Functions/WhatsApp.Functions.csproj" />
+  <Project Path="src/WhatsApp.AspNetCore/WhatsApp.AspNetCore.csproj" />
 </Solution>

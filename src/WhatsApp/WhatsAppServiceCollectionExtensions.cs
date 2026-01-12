@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using Azure.Data.Tables;
-using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -53,13 +52,13 @@ public static class WhatsAppServiceCollectionExtensions
         var builder = new WhatsAppHandlerBuilder(handlerFactory, collection);
 
         // Configure default services
-        ConfigureServices(collection, builder, lifetime, configure);
+        ConfigureCoreServices(collection, builder, lifetime, configure);
 
         return builder;
     }
 
     /// <summary>
-    /// Add WhatsApp functions and use an already registered service that implements <see cref="IWhatsAppHandler"/>.
+    /// Add WhatsApp services and use an already registered service that implements <see cref="IWhatsAppHandler"/>.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp(
         this IServiceCollection collection,
@@ -68,7 +67,7 @@ public static class WhatsAppServiceCollectionExtensions
         => collection.AddWhatsApp(services => services.GetRequiredService<IWhatsAppHandler>(), lifetime, configure);
 
     /// <summary>
-    /// Configure the WhatsApp handler for Azure Functions.
+    /// Configure the WhatsApp handler with a typed handler.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<THandler>(
         this IServiceCollection collection,
@@ -85,7 +84,7 @@ public static class WhatsAppServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configure the WhatsApp handler for Azure Functions.
+    /// Configure the WhatsApp handler with an anonymous handler delegate.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp(
         this IServiceCollection collection,
@@ -98,7 +97,7 @@ public static class WhatsAppServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configure the WhatsApp handler for Azure Functions.
+    /// Configure the WhatsApp handler with an anonymous handler delegate.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp(
         this IServiceCollection collection,
@@ -111,7 +110,7 @@ public static class WhatsAppServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configure the WhatsApp handler for Azure Functions.
+    /// Configure the WhatsApp handler with an anonymous handler delegate that receives a service.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService>(
         this IServiceCollection collection,
@@ -125,7 +124,7 @@ public static class WhatsAppServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configure the WhatsApp handler for Azure Functions.
+    /// Configure the WhatsApp handler with an anonymous handler delegate that receives two services.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2>(
         this IServiceCollection collection,
@@ -143,7 +142,7 @@ public static class WhatsAppServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configure the WhatsApp handler for Azure Functions.
+    /// Configure the WhatsApp handler with an anonymous handler delegate that receives three services.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3>(
         this IServiceCollection collection,
@@ -163,7 +162,7 @@ public static class WhatsAppServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configure the WhatsApp handler for Azure Functions.
+    /// Configure the WhatsApp handler with an anonymous handler delegate that receives four services.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3, TService4>(
         this IServiceCollection collection,
@@ -185,7 +184,7 @@ public static class WhatsAppServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configure the WhatsApp handler for Azure Functions.
+    /// Configure the WhatsApp handler with an anonymous handler delegate that receives five services.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3, TService4, TService5>(
         this IServiceCollection collection,
@@ -209,7 +208,7 @@ public static class WhatsAppServiceCollectionExtensions
     }
 
     /// <summary>
-    /// Configure the WhatsApp handler for Azure Functions.
+    /// Configure the WhatsApp handler with an anonymous handler delegate that receives six services.
     /// </summary>
     public static WhatsAppHandlerBuilder AddWhatsApp<TService1, TService2, TService3, TService4, TService5, TService6>(
         this IServiceCollection collection,
@@ -233,11 +232,12 @@ public static class WhatsAppServiceCollectionExtensions
                 services.GetRequiredService<TService6>(),
                 handler), lifetime, configure);
     }
-    static WhatsAppHandlerBuilder ConfigureServices(IServiceCollection services, WhatsAppHandlerBuilder builder, ServiceLifetime lifetime, Action<WhatsAppOptions>? configure)
-    {
-        if (services.AsEnumerable().FirstOrDefault(x => x.ServiceType == typeof(IFunctionContextAccessor)) == null)
-            throw new InvalidOperationException("Function context accessor is missing. Please ensure you call UseWhatsApp() on the functions application builder to register IFunctionContextAccessor.");
 
+    /// <summary>
+    /// Configures core WhatsApp services that are platform-agnostic.
+    /// </summary>
+    internal static WhatsAppHandlerBuilder ConfigureCoreServices(IServiceCollection services, WhatsAppHandlerBuilder builder, ServiceLifetime lifetime, Action<WhatsAppOptions>? configure)
+    {
         services.AddHttpClient("whatsapp").AddStandardResilienceHandler();
         services.AddHybridCache();
         services.AddSingleton<Idempotency>();
@@ -280,23 +280,15 @@ public static class WhatsAppServiceCollectionExtensions
         services.Add(new ServiceDescriptor(typeof(IWhatsAppHandler), builder.Build, lifetime));
         services.Add(new ServiceDescriptor(typeof(PipelineRunner), typeof(PipelineRunner), lifetime));
 
-        services.Add(new ServiceDescriptor(typeof(Func<IWhatsAppHandler>), services => () =>
-        {
-            var accessor = services.GetRequiredService<IFunctionContextAccessor>();
-            var ctx = accessor.FunctionContext ?? throw new InvalidOperationException("FunctionContext is not available. Ensure UseWhatsApp() has been called on the application builder.");
-            return ctx.InstanceServices.GetRequiredService<IWhatsAppHandler>();
-        }, lifetime));
+        // Register direct handler and runner factories for non-Functions hosting
+        services.TryAdd(new ServiceDescriptor(typeof(Func<IWhatsAppHandler>), services => () =>
+            services.GetRequiredService<IWhatsAppHandler>(), lifetime));
 
-        services.Add(new ServiceDescriptor(typeof(Func<PipelineRunner>), services => () =>
-        {
-            var accessor = services.GetRequiredService<IFunctionContextAccessor>();
-            var ctx = accessor.FunctionContext ?? throw new InvalidOperationException("FunctionContext is not available. Ensure UseWhatsApp() has been called on the application builder.");
-            return ctx.InstanceServices.GetRequiredService<PipelineRunner>();
-        }, lifetime));
+        services.TryAdd(new ServiceDescriptor(typeof(Func<PipelineRunner>), services => () =>
+            services.GetRequiredService<PipelineRunner>(), lifetime));
 
-        // By default we use the queue processor, but it's idempotent if 
-        // called subsequently
-        builder.UseQueueProcessor(true);
+        // By default we use the task scheduler processor, which doesn't require Azure Functions
+        builder.UseTaskSchedulerProcessor();
 
         return builder;
     }

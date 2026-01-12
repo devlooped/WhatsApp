@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\WhatsApp\WhatsApp.csproj" />
+    <ProjectReference Include="..\WhatsApp.Functions\WhatsApp.Functions.csproj" />
     <ProjectReference Include="..\CodeAnalysis\CodeAnalysis.csproj" OutputItemType="Analyzer" Aliases="CodeAnalysis" />
   </ItemGroup>
 
