@@ -6,7 +6,7 @@ using Microsoft.Extensions.Hosting;
 namespace Devlooped.WhatsApp;
 
 /// <summary>
-/// Provides extensions for processing WhatsApp messages asynchronusly 
+/// Provides extensions for processing WhatsApp messages asynchronously 
 /// using Azure Functions queue.
 /// </summary>
 public static class QueueMessageProcessorExtensions
@@ -15,7 +15,7 @@ public static class QueueMessageProcessorExtensions
     /// Uses the Azure Functions queue to process WhatsApp messages asynchronously.
     /// </summary>
     /// <param name="builder">The builder pipeline</param>
-    /// <param name="configure">Optional configuration callback for the queue.></param>
+    /// <param name="configure">Optional configuration callback for the queue.</param>
     public static WhatsAppHandlerBuilder UseQueueProcessor(this WhatsAppHandlerBuilder builder, Action<QueueClientOptions>? configure = default)
         => UseQueueProcessor(builder, false, configure: configure);
     internal static WhatsAppHandlerBuilder UseQueueProcessor(this WhatsAppHandlerBuilder builder, bool isDefault, Action<QueueClientOptions>? configure = default)
