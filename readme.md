@@ -1,4 +1,4 @@
-![Icon](assets/img/icon.png) WhatsApp agents for Azure Functions
+![Icon](assets/img/icon.png) WhatsApp agents for .NET
 ============
 
 [![Version](https://img.shields.io/nuget/vpre/Devlooped.WhatsApp.svg?color=royalblue)](https://www.nuget.org/packages/Devlooped.WhatsApp)
@@ -8,7 +8,7 @@
 
 
 <!-- #description -->
-Create agents for WhatsApp using Azure Functions.
+Create agents for WhatsApp using .NET with support for Azure Functions and ASP.NET Core.
 <!-- #description -->
 
 ## Open Source Maintenance Fee
@@ -26,6 +26,8 @@ To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/devlo
 <!-- #content -->
 ## Usage
 
+### Azure Functions
+
 ```csharp
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
@@ -33,10 +35,33 @@ builder.ConfigureFunctionsWebApplication();
 builder.UseWhatsApp(); // 👈 setup middleware
 
 // add your messages handler here 👇 
-builder.Services.AddWhatsApp<MyWhatsAppHandler>();
+builder.Services.AddWhatsApp<MyWhatsAppHandler>()
+    .UseAzureFunctions(); // 👈 configure Azure Functions-specific services
 
 builder.Build().Run();
 ```
+
+### ASP.NET Core
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+// add your messages handler here 👇 
+builder.Services.AddWhatsApp<MyWhatsAppHandler>();
+
+var app = builder.Build();
+
+app.UseWhatsApp(); // 👈 map webhook endpoints
+
+app.Run();
+```
+
+The ASP.NET Core integration maps the following endpoints:
+- `POST /whatsapp` - Main webhook for receiving messages
+- `GET /whatsapp` - Webhook verification endpoint
+- `POST /whatsapp/process` - Direct message processing
+- `POST /whatsapp/eventgrid` - Event Grid processing
+- `POST/GET /whatsapp/cli` - Development console
 
 Instead of providing an `IWhatsAppHandler` implementation, you can also 
 register an inline handler using minimal API style:
