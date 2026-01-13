@@ -12,7 +12,7 @@ namespace Devlooped.WhatsApp;
 /// to configure common WhatsApp services.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Never)]
-internal static class WhatsAppServiceCollectionExtensions
+static class WhatsAppServiceCollectionExtensions
 {
     /// <summary>Registers a singleton <see cref="IWhatsAppClient"/> and <see cref="IWhatsAppHandler"/> in the <see cref="IServiceCollection"/>.</summary>
     internal static WhatsAppHandlerBuilder AddWhatsAppCore(
