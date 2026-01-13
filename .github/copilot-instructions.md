@@ -11,6 +11,7 @@
 
 - **Run tests**: `dnx --yes retest`
   - Runs all unit tests across the solution
+  - If tests fail due to Azure Storage, run the following commands and retry: `npm install azurite` and `npx azurite &`
 
 ### Build Validation and CI Requirements
 - **Always run before committing**: 
