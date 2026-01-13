@@ -35,8 +35,7 @@ builder.ConfigureFunctionsWebApplication();
 builder.UseWhatsApp(); // 👈 setup middleware
 
 // add your messages handler here 👇 
-builder.Services.AddWhatsApp<MyWhatsAppHandler>()
-    .UseAzureFunctions(); // 👈 configure Azure Functions-specific services
+builder.Services.AddWhatsApp<MyWhatsAppHandler>();
 
 builder.Build().Run();
 ```

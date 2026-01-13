@@ -57,7 +57,6 @@ var whatsapp = builder.Services
         options.ReactOnProcess = "⚙️";
         options.ReactOnConversation = "💭";
     })
-    .UseAzureFunctions()
     .UseIgnore()
     // Matches what we use in ConfigureOpenTelemetry
     .UseOpenTelemetry(builder.Environment.ApplicationName)
