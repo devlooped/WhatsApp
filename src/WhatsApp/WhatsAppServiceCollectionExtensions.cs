@@ -8,6 +8,8 @@ namespace Devlooped.WhatsApp;
 
 /// <summary>
 /// Provides internal extension methods for registering core WhatsApp services.
+/// These methods are used by hosting-specific packages (ASP.NET Core, Azure Functions) 
+/// to configure common WhatsApp services.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Never)]
 internal static class WhatsAppServiceCollectionExtensions

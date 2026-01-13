@@ -209,7 +209,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
 
     static void ValidateFunctionContextAccessor(IServiceCollection services)
     {
-        if (services.AsEnumerable().FirstOrDefault(x => x.ServiceType == typeof(IFunctionContextAccessor)) == null)
+        if (!services.Any(x => x.ServiceType == typeof(IFunctionContextAccessor)))
             throw new InvalidOperationException("Function context accessor is missing. Please ensure you call UseWhatsApp() on the functions application builder to register IFunctionContextAccessor.");
     }
 
