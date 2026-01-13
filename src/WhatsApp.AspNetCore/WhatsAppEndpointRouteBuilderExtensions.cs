@@ -1,13 +1,14 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
+using Azure.Messaging.EventGrid;
 using Devlooped.WhatsApp;
 using Devlooped.WhatsApp.Flows;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -46,51 +47,50 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         Throw.IfNull(endpoints);
 
         // POST /whatsapp - Main webhook endpoint for receiving messages
-        endpoints.MapPost("/whatsapp", (Delegate)HandleMessageAsync);
+        endpoints.MapPost("/whatsapp", HandleMessageAsync);
 
         // GET /whatsapp - Webhook verification endpoint
-        endpoints.MapGet("/whatsapp", (Delegate)HandleRegisterAsync);
+        endpoints.MapGet("/whatsapp", HandleRegisterAsync);
 
         // POST /whatsapp/process - Direct message processing endpoint
-        endpoints.MapPost("/whatsapp/process", (Delegate)HandleProcessAsync);
+        endpoints.MapPost("/whatsapp/process", HandleProcessAsync);
 
         // POST /whatsapp/eventgrid - Azure Event Grid event processing endpoint
-        endpoints.MapPost("/whatsapp/eventgrid", (Delegate)HandleEventGridAsync);
+        endpoints.MapPost("/whatsapp/eventgrid", HandleEventGridAsync);
 
         // POST/GET /whatsapp/cli - Development console endpoint
-        endpoints.MapMethods("/whatsapp/cli", ["POST", "GET"], (Delegate)HandleConsoleAsync);
+        endpoints.MapMethods("/whatsapp/cli", ["POST", "GET"], HandleConsoleAsync);
 
         // Legacy console endpoint redirect
-        endpoints.MapMethods("/whatsappcli", ["POST", "GET"], (HttpContext context) =>
+        endpoints.MapMethods("/whatsappcli", ["POST", "GET"], (HttpRequest request) =>
         {
-            var newPath = context.Request.Path.Value?.Replace("whatsappcli", "whatsapp/cli") ?? "/whatsapp/cli";
+            var newPath = request.Path.Value?.Replace("whatsappcli", "whatsapp/cli") ?? "/whatsapp/cli";
             return Results.Redirect(newPath, true, true);
         });
 
         return endpoints;
     }
 
-    static async Task<IResult> HandleMessageAsync(HttpContext context)
+    static async Task<IResult> HandleMessageAsync(
+        [FromBody] JsonElement body,
+        IMessageProcessor messageProcessor,
+        IWhatsAppClient whatsapp,
+        IOptions<MetaOptions> metaOptions,
+        IOptions<WhatsAppOptions> whatsappOptions,
+        IHostEnvironment hosting,
+        Func<IWhatsAppHandler> handlerFactory,
+        ILogger<WhatsAppEndpoints> logger)
     {
-        var logger = context.RequestServices.GetRequiredService<ILogger<WhatsAppEndpoints>>();
-        var messageProcessor = context.RequestServices.GetRequiredService<IMessageProcessor>();
-        var whatsapp = context.RequestServices.GetRequiredService<IWhatsAppClient>();
-        var metaOptions = context.RequestServices.GetRequiredService<IOptions<MetaOptions>>();
-        var functionOptions = context.RequestServices.GetRequiredService<IOptions<WhatsAppOptions>>();
-        var hosting = context.RequestServices.GetRequiredService<IHostEnvironment>();
-        var handler = context.RequestServices.GetRequiredService<Func<IWhatsAppHandler>>();
-
-        using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
-        var json = await reader.ReadToEndAsync();
+        var json = body.GetRawText();
 
         logger.LogDebug("Received WhatsApp message: {Message}.",
             hosting.IsProduction() ? json :
-            JsonSerializer.Serialize(JsonSerializer.Deserialize<JsonElement>(json), jsonOptions));
+            JsonSerializer.Serialize(body, jsonOptions));
 
         // Detect encrypted flow request setup for flows endpoints
         if (JsonSerializer.Deserialize<EncryptedFlowData>(json) is { Data.Length: > 0, IV.Length: > 0, Key.Length: > 0 } encrypted)
         {
-            return await ProcessFlowDataAsync(json, encrypted, metaOptions.Value, handler(), logger);
+            return await ProcessFlowDataAsync(json, encrypted, metaOptions.Value, handlerFactory(), logger);
         }
 
         if (await Message.DeserializeAsync(json) is { } message)
@@ -98,10 +98,10 @@ public static class WhatsAppEndpointRouteBuilderExtensions
             // If we got a user message, we can send progress updates as configured. We ignore exceptions in the 
             // operation since it can be a notification for an old message or it may have been deleted by the user.
             if (message is UserMessage user)
-                await user.SendProgress(whatsapp, functionOptions.Value.ReadOnMessage is true, functionOptions.Value.TypingOnMessage is true).Ignore();
+                await user.SendProgress(whatsapp, whatsappOptions.Value.ReadOnMessage is true, whatsappOptions.Value.TypingOnMessage is true).Ignore();
 
-            if (functionOptions.Value.ReactOnMessage != null && message.Type == MessageType.Content)
-                await message.React(functionOptions.Value.ReactOnMessage).SendAsync(whatsapp).Ignore();
+            if (whatsappOptions.Value.ReactOnMessage != null && message.Type == MessageType.Content)
+                await message.React(whatsappOptions.Value.ReactOnMessage).SendAsync(whatsapp).Ignore();
 
             await messageProcessor.EnqueueAsync(json);
         }
@@ -184,83 +184,78 @@ public static class WhatsAppEndpointRouteBuilderExtensions
             })));
     }
 
-    static IResult HandleRegisterAsync(HttpContext context)
+    static IResult HandleRegisterAsync(
+        [FromQuery(Name = "hub.mode")] string? mode,
+        [FromQuery(Name = "hub.verify_token")] string? verifyToken,
+        [FromQuery(Name = "hub.challenge")] string? challenge,
+        IOptions<MetaOptions> metaOptions,
+        ILogger<WhatsAppEndpoints> logger)
     {
-        var logger = context.RequestServices.GetRequiredService<ILogger<WhatsAppEndpoints>>();
-        var metaOptions = context.RequestServices.GetRequiredService<IOptions<MetaOptions>>();
-
-        var req = context.Request;
-        string? token = null;
-        if (req.Query.TryGetValue("hub.mode", out var mode) && mode == "subscribe" &&
-            req.Query.TryGetValue("hub.verify_token", out var tokenValue) && (token = tokenValue) == metaOptions.Value.VerifyToken &&
-            req.Query.TryGetValue("hub.challenge", out var values) &&
-            values.ToString() is { } challenge)
+        if (mode == "subscribe" && verifyToken == metaOptions.Value.VerifyToken && challenge is { Length: > 0 })
         {
             logger.LogInformation("Registering webhook callback.");
             return Results.Ok(challenge);
         }
 
-        logger.LogError("Received token {ACTUAL} but expected {EXPECTED}.", token, metaOptions.Value.VerifyToken);
+        logger.LogError("Received token {ACTUAL} but expected {EXPECTED}.", verifyToken, metaOptions.Value.VerifyToken);
         return Results.BadRequest("Received verification token doesn't match the configured one.");
     }
 
-    static async Task<IResult> HandleProcessAsync(HttpContext context)
+    static async Task<IResult> HandleProcessAsync(
+        [FromBody] JsonElement body,
+        [FromHeader(Name = "X-WHATSAPP-SECRET")] string? secret,
+        IOptions<WhatsAppOptions> options,
+        Func<PipelineRunner> runnerFactory)
     {
-        var options = context.RequestServices.GetRequiredService<IOptions<WhatsAppOptions>>();
-        var runner = context.RequestServices.GetRequiredService<Func<PipelineRunner>>();
-
         if (string.IsNullOrEmpty(options.Value.ProcessSecret) ||
-            !context.Request.Headers.TryGetValue("X-WHATSAPP-SECRET", out var values) ||
-            !options.Value.ProcessSecret.Equals(values.ToString(), StringComparison.Ordinal))
+            !options.Value.ProcessSecret.Equals(secret, StringComparison.Ordinal))
             return Results.Unauthorized();
 
-        using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
-        var json = await reader.ReadToEndAsync();
-
-        await runner().ProcessAsync(json);
+        var json = body.GetRawText();
+        await runnerFactory().ProcessAsync(json);
         return Results.Ok();
     }
 
-    static async Task<IResult> HandleEventGridAsync(HttpContext context)
+    static async Task<IResult> HandleEventGridAsync(
+        HttpRequest request,
+        [FromBody] JsonElement body,
+        Func<PipelineRunner> runnerFactory)
     {
-        var runner = context.RequestServices.GetRequiredService<Func<PipelineRunner>>();
-
-        using var sr = new StreamReader(context.Request.Body);
-        var json = await sr.ReadToEndAsync();
+        var json = body.GetRawText();
         var events = JsonSerializer.Deserialize<JsonObject[]>(json);
 
         // Validation handshake?
-        if (context.Request.Headers.TryGetValue("aeg-event-type", out var aeg) && aeg.ToString() == "SubscriptionValidation" &&
+        if (request.Headers.TryGetValue("aeg-event-type", out var aeg) && aeg.ToString() == "SubscriptionValidation" &&
             events?[0]?["data"]?["validationCode"]?.ToString() is string code)
         {
             return Results.Ok(new { validationResponse = code });
         }
 
         // Normal events here...
-        var data = JsonSerializer.Deserialize<Azure.Messaging.EventGrid.EventGridEvent[]>(json);
+        var data = JsonSerializer.Deserialize<EventGridEvent[]>(json);
         if (data == null)
             return Results.Ok();
 
         foreach (var item in data)
         {
-            await runner().ProcessAsync(System.Text.RegularExpressions.Regex.Unescape(item.Data.ToString()).Trim('"'));
+            await runnerFactory().ProcessAsync(Regex.Unescape(item.Data.ToString()).Trim('"'));
         }
 
         return Results.Ok();
     }
 
-    static async Task<IResult> HandleConsoleAsync(HttpContext context)
+    static async Task<IResult> HandleConsoleAsync(
+        HttpRequest request,
+        IWhatsAppClient client,
+        Func<IWhatsAppHandler> handlerFactory,
+        IHostEnvironment environment,
+        ILogger<WhatsAppEndpoints> logger)
     {
-        var logger = context.RequestServices.GetRequiredService<ILogger<WhatsAppEndpoints>>();
-        var client = context.RequestServices.GetRequiredService<IWhatsAppClient>();
-        var handler = context.RequestServices.GetRequiredService<Func<IWhatsAppHandler>>();
-        var environment = context.RequestServices.GetRequiredService<IHostEnvironment>();
-
         // This endpoint is only available in development environments, since it allows sending messages from the debug console.
         if (environment.IsProduction())
             return Results.Unauthorized();
 
-        if (context.Request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
+        if (request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
         {
             // Return a simple HTML page so we can verify from the console that the service endpoint URL is reachable
             return Results.Content(
@@ -275,7 +270,7 @@ public static class WhatsAppEndpointRouteBuilderExtensions
                 "text/html");
         }
 
-        using var reader = new StreamReader(context.Request.Body, Encoding.UTF8);
+        using var reader = new StreamReader(request.Body);
         var json = await reader.ReadToEndAsync();
         logger.LogDebug("Received WhatsApp message: {Message}.",
             environment.IsProduction() ? json :
@@ -291,7 +286,7 @@ public static class WhatsAppEndpointRouteBuilderExtensions
 
             // Await all responses
             // No action needed, just make sure all items are processed
-            _ = Task.Run(() => handler().HandleAsync([message]).ToArrayAsync().AsTask()).Ignore();
+            _ = Task.Run(() => handlerFactory().HandleAsync([message]).ToArrayAsync().AsTask()).Ignore();
         }
         else
         {
