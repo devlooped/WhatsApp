@@ -1,7 +1,8 @@
 <Solution>
   <Folder Name="/SampleApp/">
     <Project Path="src/SampleApp/Dashboard/Dashboard.csproj" />
-    <Project Path="src/SampleApp/Sample/Sample.csproj" />
+    <Project Path="src/SampleApp/SampleFunctions/SampleFunctions.csproj" />
+    <Project Path="src/SampleApp/SampleWeb/SampleWeb.csproj" />
   </Folder>
   <Project Path="src/CodeAnalysis/CodeAnalysis.csproj" />
   <Project Path="src/Console/Console.csproj" Id="9b6aa258-0564-43f2-84ed-bd2dabe9d690" />

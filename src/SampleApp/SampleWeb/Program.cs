@@ -1,0 +1,62 @@
+using System.Runtime.CompilerServices;
+using Azure.Messaging.EventGrid;
+using Devlooped.WhatsApp;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Configure to use user secrets in development
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
+// Add WhatsApp services with a simple handler that echoes messages
+var whatsapp = builder.Services
+    .AddWhatsApp<EchoHandler>(configure: options =>
+    {
+        options.ReactOnMessage = "🌐";
+        options.ReactOnProcess = "⚙️";
+        options.ReactOnConversation = "💭";
+    })
+    .UseLogging()
+    .UseConversation(conversationWindowSeconds: 300);
+
+// In production, use EventGrid if configured
+if (!builder.Environment.IsDevelopment())
+{
+    if (builder.Configuration["EventGrid:Topic"] is { Length: > 0 } topic &&
+        builder.Configuration["EventGrid:Key"] is { Length: > 0 } key)
+    {
+        whatsapp.UseEventGridProcessor(new EventGridPublisherClient(
+            new Uri(topic), new Azure.AzureKeyCredential(key)),
+            options => builder.Configuration.Bind("EventGrid", options));
+    }
+}
+
+var app = builder.Build();
+
+// Map WhatsApp webhook endpoints
+app.UseWhatsApp();
+
+app.Run();
+
+/// <summary>
+/// Simple echo handler that replies to incoming messages with their content.
+/// </summary>
+class EchoHandler : IWhatsAppHandler
+{
+    public async IAsyncEnumerable<Response> HandleAsync(
+        IEnumerable<IMessage> messages,
+        [EnumeratorCancellation] CancellationToken cancellation = default)
+    {
+        foreach (var message in messages)
+        {
+            if (message is ContentMessage content)
+            {
+                yield return content.Reply($"Echo: {content.Content}");
+            }
+        }
+
+        await Task.CompletedTask;
+    }
+}

@@ -3,7 +3,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 // Run Azurite via npx instead of container
 var storage = builder.AddExecutable("azurite", "npx", ".", "azurite", "--silent", "--location", ".azurite", "--debug", ".azurite/debug.log");
 
-builder.AddAzureFunctionsProject<Projects.Sample>("api")
+builder.AddAzureFunctionsProject<Projects.SampleFunctions>("api")
        .WaitFor(storage)
        .WithEnvironment("AzureWebJobsStorage", "UseDevelopmentStorage=true")
        // Disable Azure SDK telemetry since we're running locally
