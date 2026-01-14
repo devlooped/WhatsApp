@@ -30,6 +30,8 @@ builder.Services.AddSingleton(services => builder.Environment.IsDevelopment() ?
     storage :
     CloudStorageAccount.Parse(builder.Configuration["AzureWebJobsStorage"]));
 
+builder.AddServiceDefaults();
+
 // Add WhatsApp services with a simple handler that echoes messages
 var whatsapp = builder.Services
     .AddWhatsApp<EchoHandler>(configure: options =>
