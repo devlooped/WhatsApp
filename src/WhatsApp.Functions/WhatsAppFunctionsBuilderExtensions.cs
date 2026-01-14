@@ -13,6 +13,13 @@ namespace Devlooped.WhatsApp;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static class WhatsAppFunctionsBuilderExtensions
 {
+    /// <summary>
+    /// Adds required WhatsApp middleware to the functions worker application builder.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public static IFunctionsWorkerApplicationBuilder UseWhatsApp(this IFunctionsWorkerApplicationBuilder builder)
+        => builder.UseFunctionContextAccessor();
+
     /// <summary>Registers a singleton <see cref="IWhatsAppClient"/> and <see cref="IWhatsAppHandler"/> in the <see cref="IServiceCollection"/> for Azure Functions hosting.</summary>
     /// <param name="builder">The <see cref="IFunctionsWorkerApplicationBuilder"/> to which the WhatsApp services should be added.</param>
     /// <param name="handler">The <see cref="IWhatsAppHandler"/> that handles incoming WhatsApp messages as the underlying backend.</param>
@@ -27,7 +34,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(handler, lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>Registers a singleton <see cref="IWhatsAppClient"/> and <see cref="IWhatsAppHandler"/> in the <see cref="IServiceCollection"/> for Azure Functions hosting.</summary>
@@ -44,7 +51,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(handlerFactory, lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>
@@ -57,7 +64,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>
@@ -71,7 +78,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore<THandler>(lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>
@@ -85,7 +92,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(handler, lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>
@@ -99,7 +106,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(handler, lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>
@@ -114,7 +121,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(handler, lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>
@@ -130,7 +137,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(handler, lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>
@@ -147,7 +154,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(handler, lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>
@@ -165,7 +172,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(handler, lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>
@@ -184,7 +191,7 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(handler, lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
     /// <summary>
@@ -204,11 +211,14 @@ public static class WhatsAppFunctionsBuilderExtensions
     {
         builder.UseFunctionContextAccessor();
         var handlerBuilder = builder.Services.AddWhatsAppCore(handler, lifetime, configure);
-        return ConfigureAzureFunctions(builder.Services, handlerBuilder);
+        return ConfigureAzureFunctions(builder.Services, handlerBuilder, false);
     }
 
-    internal static WhatsAppHandlerBuilder ConfigureAzureFunctions(this IServiceCollection services, WhatsAppHandlerBuilder handlerBuilder, Action<QueueClientOptions>? configure = null)
+    internal static WhatsAppHandlerBuilder ConfigureAzureFunctions(this IServiceCollection services, WhatsAppHandlerBuilder handlerBuilder, bool validateAccessor, Action<QueueClientOptions>? configure = null)
     {
+        if (validateAccessor && services.AsEnumerable().FirstOrDefault(x => x.ServiceType == typeof(IFunctionContextAccessor)) == null)
+            throw new InvalidOperationException("Function context accessor is missing. Please ensure you call UseWhatsApp() on the functions application builder to register IFunctionContextAccessor.");
+
         // Remove the default handler and runner factories from the core registration
         var handlerFactory = services.FirstOrDefault(x => x.ServiceType == typeof(Func<IWhatsAppHandler>));
         if (handlerFactory != null)

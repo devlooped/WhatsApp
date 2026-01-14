@@ -31,6 +31,7 @@ using System.Threading;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 // Follows implementation of HttpContextAccessor at https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
 
@@ -63,7 +64,7 @@ namespace Microsoft.Extensions.Hosting
         public static IFunctionsWorkerApplicationBuilder UseFunctionContextAccessor(this IFunctionsWorkerApplicationBuilder builder)
         {
             builder.UseMiddleware<FunctionContextAccessorMiddleware>();
-            builder.Services.AddSingleton<IFunctionContextAccessor, FunctionContextAccessor>();
+            builder.Services.TryAddSingleton<IFunctionContextAccessor, FunctionContextAccessor>();
             return builder;
         }
     }
