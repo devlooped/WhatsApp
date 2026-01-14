@@ -23,7 +23,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         Action<WhatsAppOptions>? configure = null)
     {
         var builder = collection.AddWhatsAppCore(handler, lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -41,7 +41,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         Action<WhatsAppOptions>? configure = null)
     {
         var builder = collection.AddWhatsAppCore(handlerFactory, lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -55,7 +55,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         Action<WhatsAppOptions>? configure = null)
     {
         var builder = collection.AddWhatsAppCore(lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -70,7 +70,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         where THandler : class, IWhatsAppHandler
     {
         var builder = collection.AddWhatsAppCore<THandler>(lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -85,7 +85,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         Action<WhatsAppOptions>? configure = null)
     {
         var builder = collection.AddWhatsAppCore(handler, lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -100,7 +100,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         Action<WhatsAppOptions>? configure = null)
     {
         var builder = collection.AddWhatsAppCore(handler, lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -116,7 +116,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         where TService : notnull
     {
         var builder = collection.AddWhatsAppCore(handler, lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -133,7 +133,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         where TService2 : notnull
     {
         var builder = collection.AddWhatsAppCore(handler, lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -151,7 +151,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         where TService3 : notnull
     {
         var builder = collection.AddWhatsAppCore(handler, lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -170,7 +170,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         where TService4 : notnull
     {
         var builder = collection.AddWhatsAppCore(handler, lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -190,7 +190,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         where TService5 : notnull
     {
         var builder = collection.AddWhatsAppCore(handler, lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 
@@ -211,7 +211,7 @@ public static class WhatsAppFunctionsServiceCollectionExtensions
         where TService6 : notnull
     {
         var builder = collection.AddWhatsAppCore(handler, lifetime, configure);
-        collection.ConfigureAzureFunctions(builder);
+        collection.ConfigureAzureFunctions(builder, true);
         return builder;
     }
 }
