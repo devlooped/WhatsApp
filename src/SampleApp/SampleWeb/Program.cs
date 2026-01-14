@@ -1,5 +1,8 @@
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Azure.Messaging.EventGrid;
+using Devlooped;
 using Devlooped.WhatsApp;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +12,23 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddUserSecrets<Program>();
 }
+
+builder.Services.AddSingleton(new JsonSerializerOptions(JsonSerializerDefaults.General)
+{
+    Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+    Converters =
+    {
+        new JsonStringEnumConverter()
+    },
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+    WriteIndented = true
+});
+
+builder.Services.AddSingleton(services => builder.Environment.IsDevelopment() ?
+    CloudStorageAccount.DevelopmentStorageAccount :
+    CloudStorageAccount.TryParse(builder.Configuration["App:Storage"] ?? "", out var storage) ?
+    storage :
+    CloudStorageAccount.Parse(builder.Configuration["AzureWebJobsStorage"]));
 
 // Add WhatsApp services with a simple handler that echoes messages
 var whatsapp = builder.Services
