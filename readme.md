@@ -23,25 +23,23 @@ In short, if you use this project to generate revenue, the [Maintenance Fee is r
 
 To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/devlooped).
 
-<!-- #content -->
 ## Usage
 
 ### Azure Functions
-
+<!-- #usage-functions -->
 ```csharp
 var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
-builder.UseWhatsApp(); // 👈 setup middleware
-
 // add your messages handler here 👇 
-builder.Services.AddWhatsApp<MyWhatsAppHandler>();
+builder.AddWhatsApp<MyWhatsAppHandler>();
 
 builder.Build().Run();
 ```
+<!-- #usage-functions -->
 
 ### ASP.NET Core
-
+<!-- #usage-aspnet -->
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,8 +52,9 @@ app.UseWhatsApp(); // 👈 map webhook endpoints
 
 app.Run();
 ```
-
-The ASP.NET Core integration maps the following endpoints:
+<!-- #usage-aspnet -->
+<!-- #content -->
+Both integrations (Azure Functions and ASP.NET Core) map the following endpoints:
 - `POST /whatsapp` - Main webhook for receiving messages
 - `GET /whatsapp` - Webhook verification endpoint
 - `POST /whatsapp/process` - Direct message processing

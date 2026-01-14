@@ -1,8 +1,5 @@
 <!-- include ../../readme.md#description -->
 ## Usage
-### Azure Functions
-<!-- include ../../readme.md#usage-functions -->
-### ASP.NET Core
 <!-- include ../../readme.md#usage-aspnet -->
 <!-- include ../../readme.md#content -->
 <!-- include https://github.com/devlooped/.github/raw/main/osmf.md -->
