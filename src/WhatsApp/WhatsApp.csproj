@@ -32,7 +32,7 @@
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.76.0" />
 
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="NuGetizer" Version="1.4.6" />
+    <PackageReference Include="NuGetizer" Version="1.4.7" />
     <PackageReference Include="PolySharp" Version="1.15.0" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
     <PackageReference Include="ThisAssembly.AssemblyInfo" Version="2.1.2" PrivateAssets="all" />
