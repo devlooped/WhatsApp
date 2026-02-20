@@ -13,7 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Azure.Messaging.EventGrid" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.1" />
-    <PackageReference Include="System.Linq.AsyncEnumerable" Version="10.0.2" />
+    <PackageReference Include="System.Linq.AsyncEnumerable" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.1.0" />
     <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.1.0" />
     <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.4.0" />
