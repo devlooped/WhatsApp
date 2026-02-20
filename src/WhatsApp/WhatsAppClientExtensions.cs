@@ -260,7 +260,46 @@ public static partial class WhatsAppClientExtensions
         }, cancellation);
 
     /// <summary>
-    /// Replies to a user message with a additional interactive buttons.
+    /// Replies to a user message.
+    /// </summary>
+    /// <param name="client">The WhatsApp client.</param>
+    /// <param name="message">The message to reply to.</param>
+    /// <param name="reply">The text message to respond with.</param>
+    /// <param name="cancellation">The cancellation token.</param>
+    /// <returns>The identifier of the reply message.</returns>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#text-object"/>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, CancellationToken cancellation = default)
+        => ReplyAsync(client, message.Service.Id, message.User.Number, message.Id, reply, cancellation);
+
+    /// <summary>
+    /// Replies to a user message with an additional interactive button.
+    /// </summary>
+    /// <param name="client">The WhatsApp client.</param>
+    /// <param name="message">The message to reply to.</param>
+    /// <param name="reply">The text message to respond with.</param>
+    /// <param name="button">Interactive button for users to reply.</param>
+    /// <param name="cancellation">The cancellation token.</param>
+    /// <returns>The identifier of the reply message.</returns>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button, CancellationToken cancellation = default)
+        => ReplyAsync(client, message.Service.Id, message.User.Number, message.Id, reply, button, cancellation);
+
+    /// <summary>
+    /// Replies to a user message with additional interactive buttons.
+    /// </summary>
+    /// <param name="client">The WhatsApp client.</param>
+    /// <param name="message">The message to reply to.</param>
+    /// <param name="reply">The text message to respond with.</param>
+    /// <param name="button1">Interactive button for a user choice.</param>
+    /// <param name="button2">Interactive button for a user choice.</param>
+    /// <param name="cancellation">The cancellation token.</param>
+    /// <returns>The identifier of the reply message.</returns>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button1, Button button2, CancellationToken cancellation = default)
+        => ReplyAsync(client, message.Service.Id, message.User.Number, message.Id, reply, button1, button2, cancellation);
+
+    /// <summary>
+    /// Replies to a user message with additional interactive buttons.
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="message">The message to reply to.</param>
@@ -272,35 +311,7 @@ public static partial class WhatsAppClientExtensions
     /// <returns>The identifier of the reply message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
     public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button1, Button button2, Button button3, CancellationToken cancellation = default)
-        => client.SendAsync(message.Service.Id, new
-        {
-            messaging_product = "whatsapp",
-            preview_url = false,
-            recipient_type = "individual",
-            to = NormalizeNumber(message.User.Number),
-            type = "interactive",
-            context = new
-            {
-                message_id = message.Id
-            },
-            interactive = new
-            {
-                type = "button",
-                body = new
-                {
-                    text = reply
-                },
-                action = new
-                {
-                    buttons = new[]
-                    {
-                        new { type = "reply", reply = new { id = button1.Id, title = button1.Title } },
-                        new { type = "reply", reply = new { id = button2.Id, title = button2.Title } },
-                        new { type = "reply", reply = new { id = button3.Id, title = button3.Title } },
-                    }
-                }
-            }
-        }, cancellation);
+        => ReplyAsync(client, message.Service.Id, message.User.Number, message.Id, reply, button1, button2, button3, cancellation);
 
     /// <summary>
     /// Replies to the message a user reacted to.
@@ -326,6 +337,129 @@ public static partial class WhatsAppClientExtensions
             text = new
             {
                 body = reply
+            }
+        }, cancellation);
+
+    /// <summary>
+    /// Replies to the message a user reacted to with an additional interactive button.
+    /// </summary>
+    /// <param name="client">The WhatsApp client.</param>
+    /// <param name="message">The reaction from the user.</param>
+    /// <param name="reply">The text message to respond with.</param>
+    /// <param name="button">Interactive button for users to reply.</param>
+    /// <param name="cancellation">The cancellation token.</param>
+    /// <returns>The identifier of the reply message.</returns>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, ReactionMessage message, string reply, Button button, CancellationToken cancellation = default)
+        => client.SendAsync(message.Service.Id, new
+        {
+            messaging_product = "whatsapp",
+            preview_url = false,
+            recipient_type = "individual",
+            to = NormalizeNumber(message.User.Number),
+            type = "interactive",
+            context = new
+            {
+                message_id = message.Context
+            },
+            interactive = new
+            {
+                type = "button",
+                body = new
+                {
+                    text = reply
+                },
+                action = new
+                {
+                    buttons = new[]
+                    {
+                        new { type = "reply", reply = new { id = button.Id, title = button.Title } },
+                    }
+                }
+            }
+        }, cancellation);
+
+    /// <summary>
+    /// Replies to the message a user reacted to with additional interactive buttons.
+    /// </summary>
+    /// <param name="client">The WhatsApp client.</param>
+    /// <param name="message">The reaction from the user.</param>
+    /// <param name="reply">The text message to respond with.</param>
+    /// <param name="button1">Interactive button for a user choice.</param>
+    /// <param name="button2">Interactive button for a user choice.</param>
+    /// <param name="cancellation">The cancellation token.</param>
+    /// <returns>The identifier of the reply message.</returns>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, ReactionMessage message, string reply, Button button1, Button button2, CancellationToken cancellation = default)
+        => client.SendAsync(message.Service.Id, new
+        {
+            messaging_product = "whatsapp",
+            preview_url = false,
+            recipient_type = "individual",
+            to = NormalizeNumber(message.User.Number),
+            type = "interactive",
+            context = new
+            {
+                message_id = message.Context
+            },
+            interactive = new
+            {
+                type = "button",
+                body = new
+                {
+                    text = reply
+                },
+                action = new
+                {
+                    buttons = new[]
+                    {
+                        new { type = "reply", reply = new { id = button1.Id, title = button1.Title } },
+                        new { type = "reply", reply = new { id = button2.Id, title = button2.Title } },
+                    }
+                }
+            }
+        }, cancellation);
+
+    /// <summary>
+    /// Replies to the message a user reacted to with additional interactive buttons.
+    /// </summary>
+    /// <param name="client">The WhatsApp client.</param>
+    /// <param name="message">The reaction from the user.</param>
+    /// <param name="reply">The text message to respond with.</param>
+    /// <param name="button1">Interactive button for a user choice.</param>
+    /// <param name="button2">Interactive button for a user choice.</param>
+    /// <param name="button3">Interactive button for a user choice.</param>
+    /// <param name="cancellation">The cancellation token.</param>
+    /// <returns>The identifier of the reply message.</returns>
+    /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, ReactionMessage message, string reply, Button button1, Button button2, Button button3, CancellationToken cancellation = default)
+        => client.SendAsync(message.Service.Id, new
+        {
+            messaging_product = "whatsapp",
+            preview_url = false,
+            recipient_type = "individual",
+            to = NormalizeNumber(message.User.Number),
+            type = "interactive",
+            context = new
+            {
+                message_id = message.Context
+            },
+            interactive = new
+            {
+                type = "button",
+                body = new
+                {
+                    text = reply
+                },
+                action = new
+                {
+                    buttons = new[]
+                    {
+                        new { type = "reply", reply = new { id = button1.Id, title = button1.Title } },
+                        new { type = "reply", reply = new { id = button2.Id, title = button2.Title } },
+                        new { type = "reply", reply = new { id = button3.Id, title = button3.Title } },
+                    }
+                }
             }
         }, cancellation);
 
