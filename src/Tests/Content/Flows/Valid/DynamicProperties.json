@@ -1,0 +1,44 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "DYNAMIC",
+      "data": {
+        "welcome": {
+          "type": "string"
+        },
+        "can_continue": {
+          "type": "boolean"
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "${data.welcome}"
+          },
+          {
+            "type": "TextInput",
+            "name": "nickname",
+            "label": "Nickname",
+            "helper-text": "${data.welcome}",
+            "init-value": "${form.nickname}"
+          },
+          {
+            "type": "Footer",
+            "label": "Continue",
+            "enabled": "${data.can_continue}",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "nickname": "${form.nickname}",
+                "welcome": "${data.welcome}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

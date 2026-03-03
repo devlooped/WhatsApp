@@ -1,0 +1,22 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "IMG",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Image",
+            "src": "https://example.com/hero.jpg",
+            "width": 320,
+            "height": 180,
+            "scale-type": "cover",
+            "aspect-ratio": 1.78,
+            "alt-text": "Hero image"
+          }
+        ]
+      }
+    }
+  ]
+}

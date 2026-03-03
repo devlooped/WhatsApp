@@ -1,0 +1,27 @@
+{
+  "version": "6.0",
+  "data_api_version": "3.0",
+  "routing_model": {
+    "START": []
+  },
+  "screens": [
+    {
+      "id": "START",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Footer",
+            "label": "Exchange",
+            "on-click-action": {
+              "name": "data_exchange",
+              "payload": {
+                "request": "sync"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

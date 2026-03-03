@@ -1,0 +1,14 @@
+{
+  "version": "v2.1",
+  "screens": [
+    {
+      "id": "START",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          { "type": "TextBody", "text": "Hello" }
+        ]
+      }
+    }
+  ]
+}

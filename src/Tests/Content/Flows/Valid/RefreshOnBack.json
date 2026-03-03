@@ -1,0 +1,18 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "REFRESH",
+      "refresh_on_back": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Refresh when navigating back"
+          }
+        ]
+      }
+    }
+  ]
+}

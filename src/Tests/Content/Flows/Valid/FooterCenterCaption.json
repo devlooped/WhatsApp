@@ -1,0 +1,22 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "CENTER",
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Footer",
+            "label": "Done",
+            "center-caption": "Centered caption",
+            "on-click-action": {
+              "name": "complete"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

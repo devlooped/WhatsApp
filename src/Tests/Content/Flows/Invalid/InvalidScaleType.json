@@ -1,0 +1,18 @@
+{
+  "version": "2.1",
+  "screens": [
+    {
+      "id": "START",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Image",
+            "src": "https://example.com/image.png",
+            "scale-type": "stretch"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "version": "6.0",
+  "screens": [
+    {
+      "id": "OPENURL",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "EmbeddedLink",
+            "text": "Open docs",
+            "on-click-action": {
+              "name": "open_url",
+              "url": "https://example.com/docs"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

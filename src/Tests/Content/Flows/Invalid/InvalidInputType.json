@@ -1,0 +1,19 @@
+{
+  "version": "2.1",
+  "screens": [
+    {
+      "id": "START",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextInput",
+            "name": "website",
+            "label": "Website",
+            "input-type": "url"
+          }
+        ]
+      }
+    }
+  ]
+}

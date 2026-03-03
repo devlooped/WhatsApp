@@ -1,0 +1,29 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "CAL_SINGLE",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "CalendarPicker",
+            "name": "day",
+            "mode": "single",
+            "label": "Select day",
+            "include-days": [
+              "Mon",
+              "Tue",
+              "Wed",
+              "Thu",
+              "Fri"
+            ],
+            "unavailable-dates": [
+              "2025-11-27"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

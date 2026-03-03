@@ -1,0 +1,40 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "LINK",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "EmbeddedLink",
+            "text": "Go next",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "NEXT"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "NEXT",
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Footer",
+            "label": "Complete",
+            "on-click-action": {
+              "name": "complete"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

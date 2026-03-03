@@ -1,0 +1,298 @@
+{
+  "version": "6.3",
+  "data_api_version": "3.0",
+  "data_channel_uri": "https://example.com/flow-data",
+  "routing_model": {
+    "INTRO": [
+      "PROFILE"
+    ],
+    "PROFILE": [
+      "REVIEW"
+    ],
+    "REVIEW": []
+  },
+  "screens": [
+    {
+      "id": "INTRO",
+      "title": "Welcome",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "Onboarding"
+          },
+          {
+            "type": "TextSubheading",
+            "text": "Let's get started"
+          },
+          {
+            "type": "TextBody",
+            "text": "Fill in your details below."
+          },
+          {
+            "type": "TextCaption",
+            "text": "All fields are secure."
+          },
+          {
+            "type": "RichText",
+            "text": [
+              "## Benefits",
+              "- Fast",
+              "- Secure"
+            ]
+          },
+          {
+            "type": "Image",
+            "src": "https://example.com/welcome.png",
+            "scale-type": "cover",
+            "alt-text": "Welcome"
+          },
+          {
+            "type": "Footer",
+            "label": "Start",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "PROFILE"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "PROFILE",
+      "refresh_on_back": true,
+      "sensitive": [
+        "password",
+        "birth_date"
+      ],
+      "data": {
+        "allow_submit": {
+          "type": "boolean"
+        }
+      },
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "profile",
+            "children": [
+              {
+                "type": "TextInput",
+                "name": "name",
+                "label": "Name",
+                "required": true
+              },
+              {
+                "type": "TextInput",
+                "name": "email",
+                "label": "Email",
+                "input-type": "email"
+              },
+              {
+                "type": "TextInput",
+                "name": "password",
+                "label": "Password",
+                "input-type": "password"
+              },
+              {
+                "type": "TextArea",
+                "name": "about",
+                "label": "About you",
+                "max-length": 250
+              },
+              {
+                "type": "Dropdown",
+                "name": "country",
+                "label": "Country",
+                "data-source": [
+                  {
+                    "id": "us",
+                    "title": "USA"
+                  },
+                  {
+                    "id": "uk",
+                    "title": "UK"
+                  }
+                ]
+              },
+              {
+                "type": "RadioButtonsGroup",
+                "name": "tier",
+                "label": "Plan",
+                "data-source": [
+                  {
+                    "id": "free",
+                    "title": "Free"
+                  },
+                  {
+                    "id": "pro",
+                    "title": "Pro"
+                  }
+                ],
+                "media-size": "regular",
+                "description": "Choose one"
+              },
+              {
+                "type": "CheckboxGroup",
+                "name": "interests",
+                "label": "Interests",
+                "data-source": [
+                  {
+                    "id": "tech",
+                    "title": "Tech"
+                  },
+                  {
+                    "id": "sports",
+                    "title": "Sports"
+                  }
+                ]
+              },
+              {
+                "type": "OptIn",
+                "name": "terms",
+                "label": "Accept terms",
+                "required": true,
+                "on-select-action": {
+                  "name": "update_data",
+                  "payload": {
+                    "terms": true
+                  }
+                }
+              },
+              {
+                "type": "DatePicker",
+                "name": "birth_date",
+                "label": "Birth date",
+                "min-date": "1950-01-01",
+                "max-date": "2020-12-31"
+              },
+              {
+                "type": "CalendarPicker",
+                "name": "meeting",
+                "mode": "single",
+                "label": "Meeting day",
+                "include-days": [
+                  "Mon",
+                  "Tue",
+                  "Wed",
+                  "Thu",
+                  "Fri"
+                ]
+              },
+              {
+                "type": "PhotoPicker",
+                "name": "photos",
+                "label": "Photos",
+                "photo-source": "camera_gallery",
+                "max-uploaded-photos": 2
+              },
+              {
+                "type": "DocumentPicker",
+                "name": "docs",
+                "label": "Docs",
+                "allowed-mime-types": [
+                  "application/pdf"
+                ],
+                "max-uploaded-documents": 2
+              }
+            ],
+            "init-values": {
+              "country": "us"
+            },
+            "error-messages": {
+              "name": "Name required"
+            }
+          },
+          {
+            "type": "If",
+            "condition": "${data.allow_submit}",
+            "then": [
+              {
+                "type": "TextBody",
+                "text": "You can proceed"
+              }
+            ],
+            "else": [
+              {
+                "type": "TextCaption",
+                "text": "Complete required fields"
+              }
+            ]
+          },
+          {
+            "type": "EmbeddedLink",
+            "text": "Help center",
+            "on-click-action": {
+              "name": "open_url",
+              "url": "https://example.com/help"
+            }
+          },
+          {
+            "type": "Footer",
+            "label": "Review",
+            "enabled": "${data.allow_submit}",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "REVIEW"
+              },
+              "payload": {
+                "name": "${form.name}",
+                "email": "${form.email}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "REVIEW",
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Review and submit"
+          },
+          {
+            "type": "Footer",
+            "label": "Exchange",
+            "on-click-action": {
+              "name": "data_exchange",
+              "payload": {
+                "step": "review"
+              }
+            }
+          },
+          {
+            "type": "Footer",
+            "label": "Update",
+            "on-click-action": {
+              "name": "update_data",
+              "payload": {
+                "status": "reviewed"
+              }
+            }
+          },
+          {
+            "type": "Footer",
+            "label": "Complete",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "result": "submitted"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

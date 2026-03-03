@@ -1,0 +1,65 @@
+{
+  "version": "5.0",
+  "routing_model": {
+    "START": [
+      "DETAILS"
+    ],
+    "DETAILS": []
+  },
+  "screens": [
+    {
+      "id": "START",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextInput",
+            "name": "first_name",
+            "label": "First name"
+          },
+          {
+            "type": "TextInput",
+            "name": "email",
+            "label": "Email",
+            "input-type": "email"
+          },
+          {
+            "type": "Footer",
+            "label": "Next",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "DETAILS"
+              },
+              "payload": {
+                "first_name": "${form.first_name}",
+                "email": "${form.email}"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "DETAILS",
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Review details"
+          },
+          {
+            "type": "Footer",
+            "label": "Complete",
+            "on-click-action": {
+              "name": "complete"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

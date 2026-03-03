@@ -1,0 +1,23 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "MARKDOWN",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "**Bold** and _italic_ and `code`",
+            "markdown": true
+          },
+          {
+            "type": "TextCaption",
+            "text": "[Link](https://example.com) with ~~strike~~",
+            "markdown": true
+          }
+        ]
+      }
+    }
+  ]
+}

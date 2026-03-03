@@ -1,0 +1,29 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "FOOTER",
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Footer",
+            "label": "Complete",
+            "left-caption": "Left",
+            "right-caption": "Right",
+            "enabled": "${data.can_submit}",
+            "on-click-action": {
+              "name": "complete"
+            }
+          }
+        ]
+      },
+      "data": {
+        "can_submit": {
+          "type": "boolean"
+        }
+      }
+    }
+  ]
+}

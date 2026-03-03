@@ -1,0 +1,40 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "DROP",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Dropdown",
+            "name": "country",
+            "label": "Country",
+            "data-source": [
+              {
+                "id": "us",
+                "title": "USA"
+              },
+              {
+                "id": "ca",
+                "title": "Canada"
+              }
+            ],
+            "on-select-action": {
+              "name": "update_data",
+              "payload": {
+                "country": "${form.country}"
+              }
+            },
+            "on-unselect-action": {
+              "name": "update_data",
+              "payload": {
+                "country": ""
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "FORM",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Form",
+            "name": "profile_form",
+            "init-values": {
+              "full_name": "Ada",
+              "country": "us"
+            },
+            "error-messages": {
+              "full_name": "Name required",
+              "country": "Country required"
+            },
+            "children": [
+              {
+                "type": "TextInput",
+                "name": "full_name",
+                "label": "Full name"
+              },
+              {
+                "type": "Dropdown",
+                "name": "country",
+                "label": "Country",
+                "data-source": [
+                  {
+                    "id": "us",
+                    "title": "USA"
+                  },
+                  {
+                    "id": "mx",
+                    "title": "Mexico"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

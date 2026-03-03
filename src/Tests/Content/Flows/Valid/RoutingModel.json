@@ -1,0 +1,102 @@
+{
+  "version": "5.0",
+  "routing_model": {
+    "START": [
+      "PERSONAL",
+      "BUSINESS"
+    ],
+    "PERSONAL": [
+      "REVIEW"
+    ],
+    "BUSINESS": [
+      "REVIEW"
+    ],
+    "REVIEW": []
+  },
+  "screens": [
+    {
+      "id": "START",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Footer",
+            "label": "Personal",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "PERSONAL"
+              }
+            }
+          },
+          {
+            "type": "Footer",
+            "label": "Business",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "BUSINESS"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "PERSONAL",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Footer",
+            "label": "Review",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "REVIEW"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "BUSINESS",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Footer",
+            "label": "Review",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "REVIEW"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "REVIEW",
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Footer",
+            "label": "Complete",
+            "on-click-action": {
+              "name": "complete"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

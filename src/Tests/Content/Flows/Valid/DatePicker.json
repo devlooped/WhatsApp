@@ -1,0 +1,25 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "DATE",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "DatePicker",
+            "name": "appointment",
+            "label": "Appointment",
+            "min-date": "2025-01-01",
+            "max-date": "2025-12-31",
+            "unavailable-dates": [
+              "2025-07-04",
+              "2025-12-25"
+            ],
+            "helper-text": "Choose a date"
+          }
+        ]
+      }
+    }
+  ]
+}

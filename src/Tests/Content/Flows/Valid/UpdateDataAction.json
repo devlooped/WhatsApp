@@ -1,0 +1,33 @@
+{
+  "version": "6.0",
+  "screens": [
+    {
+      "id": "UPDATE",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Dropdown",
+            "name": "state",
+            "data-source": [
+              {
+                "id": "ca",
+                "title": "California"
+              },
+              {
+                "id": "ny",
+                "title": "New York"
+              }
+            ],
+            "on-select-action": {
+              "name": "update_data",
+              "payload": {
+                "state": "${form.state}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

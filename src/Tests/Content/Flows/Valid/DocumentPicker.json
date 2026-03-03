@@ -1,0 +1,25 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "DOC",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "DocumentPicker",
+            "name": "docs",
+            "label": "Upload documents",
+            "allowed-mime-types": [
+              "application/pdf",
+              "image/png",
+              "text/plain"
+            ],
+            "min-uploaded-documents": 1,
+            "max-uploaded-documents": 2
+          }
+        ]
+      }
+    }
+  ]
+}

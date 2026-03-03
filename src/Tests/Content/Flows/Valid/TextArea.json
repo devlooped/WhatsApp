@@ -1,0 +1,26 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "AREA",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextArea",
+            "name": "notes",
+            "label": "Notes",
+            "label-variant": "floating",
+            "required": true,
+            "max-length": 500,
+            "helper-text": "Up to 500 chars",
+            "enabled": true,
+            "visible": true,
+            "init-value": "Initial notes",
+            "error-message": "Please provide notes"
+          }
+        ]
+      }
+    }
+  ]
+}
