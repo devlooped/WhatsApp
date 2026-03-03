@@ -212,8 +212,7 @@ Allows users to select multiple options from a list.
 
 | Version | Fields |
 |---------|--------|
-| Before v5.0 | `id`, `title`, `description`, `metadata`, `enabled` |
-| v5.0+ | + `image` (base64), `alt-text`, `color` (6-digit hex) |
+| v5.0+ | `id`, `title`, `description`, `metadata`, `enabled`, `image` (base64), `alt-text`, `color` (6-digit hex) |
 | v6.0+ | + `on-select-action`, `on-unselect-action` |
 
 ### Limits
@@ -226,10 +225,7 @@ Allows users to select multiple options from a list.
 | Metadata | 20 chars |
 | Min options | 1 |
 | Max options | 20 |
-| Image (before v6.0) | 300 KB |
-| Image (v6.0+) | 100 KB |
-
-> WEBP images are not supported on iOS versions prior to iOS 14.
+| Image | 100 KB |
 
 ---
 
@@ -334,8 +330,7 @@ A select component for choosing a single option from a list.
 | Min options | 1 |
 | Max options (no images) | 200 |
 | Max options (with images) | 100 |
-| Image (before v6.0) | 300 KB |
-| Image (v6.0+) | 100 KB |
+| Image | 100 KB |
 
 ---
 
@@ -368,8 +363,8 @@ An interactive date selection component.
 | `type` | string | ✅ | `"DatePicker"` |
 | `name` | string | ✅ | Field name |
 | `label` | string | ✅ | Supports dynamic. |
-| `min-date` | string | — | Timestamp (ms) in v<5.0; `YYYY-MM-DD` string in v5.0+. |
-| `max-date` | string | — | Timestamp (ms) in v<5.0; `YYYY-MM-DD` string in v5.0+. |
+| `min-date` | string | — | `YYYY-MM-DD` format. |
+| `max-date` | string | — | `YYYY-MM-DD` format. |
 | `unavailable-dates` | array | — | Dates to disable. |
 | `helper-text` | string | — | Hint text. Supports dynamic. |
 | `enabled` | boolean | — | Default: `true`. |
@@ -378,8 +373,7 @@ An interactive date selection component.
 | `init-value` | string | — | Outside Form only. *(v4.0+)* |
 | `error-message` | string | — | Outside Form only. *(v4.0+)* |
 
-> **Before v5.0:** DatePicker uses UTC timestamps in milliseconds and only works reliably when business and user are in the **same time zone**.  
-> **v5.0+:** DatePicker uses `"YYYY-MM-DD"` strings — timezone-independent.
+> DatePicker uses `"YYYY-MM-DD"` strings — timezone-independent.
 
 ### Limits
 
