@@ -1,0 +1,24 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "CAL_RANGE",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "CalendarPicker",
+            "name": "trip",
+            "mode": "range",
+            "label": {
+              "start-date": "Start date",
+              "end-date": "End date"
+            },
+            "min-days": 2,
+            "max-days": 10
+          }
+        ]
+      }
+    }
+  ]
+}

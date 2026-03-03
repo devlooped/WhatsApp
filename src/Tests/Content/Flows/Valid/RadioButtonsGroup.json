@@ -1,0 +1,36 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "RADIO",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "RadioButtonsGroup",
+            "name": "plan",
+            "label": "Choose plan",
+            "description": "Select one plan",
+            "media-size": "large",
+            "data-source": [
+              {
+                "id": "basic",
+                "title": "Basic"
+              },
+              {
+                "id": "pro",
+                "title": "Pro"
+              }
+            ],
+            "on-select-action": {
+              "name": "update_data",
+              "payload": {
+                "selected": "${form.plan}"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

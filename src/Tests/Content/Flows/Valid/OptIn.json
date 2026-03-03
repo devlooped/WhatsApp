@@ -1,0 +1,47 @@
+{
+  "version": "6.0",
+  "screens": [
+    {
+      "id": "OPT",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "OptIn",
+            "name": "agree",
+            "label": "I agree",
+            "on-click-action": {
+              "name": "navigate",
+              "next": {
+                "type": "screen",
+                "name": "NEXT"
+              }
+            },
+            "on-select-action": {
+              "name": "update_data",
+              "payload": {
+                "agree": true
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "NEXT",
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Footer",
+            "label": "Complete",
+            "on-click-action": {
+              "name": "complete"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

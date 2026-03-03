@@ -1,0 +1,18 @@
+{
+  "version": "2.1",
+  "screens": [
+    {
+      "id": "START",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "Footer",
+            "label": "Open",
+            "on-click-action": { "name": "open_url" }
+          }
+        ]
+      }
+    }
+  ]
+}

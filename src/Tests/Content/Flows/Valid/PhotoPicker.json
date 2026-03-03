@@ -1,0 +1,22 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "PHOTO",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "PhotoPicker",
+            "name": "photos",
+            "label": "Upload photos",
+            "photo-source": "camera",
+            "max-file-size-kb": 4096,
+            "min-uploaded-photos": 1,
+            "max-uploaded-photos": 3
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "version": "6.3",
+  "screens": [
+    {
+      "id": "RICH_FOOTER",
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "RichText",
+            "text": [
+              "Please review terms",
+              "- Item 1",
+              "- Item 2"
+            ]
+          },
+          {
+            "type": "Footer",
+            "label": "Complete",
+            "on-click-action": {
+              "name": "complete"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

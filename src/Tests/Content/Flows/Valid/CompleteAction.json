@@ -1,0 +1,29 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "DONE",
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Submit"
+          },
+          {
+            "type": "Footer",
+            "label": "Complete",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "result": "success",
+                "source": "flow"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

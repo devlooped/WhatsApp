@@ -1,0 +1,22 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "RICH",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "RichText",
+            "text": [
+              "# Rich Text",
+              "| Name | Value |",
+              "| --- | --- |",
+              "| A | 1 |"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

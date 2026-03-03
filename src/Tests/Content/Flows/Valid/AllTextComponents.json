@@ -1,0 +1,29 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "TEXTS",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextHeading",
+            "text": "Heading"
+          },
+          {
+            "type": "TextSubheading",
+            "text": "Subheading"
+          },
+          {
+            "type": "TextBody",
+            "text": "Body"
+          },
+          {
+            "type": "TextCaption",
+            "text": "Caption"
+          }
+        ]
+      }
+    }
+  ]
+}

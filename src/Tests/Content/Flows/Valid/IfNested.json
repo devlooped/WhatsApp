@@ -1,0 +1,64 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "IF_NESTED",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "If",
+            "condition": "${data.level1}",
+            "then": [
+              {
+                "type": "If",
+                "condition": "${data.level2}",
+                "then": [
+                  {
+                    "type": "If",
+                    "condition": "${data.level3}",
+                    "then": [
+                      {
+                        "type": "TextBody",
+                        "text": "All true"
+                      }
+                    ],
+                    "else": [
+                      {
+                        "type": "TextCaption",
+                        "text": "Level 3 false"
+                      }
+                    ]
+                  }
+                ],
+                "else": [
+                  {
+                    "type": "TextCaption",
+                    "text": "Level 2 false"
+                  }
+                ]
+              }
+            ],
+            "else": [
+              {
+                "type": "TextCaption",
+                "text": "Level 1 false"
+              }
+            ]
+          }
+        ]
+      },
+      "data": {
+        "level1": {
+          "type": "boolean"
+        },
+        "level2": {
+          "type": "boolean"
+        },
+        "level3": {
+          "type": "boolean"
+        }
+      }
+    }
+  ]
+}

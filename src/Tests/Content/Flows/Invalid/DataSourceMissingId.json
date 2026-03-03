@@ -1,0 +1,20 @@
+{
+  "version": "2.1",
+  "screens": [
+    {
+      "id": "START",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "CheckboxGroup",
+            "name": "choices",
+            "data-source": [
+              { "title": "Option 1" }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

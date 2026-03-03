@@ -1,0 +1,28 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "START",
+      "terminal": true,
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextBody",
+            "text": "Welcome to minimal flow"
+          },
+          {
+            "type": "Footer",
+            "label": "Complete",
+            "on-click-action": {
+              "name": "complete",
+              "payload": {
+                "status": "done"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

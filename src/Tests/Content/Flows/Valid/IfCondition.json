@@ -1,0 +1,34 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "IF",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "If",
+            "condition": "${data.show_message}",
+            "then": [
+              {
+                "type": "TextBody",
+                "text": "Shown when true"
+              }
+            ],
+            "else": [
+              {
+                "type": "TextCaption",
+                "text": "Shown when false"
+              }
+            ]
+          }
+        ]
+      },
+      "data": {
+        "show_message": {
+          "type": "boolean"
+        }
+      }
+    }
+  ]
+}

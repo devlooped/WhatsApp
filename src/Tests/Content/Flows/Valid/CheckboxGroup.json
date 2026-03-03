@@ -1,0 +1,40 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "CHECKBOX",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "CheckboxGroup",
+            "name": "choices",
+            "label": "Pick options",
+            "data-source": [
+              {
+                "id": "opt_a",
+                "title": "Option A",
+                "image": "https://example.com/a.png",
+                "alt-text": "Option A image",
+                "color": "FFAA00",
+                "metadata": "meta-a",
+                "description": "Description A"
+              },
+              {
+                "id": "opt_b",
+                "title": "Option B",
+                "image": "https://example.com/b.png",
+                "alt-text": "Option B image",
+                "color": "00AACC",
+                "metadata": "meta-b",
+                "description": "Description B"
+              }
+            ],
+            "min-selected-items": 1,
+            "max-selected-items": 2
+          }
+        ]
+      }
+    }
+  ]
+}

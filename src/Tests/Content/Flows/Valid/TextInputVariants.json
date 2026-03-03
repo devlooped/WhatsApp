@@ -1,0 +1,67 @@
+{
+  "version": "5.0",
+  "screens": [
+    {
+      "id": "INPUTS",
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextInput",
+            "name": "txt",
+            "label": "Text",
+            "input-type": "text",
+            "pattern": "^[A-Za-z ]+$",
+            "min-chars": 2,
+            "max-chars": 50
+          },
+          {
+            "type": "TextInput",
+            "name": "num",
+            "label": "Number",
+            "input-type": "number",
+            "pattern": "^[0-9]+$",
+            "min-chars": 1,
+            "max-chars": 6
+          },
+          {
+            "type": "TextInput",
+            "name": "em",
+            "label": "Email",
+            "input-type": "email",
+            "pattern": "^[^@]+@[^@]+\\.[^@]+$",
+            "min-chars": 5,
+            "max-chars": 80
+          },
+          {
+            "type": "TextInput",
+            "name": "pwd",
+            "label": "Password",
+            "input-type": "password",
+            "pattern": "^.{8,}$",
+            "min-chars": 8,
+            "max-chars": 64
+          },
+          {
+            "type": "TextInput",
+            "name": "pin",
+            "label": "Passcode",
+            "input-type": "passcode",
+            "pattern": "^[0-9]{4,6}$",
+            "min-chars": 4,
+            "max-chars": 6
+          },
+          {
+            "type": "TextInput",
+            "name": "phone",
+            "label": "Phone",
+            "input-type": "phone",
+            "pattern": "^\\+?[0-9]{7,15}$",
+            "min-chars": 7,
+            "max-chars": 15
+          }
+        ]
+      }
+    }
+  ]
+}

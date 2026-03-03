@@ -1,0 +1,28 @@
+{
+  "version": "5.1",
+  "screens": [
+    {
+      "id": "SENSITIVE",
+      "sensitive": [
+        "ssn",
+        "dob"
+      ],
+      "layout": {
+        "type": "SingleColumnLayout",
+        "children": [
+          {
+            "type": "TextInput",
+            "name": "ssn",
+            "label": "SSN",
+            "input-type": "passcode"
+          },
+          {
+            "type": "DatePicker",
+            "name": "dob",
+            "label": "Date of birth"
+          }
+        ]
+      }
+    }
+  ]
+}
