@@ -35,20 +35,8 @@ Flow JSON enables businesses to create workflows in WhatsApp using a custom JSON
 |----------|-------------|
 | `routing_model` | Directed graph of screen transitions. Auto-generated if no Data Endpoint is used. **Required** when using a Data Endpoint. |
 | `data_api_version` | Version for Data Endpoint communication. Currently `3.0`. Required when using data-channel capability. |
-| `data_channel_uri` | URL of the Flow Data Endpoint. **Deprecated** in Flow JSON v3.0+ — use `endpoint_uri` via the Flows API instead. |
 
-**Example (v2.1 with endpoint):**
-```json
-{
-  "version": "2.1",
-  "data_api_version": "3.0",
-  "routing_model": { "MY_FIRST_SCREEN": ["MY_SECOND_SCREEN"] },
-  "screens": [...],
-  "data_channel_uri": "https://example.com"
-}
-```
-
-**Example (v3.1+, endpoint URI set via API):**
+**Example (with endpoint, URI set via API):**
 ```json
 {
   "version": "3.1",
@@ -225,7 +213,7 @@ Add `data_api_version`, `routing_model` to the Flow JSON. The endpoint supplies 
 
 ## Forms and Form Properties
 
-The `Form` component is **optional from Flow JSON v4.0+**. Without a Form, use `init-value` and `error-message` directly on individual components.
+The `Form` component is **optional**. Without a Form, use `init-value` and `error-message` directly on individual components.
 
 **HTML equivalent:**
 ```html
@@ -234,21 +222,6 @@ The `Form` component is **optional from Flow JSON v4.0+**. Without a Form, use `
   <input type="text" name="last_name">
 </form>
 ```
-
-**Form component availability:**
-
-| Component | Before v4.0 | v4.0+ |
-|-----------|-------------|-------|
-| TextHeading, TextSubheading, TextCaption, TextBody | ✅ Outside Forms | ✅ Outside Forms |
-| TextInput | ❌ Must be in Form | ✅ Outside Forms |
-| TextArea | ❌ Must be in Form | ✅ Outside Forms |
-| CheckboxGroup | ❌ Must be in Form | ✅ Outside Forms |
-| RadioButtonsGroup | ❌ Must be in Form | ✅ Outside Forms |
-| Footer | ✅ Outside Forms | ✅ Outside Forms |
-| OptIn | ❌ Must be in Form | ✅ Outside Forms |
-| Dropdown | ❌ Must be in Form | ✅ Outside Forms |
-| EmbeddedLink | ✅ Outside Forms | ✅ Outside Forms |
-| DatePicker | ❌ Must be in Form | ✅ Outside Forms |
 
 ### Form Configuration
 
@@ -303,7 +276,7 @@ Reference user input via `"${form.field_name}"` using the component's `name` pro
 
 ---
 
-## Global Dynamic and Form Properties (v4.0+)
+## Global Dynamic and Form Properties
 
 Access data from any screen using:
 

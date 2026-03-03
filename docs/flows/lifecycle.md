@@ -105,7 +105,7 @@ After publishing, you may still update the Flow's metadata or Flow JSON — this
 |-------|-------|--------|-----------|
 | — | Create a new Flow | [Create](./flows-api.md#create) | Draft |
 | Draft | Update the Flow JSON content | [Update JSON](./flows-api.md#update-json) | Draft |
-| Draft | Update the `data_channel_uri` | [Update](./flows-api.md#update) | Draft |
+| Draft | Set the endpoint URI | [Update](./flows-api.md#update) | Draft |
 | Draft | Ready for production | [Publish](./flows-api.md#publish) | Published |
 
 ---
@@ -132,5 +132,5 @@ After publishing, you may still update the Flow's metadata or Flow JSON — this
 |-------|-------|--------|-----------|
 | — | Create a new Flow | Create | Draft |
 | Draft | Update Flow JSON | Update JSON | Draft |
-| Draft | Update `data_channel_uri` | Update | Draft |
+| Draft | Set the endpoint URI | Update | Draft |
 | Draft | No longer needed | Delete | Deleted |

@@ -17,7 +17,6 @@ Errors returned when creating, updating, deleting, or publishing Flows.
 | `100` | Invalid `data_api_version` | Check for typos or upgrade to a supported version. |
 | `100` | Flow with specified ID does not exist | Verify the ID and credentials. |
 | `100` | Only one clone source can be set | Provide either `clone_flow_id` or `clone_template`, not both. |
-| `100` | Specify Endpoint URI in Flow JSON | For Flow JSON < v3.0, use `data_channel_uri` inside Flow JSON instead of `endpoint_uri`. |
 | `100` | Invalid Endpoint URI | Provide a valid URL. |
 | `139000` | Blocked by Integrity | Contact [Support](https://developers.facebook.com/docs/whatsapp/support). |
 | `139001` | Flow can't be updated | Clone the published Flow and republish the clone. |
@@ -161,4 +160,3 @@ Errors returned during Flow JSON development/compilation.
 | `INVALID_NAVIGATE_ACTION_NEXT_SCREEN_NAME` | Same screen navigation (loop) | Cannot navigate to the current screen |
 | `INVALID_NAVIGATE_ACTION_NEXT_SCREEN_NAME` | Unknown screen IDs | Target screen doesn't exist in the Flow |
 | `INVALID_FLOW_JSON` | Flow JSON is not valid | Syntax error in JSON (e.g., trailing comma) |
-| `KEYWORD_ONE_OF` | Component must be inside Form | Before v4.0, interactive components require a Form parent |
