@@ -4,7 +4,7 @@
 [![Version](https://img.shields.io/nuget/vpre/Devlooped.WhatsApp.svg?color=royalblue)](https://www.nuget.org/packages/Devlooped.WhatsApp)
 [![Downloads](https://img.shields.io/nuget/dt/Devlooped.WhatsApp.svg?color=darkmagenta)](https://www.nuget.org/packages/Devlooped.WhatsApp)
 [![EULA](https://img.shields.io/badge/EULA-OSMF-blue?labelColor=black&color=C9FF30)](https://github.com/devlooped/Devlooped.WhatsApp/blob/main/osmfeula.txt)
-[![License](https://img.shields.io/github/license/devlooped/Devlooped.WhatsApp.svg?color=blue)](https://github.com//devlooped/Devlooped.WhatsApp/blob/main/license.txt)
+[![License](https://img.shields.io/github/license/devlooped/WhatsApp.svg?color=blue)](https://github.com//devlooped/Devlooped.WhatsApp/blob/main/license.txt)
 
 
 <!-- #description -->
