@@ -168,7 +168,7 @@
 	sha = cf76df0d6a218c26ebe117339fe3445050b0532a
 	etag = aed711a45e051edfddfcb76d9f8021d30f9817c342cfe8d1cc38f2af37b47aa8
 	weak
-[file "src/WhatsApp/Extensions/FunctionContextAccessor.cs"]
+[file "src/WhatsApp.Functions/Extensions/FunctionContextAccessor.cs"]
 	url = https://github.com/devlooped/catbag/blob/main/Microsoft/Azure/Functions/Worker/FunctionContextAccessor.cs
 	sha = 91ea14062eb6ac6b9dc85d41b90fdbb56c46efbf
 	etag = 3d9f39632c0a896dea7aa0cebcef77a7b668fdedfd8d2c8bf79826fa3a85121f
