@@ -1,4 +1,6 @@
-﻿namespace Devlooped.WhatsApp;
+﻿using Azure;
+
+namespace Devlooped.WhatsApp;
 
 class TestConversationStorage : ConversationStorage
 {
@@ -82,5 +84,15 @@ public class ConversationStorageTests
         Assert.NotNull(updatedMessage?.AdditionalProperties);
         Assert.Equal("Calendar", updatedMessage.AdditionalProperties?["Agent"]);
         Assert.Equal("MessageValue", (string)updatedMessage.AdditionalProperties!["MessageProp"]!);
+    }
+
+    [Fact]
+    public void CheckPatternMatchingNot()
+    {
+        Func<Response, bool> test = r => r is not TypingResponse and not ReactionResponse;
+
+        Assert.False(test(new TypingResponse("", "", "")));
+        Assert.False(test(new ReactionResponse("", "", "", "")));
+        Assert.True(test(new TextResponse("", "", null, "heya")));
     }
 }
