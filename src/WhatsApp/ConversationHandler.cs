@@ -39,7 +39,7 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
             response.ConversationId = conversationId;
 
             // We don't care about typing status or reaction messages for conversation storage
-            if (response is not TypingResponse or ReactionResponse)
+            if (response is not TypingResponse and not ReactionResponse)
                 await storage.SaveAsync(response, cancellation);
 
             yield return response;
