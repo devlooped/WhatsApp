@@ -183,11 +183,11 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, new MessageTemplate("meeting", "es")
         {
             Header = new HeaderComponent(new LocationParameter(37.483307, -122.148981, "Pablo Morales", "1 Hacker Way, Menlo Park, CA 94025")),
-            Body = new BodyComponent(
+            Body = new(
                 [
-                    new TextParameter("kzu", "who"),
-                    new TextParameter("office", "where"),
-                    new TextParameter("15'", "when")
+                    TemplateParameter.Text("kzu", "who"),
+                    TemplateParameter.Text("office", "where"),
+                    TemplateParameter.Text("15'", "when")
                 ])
         });
     }
@@ -200,11 +200,11 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, new MessageTemplate("reminder2", "en")
         {
             Header = new HeaderComponent(new LocationParameter(37.483307, -122.148981, "Pablo Morales", "1 Hacker Way, Menlo Park, CA 94025")),
-            Body = new BodyComponent(
+            Body = new(
             [
-                new TextParameter("🦷", "emoji"),
-                new TextParameter("Dentista", "text"),
-                new TextParameter("3pm", "when")
+                TemplateParameter.Text("🦷", "emoji"),
+                TemplateParameter.Text("Dentista", "text"),
+                TemplateParameter.Text("3pm", "when")
             ])
         });
     }
