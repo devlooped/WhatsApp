@@ -144,7 +144,7 @@ class FlowCryptography : IDisposable
     static byte[] FlipIvBits(byte[] iv)
     {
         var flipped = new byte[iv.Length];
-        for (int i = 0; i < iv.Length; i++)
+        for (var i = 0; i < iv.Length; i++)
             flipped[i] = (byte)~iv[i];
         return flipped;
     }

@@ -1,0 +1,958 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://devlooped.com/schemas/whatsapp/flow-json-v7.3.schema.json",
+  "title": "WhatsApp Flow JSON v7.3",
+  "description": "Schema for WhatsApp Flow JSON documents targeting version 7.3.",
+  "type": "object",
+  "required": ["version", "screens"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "const": "7.3",
+      "description": "Flow JSON version. Must be \"7.3\"."
+    },
+    "screens": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/Screen" },
+      "description": "Array of screen definitions."
+    },
+    "routing_model": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "description": "Optional routing model mapping screen IDs to arrays of target screen IDs."
+    },
+    "data_api_version": {
+      "type": "string",
+      "enum": ["3.0", "4.0"],
+      "description": "Data API version."
+    },
+    "data_channel_uri": {
+      "type": "string",
+      "format": "uri",
+      "description": "Data channel URI (must be https)."
+    }
+  },
+  "$defs": {
+    "DynamicBoolean": {
+      "description": "A boolean value or a dynamic expression string.",
+      "oneOf": [
+        { "type": "boolean" },
+        { "type": "string" }
+      ]
+    },
+    "DynamicInteger": {
+      "description": "An integer value or a dynamic expression string.",
+      "oneOf": [
+        { "type": "integer" },
+        { "type": "string" }
+      ]
+    },
+    "DynamicNumber": {
+      "description": "A number value or a dynamic expression string.",
+      "oneOf": [
+        { "type": "number" },
+        { "type": "string" }
+      ]
+    },
+    "DynamicString": {
+      "description": "A string value, possibly a dynamic expression.",
+      "type": "string"
+    },
+    "DynamicStringOrArray": {
+      "description": "A string, an array of strings, or a dynamic expression string.",
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "string" } }
+      ]
+    },
+    "DynamicDataSource": {
+      "description": "A static array of data-source items or a dynamic expression string.",
+      "oneOf": [
+        {
+          "type": "array",
+          "items": { "$ref": "#/$defs/DataSourceItem" }
+        },
+        { "type": "string" }
+      ]
+    },
+    "DataSourceItem": {
+      "type": "object",
+      "required": ["id", "title"],
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "metadata": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "image": { "type": "string" },
+        "alt-text": { "type": "string" },
+        "color": { "type": "string" },
+        "on-select-action": { "$ref": "#/$defs/Action" },
+        "on-unselect-action": { "$ref": "#/$defs/Action" }
+      },
+      "additionalProperties": false
+    },
+    "Action": {
+      "type": "object",
+      "required": ["name"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["navigate", "complete", "data_exchange", "update_data", "open_url"]
+        },
+        "next": { "$ref": "#/$defs/ActionNext" },
+        "payload": { "type": "object" },
+        "url": { "type": "string", "format": "uri" }
+      },
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": { "name": { "const": "navigate" } },
+            "required": ["name"]
+          },
+          "then": {
+            "required": ["next", "payload"]
+          }
+        },
+        {
+          "if": {
+            "properties": { "name": { "const": "complete" } },
+            "required": ["name"]
+          },
+          "then": {
+            "required": ["payload"],
+            "properties": {
+              "next": false,
+              "url": false
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "name": { "const": "data_exchange" } },
+            "required": ["name"]
+          },
+          "then": {
+            "required": ["payload"],
+            "properties": {
+              "next": false,
+              "url": false
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "name": { "const": "update_data" } },
+            "required": ["name"]
+          },
+          "then": {
+            "required": ["payload"],
+            "properties": {
+              "next": false,
+              "url": false
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": { "name": { "const": "open_url" } },
+            "required": ["name"]
+          },
+          "then": {
+            "required": ["url"],
+            "properties": {
+              "next": false,
+              "payload": false
+            }
+          }
+        }
+      ]
+    },
+    "ActionNext": {
+      "type": "object",
+      "required": ["type", "name"],
+      "properties": {
+        "type": { "const": "screen" },
+        "name": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "Screen": {
+      "type": "object",
+      "required": ["id", "layout"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(?!SUCCESS$)[A-Za-z_][A-Za-z0-9_]*$",
+          "description": "Screen identifier. Must not be \"SUCCESS\"."
+        },
+        "layout": { "$ref": "#/$defs/Layout" },
+        "terminal": { "type": "boolean" },
+        "success": { "type": "boolean" },
+        "title": { "type": "string" },
+        "refresh_on_back": { "type": "boolean" },
+        "data": { "$ref": "#/$defs/ScreenData" },
+        "sensitive": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "ScreenData": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/ScreenDataField"
+      },
+      "description": "Screen data model declarations."
+    },
+    "ScreenDataField": {
+      "type": "object",
+      "required": ["type", "__example__"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["string", "number", "boolean", "object", "array"]
+        },
+        "__example__": {},
+        "items": {
+          "type": "object"
+        }
+      }
+    },
+    "Layout": {
+      "type": "object",
+      "required": ["type", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "const": "SingleColumnLayout"
+        },
+        "children": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/Component" }
+        }
+      }
+    },
+    "Component": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "TextHeading", "TextSubheading", "TextBody", "TextCaption", "RichText",
+            "TextInput", "TextArea", "CheckboxGroup", "RadioButtonsGroup", "Dropdown",
+            "DatePicker", "CalendarPicker", "OptIn", "ChipsSelector", "Footer",
+            "EmbeddedLink", "Image", "ImageCarousel", "NavigationList", "PhotoPicker",
+            "DocumentPicker", "If", "Switch", "Form"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "type": { "const": "TextHeading" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/TextHeading" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "TextSubheading" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/TextSubheading" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "TextBody" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/TextBody" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "TextCaption" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/TextCaption" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "RichText" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/RichText" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "TextInput" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/TextInput" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "TextArea" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/TextArea" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "CheckboxGroup" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/CheckboxGroup" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "RadioButtonsGroup" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/RadioButtonsGroup" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "Dropdown" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/Dropdown" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "DatePicker" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/DatePicker" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "CalendarPicker" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/CalendarPicker" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "OptIn" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/OptIn" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "ChipsSelector" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/ChipsSelector" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "Footer" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/Footer" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "EmbeddedLink" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/EmbeddedLink" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "Image" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/Image" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "ImageCarousel" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/ImageCarousel" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "NavigationList" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/NavigationList" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "PhotoPicker" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/PhotoPicker" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "DocumentPicker" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/DocumentPicker" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "If" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/If" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "Switch" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/Switch" }
+        },
+        {
+          "if": {
+            "properties": { "type": { "const": "Form" } },
+            "required": ["type"]
+          },
+          "then": { "$ref": "#/$defs/Form" }
+        }
+      ]
+    },
+    "TextHeading": {
+      "type": "object",
+      "required": ["type", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "TextHeading" },
+        "text": { "type": "string", "maxLength": 80 },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" }
+      }
+    },
+    "TextSubheading": {
+      "type": "object",
+      "required": ["type", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "TextSubheading" },
+        "text": { "type": "string", "maxLength": 80 },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" }
+      }
+    },
+    "TextBody": {
+      "type": "object",
+      "required": ["type", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "TextBody" },
+        "text": {
+          "$ref": "#/$defs/DynamicStringOrArray",
+          "maxLength": 4096
+        },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "font-weight": {
+          "type": "string",
+          "enum": ["bold", "italic", "bold_italic", "normal"]
+        },
+        "strikethrough": { "type": "boolean" },
+        "markdown": { "type": "boolean" }
+      }
+    },
+    "TextCaption": {
+      "type": "object",
+      "required": ["type", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "TextCaption" },
+        "text": {
+          "$ref": "#/$defs/DynamicStringOrArray",
+          "maxLength": 409
+        },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "font-weight": {
+          "type": "string",
+          "enum": ["bold", "italic", "bold_italic", "normal"]
+        },
+        "strikethrough": { "type": "boolean" },
+        "markdown": { "type": "boolean" }
+      }
+    },
+    "RichText": {
+      "type": "object",
+      "required": ["type", "text"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "RichText" },
+        "text": { "$ref": "#/$defs/DynamicStringOrArray" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" }
+      }
+    },
+    "TextInput": {
+      "type": "object",
+      "required": ["type", "name", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "TextInput" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "input-type": {
+          "type": "string",
+          "enum": ["text", "number", "email", "password", "passcode", "phone"]
+        },
+        "required": { "$ref": "#/$defs/DynamicBoolean" },
+        "min-chars": { "$ref": "#/$defs/DynamicInteger" },
+        "max-chars": { "$ref": "#/$defs/DynamicInteger" },
+        "helper-text": { "$ref": "#/$defs/DynamicString" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "init-value": { "$ref": "#/$defs/DynamicString" },
+        "error-message": { "$ref": "#/$defs/DynamicString" },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "pattern": { "type": "string" },
+        "label-variant": { "const": "large" }
+      }
+    },
+    "TextArea": {
+      "type": "object",
+      "required": ["type", "name", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "TextArea" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "required": { "$ref": "#/$defs/DynamicBoolean" },
+        "max-length": { "$ref": "#/$defs/DynamicInteger" },
+        "helper-text": { "$ref": "#/$defs/DynamicString" },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "init-value": { "$ref": "#/$defs/DynamicString" },
+        "error-message": { "$ref": "#/$defs/DynamicString" },
+        "label-variant": { "const": "large" }
+      }
+    },
+    "CheckboxGroup": {
+      "type": "object",
+      "required": ["type", "name", "label", "data-source"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "CheckboxGroup" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "data-source": { "$ref": "#/$defs/DynamicDataSource" },
+        "min-selected-items": { "$ref": "#/$defs/DynamicInteger" },
+        "max-selected-items": { "$ref": "#/$defs/DynamicInteger" },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "required": { "$ref": "#/$defs/DynamicBoolean" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "on-select-action": { "$ref": "#/$defs/Action" },
+        "on-unselect-action": { "$ref": "#/$defs/Action" },
+        "description": { "$ref": "#/$defs/DynamicString" },
+        "init-value": {},
+        "error-message": { "$ref": "#/$defs/DynamicString" },
+        "media-size": {
+          "type": "string",
+          "enum": ["regular", "large"]
+        }
+      }
+    },
+    "RadioButtonsGroup": {
+      "type": "object",
+      "required": ["type", "name", "label", "data-source"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "RadioButtonsGroup" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "data-source": { "$ref": "#/$defs/DynamicDataSource" },
+        "min-selected-items": { "$ref": "#/$defs/DynamicInteger" },
+        "max-selected-items": { "$ref": "#/$defs/DynamicInteger" },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "required": { "$ref": "#/$defs/DynamicBoolean" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "on-select-action": { "$ref": "#/$defs/Action" },
+        "on-unselect-action": { "$ref": "#/$defs/Action" },
+        "description": { "$ref": "#/$defs/DynamicString" },
+        "init-value": {},
+        "error-message": { "$ref": "#/$defs/DynamicString" },
+        "media-size": {
+          "type": "string",
+          "enum": ["regular", "large"]
+        }
+      }
+    },
+    "Dropdown": {
+      "type": "object",
+      "required": ["type", "name", "label", "data-source"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "Dropdown" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "data-source": { "$ref": "#/$defs/DynamicDataSource" },
+        "required": { "$ref": "#/$defs/DynamicBoolean" },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "on-select-action": { "$ref": "#/$defs/Action" },
+        "on-unselect-action": { "$ref": "#/$defs/Action" },
+        "init-value": {},
+        "error-message": { "$ref": "#/$defs/DynamicString" }
+      }
+    },
+    "DatePicker": {
+      "type": "object",
+      "required": ["type", "name", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "DatePicker" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "min-date": { "$ref": "#/$defs/DynamicString" },
+        "max-date": { "$ref": "#/$defs/DynamicString" },
+        "unavailable-dates": {
+          "oneOf": [
+            { "type": "array", "items": { "type": "string" } },
+            { "type": "string" }
+          ]
+        },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "helper-text": { "$ref": "#/$defs/DynamicString" },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "on-select-action": { "$ref": "#/$defs/Action" },
+        "init-value": {},
+        "error-message": { "$ref": "#/$defs/DynamicString" }
+      }
+    },
+    "CalendarPicker": {
+      "type": "object",
+      "required": ["type", "name", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "CalendarPicker" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "title": { "$ref": "#/$defs/DynamicString" },
+        "description": { "$ref": "#/$defs/DynamicString" },
+        "helper-text": { "$ref": "#/$defs/DynamicString" },
+        "required": { "$ref": "#/$defs/DynamicBoolean" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "mode": {
+          "type": "string",
+          "enum": ["single", "range"]
+        },
+        "min-date": { "$ref": "#/$defs/DynamicString" },
+        "max-date": { "$ref": "#/$defs/DynamicString" },
+        "unavailable-dates": {
+          "oneOf": [
+            { "type": "array", "items": { "type": "string" } },
+            { "type": "string" }
+          ]
+        },
+        "include-days": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+          }
+        },
+        "min-days": { "$ref": "#/$defs/DynamicInteger" },
+        "max-days": { "$ref": "#/$defs/DynamicInteger" },
+        "on-select-action": { "$ref": "#/$defs/Action" },
+        "init-value": {},
+        "error-message": { "$ref": "#/$defs/DynamicString" }
+      }
+    },
+    "OptIn": {
+      "type": "object",
+      "required": ["type", "name", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "OptIn" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "required": { "$ref": "#/$defs/DynamicBoolean" },
+        "on-click-action": { "$ref": "#/$defs/Action" },
+        "on-select-action": { "$ref": "#/$defs/Action" },
+        "on-unselect-action": { "$ref": "#/$defs/Action" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "init-value": {}
+      }
+    },
+    "ChipsSelector": {
+      "type": "object",
+      "required": ["type", "name", "label", "data-source"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "ChipsSelector" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "data-source": { "$ref": "#/$defs/DynamicDataSource" },
+        "min-selected-items": { "$ref": "#/$defs/DynamicInteger" },
+        "max-selected-items": { "$ref": "#/$defs/DynamicInteger" },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "required": { "$ref": "#/$defs/DynamicBoolean" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "description": { "$ref": "#/$defs/DynamicString" },
+        "init-value": {},
+        "error-message": { "$ref": "#/$defs/DynamicString" },
+        "on-select-action": { "$ref": "#/$defs/Action" },
+        "on-unselect-action": { "$ref": "#/$defs/Action" }
+      }
+    },
+    "Footer": {
+      "type": "object",
+      "required": ["type", "label", "on-click-action"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "Footer" },
+        "label": { "type": "string", "maxLength": 35 },
+        "on-click-action": { "$ref": "#/$defs/Action" },
+        "left-caption": { "type": "string", "maxLength": 15 },
+        "center-caption": { "type": "string", "maxLength": 15 },
+        "right-caption": { "type": "string", "maxLength": 15 },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" }
+      },
+      "dependentRequired": {
+        "left-caption": ["right-caption"],
+        "right-caption": ["left-caption"]
+      },
+      "not": {
+        "required": ["center-caption", "left-caption"]
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": ["center-caption", "right-caption"]
+          }
+        }
+      ]
+    },
+    "EmbeddedLink": {
+      "type": "object",
+      "required": ["type", "text", "on-click-action"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "EmbeddedLink" },
+        "text": { "type": "string", "maxLength": 25 },
+        "on-click-action": { "$ref": "#/$defs/Action" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" }
+      }
+    },
+    "Image": {
+      "type": "object",
+      "required": ["type", "src"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "Image" },
+        "src": { "type": "string" },
+        "width": { "$ref": "#/$defs/DynamicInteger" },
+        "height": { "$ref": "#/$defs/DynamicInteger" },
+        "scale-type": {
+          "type": "string",
+          "enum": ["cover", "contain"]
+        },
+        "aspect-ratio": {},
+        "alt-text": { "type": "string" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" }
+      }
+    },
+    "ImageCarousel": {
+      "type": "object",
+      "required": ["type", "images"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "ImageCarousel" },
+        "images": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ImageCarouselItem" }
+        },
+        "aspect-ratio": {
+          "type": "string",
+          "enum": ["4:3", "16:9"]
+        },
+        "scale-type": {
+          "type": "string",
+          "enum": ["contain", "cover"]
+        }
+      }
+    },
+    "ImageCarouselItem": {
+      "type": "object",
+      "required": ["src", "alt-text"],
+      "additionalProperties": false,
+      "properties": {
+        "src": { "type": "string" },
+        "alt-text": { "type": "string" }
+      }
+    },
+    "NavigationList": {
+      "type": "object",
+      "required": ["type", "name", "list-items"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "NavigationList" },
+        "name": { "type": "string" },
+        "list-items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 20,
+          "items": { "$ref": "#/$defs/NavigationListItem" }
+        },
+        "label": { "type": "string" },
+        "description": { "$ref": "#/$defs/DynamicString" },
+        "media-size": {
+          "type": "string",
+          "enum": ["regular", "large"]
+        },
+        "on-click-action": { "$ref": "#/$defs/Action" }
+      }
+    },
+    "NavigationListItem": {
+      "type": "object",
+      "required": ["main-content"],
+      "additionalProperties": false,
+      "properties": {
+        "main-content": { "$ref": "#/$defs/NavigationListMainContent" },
+        "end": { "type": "object" },
+        "start": { "$ref": "#/$defs/NavigationListStart" },
+        "badge": {},
+        "tags": {
+          "type": "array",
+          "items": {}
+        },
+        "on-click-action": { "$ref": "#/$defs/Action" }
+      }
+    },
+    "NavigationListMainContent": {
+      "type": "object",
+      "required": ["title"],
+      "additionalProperties": false,
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "metadata": { "type": "string" }
+      }
+    },
+    "NavigationListStart": {
+      "type": "object",
+      "required": ["image"],
+      "additionalProperties": false,
+      "properties": {
+        "image": { "type": "string" }
+      }
+    },
+    "PhotoPicker": {
+      "type": "object",
+      "required": ["type", "name", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "PhotoPicker" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "description": { "$ref": "#/$defs/DynamicString" },
+        "min-uploaded-photos": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30
+        },
+        "max-uploaded-photos": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30
+        },
+        "photo-source": {
+          "type": "string",
+          "enum": ["camera_gallery", "camera", "gallery"]
+        },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "error-message": { "$ref": "#/$defs/DynamicString" }
+      }
+    },
+    "DocumentPicker": {
+      "type": "object",
+      "required": ["type", "name", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "DocumentPicker" },
+        "name": { "type": "string" },
+        "label": { "type": "string" },
+        "description": { "$ref": "#/$defs/DynamicString" },
+        "min-uploaded-documents": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30
+        },
+        "max-uploaded-documents": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 30
+        },
+        "allowed-mime-types": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "enabled": { "$ref": "#/$defs/DynamicBoolean" },
+        "visible": { "$ref": "#/$defs/DynamicBoolean" },
+        "error-message": { "$ref": "#/$defs/DynamicString" }
+      }
+    },
+    "If": {
+      "type": "object",
+      "required": ["type", "condition", "then"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "If" },
+        "condition": { "type": "string" },
+        "then": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/Component" }
+        },
+        "else": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Component" }
+        }
+      }
+    },
+    "Switch": {
+      "type": "object",
+      "required": ["type", "value", "cases"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "Switch" },
+        "value": { "type": "string" },
+        "cases": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "array",
+            "items": { "$ref": "#/$defs/Component" }
+          }
+        }
+      }
+    },
+    "Form": {
+      "type": "object",
+      "required": ["type", "name", "children"],
+      "additionalProperties": false,
+      "properties": {
+        "type": { "const": "Form" },
+        "name": { "type": "string" },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/Component" }
+        },
+        "init-values": { "type": "object" },
+        "error-messages": { "type": "object" }
+      }
+    }
+  }
+}

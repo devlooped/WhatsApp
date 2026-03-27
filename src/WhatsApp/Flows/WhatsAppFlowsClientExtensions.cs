@@ -1,10 +1,10 @@
-﻿using System.ComponentModel;
-using System.Net.Http.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Web;
-using System.Runtime.CompilerServices;
 
 namespace Devlooped.WhatsApp.Flows;
 
@@ -14,6 +14,38 @@ namespace Devlooped.WhatsApp.Flows;
 [EditorBrowsable(EditorBrowsableState.Never)]
 public static class WhatsAppFlowsClientExtensions
 {
+    /// <summary>
+    /// Validates Flow JSON locally before submission, using JSON Schema 
+    /// and programmatic semantic rules.
+    /// </summary>
+    /// <param name="client">The WhatsApp Flows client (unused, provides API discoverability).</param>
+    /// <param name="flowJson">The Flow JSON content to validate.</param>
+    /// <returns>Validation result with any errors found.</returns>
+    public static FlowValidationResult ValidateFlowJson(this IWhatsAppFlowsClient client, string flowJson)
+        => new FlowJsonValidator().Validate(flowJson);
+
+    /// <summary>
+    /// Updates Flow JSON with optional local pre-validation.
+    /// </summary>
+    /// <param name="client">The WhatsApp Flows client.</param>
+    /// <param name="accountId">The WhatsApp Business Account ID.</param>
+    /// <param name="flowId">The Flow ID.</param>
+    /// <param name="flowJson">The Flow JSON content.</param>
+    /// <param name="validate">Whether to validate locally before submitting. Defaults to <see langword="false"/>.</param>
+    /// <param name="cancellation">The cancellation token.</param>
+    /// <returns>The update flow JSON response.</returns>
+    /// <exception cref="FlowValidationException">Thrown when local validation fails and <paramref name="validate"/> is <see langword="true"/>.</exception>
+    public static async Task<UpdateFlowJsonResponse> UpdateFlowJsonAsync(this IWhatsAppFlowsClient client, string accountId, string flowId, string flowJson, bool validate, CancellationToken cancellation = default)
+    {
+        if (validate)
+        {
+            var result = new FlowJsonValidator().Validate(flowJson);
+            if (!result.IsValid)
+                throw new FlowValidationException(result);
+        }
+
+        return await client.UpdateFlowJsonAsync(accountId, flowId, flowJson, cancellation);
+    }
     /// <summary>
     /// Creates a new Flow.
     /// </summary>
@@ -43,10 +75,10 @@ public static class WhatsAppFlowsClientExtensions
         using var http = client.CreateHttp(accountId);
         var response = await http.PostAsJsonAsync(request.Id, request, FlowsJsonContext.DefaultOptions, cancellation);
         response.EnsureSuccessStatusCode();
-        
+
         var payload = await response.Content.ReadFromJsonAsync<SuccessResponse>(FlowsJsonContext.DefaultOptions, cancellation) ?? throw new InvalidOperationException("Invalid response");
 
-        return payload.Success; 
+        return payload.Success;
     }
 
     /// <summary>
@@ -86,7 +118,7 @@ public static class WhatsAppFlowsClientExtensions
         using var http = client.CreateHttp(accountId);
         var response = await http.GetAsync($"{flowId}?fields=preview.invalidate({invalidate.ToString().ToLowerInvariant()})", cancellation);
         response.EnsureSuccessStatusCode();
-        
+
         var payload = await response.Content.ReadFromJsonAsync<GetFlowPreviewResponse>(FlowsJsonContext.DefaultOptions, cancellation) ?? throw new InvalidOperationException("Invalid response");
 
         return payload.Preview;
@@ -217,7 +249,7 @@ public static class WhatsAppFlowsClientExtensions
         using var http = client.CreateHttp(accountId);
         var response = await http.PostAsync($"{flowId}/deprecate", null, cancellation);
         response.EnsureSuccessStatusCode();
-        
+
         var payload = await response.Content.ReadFromJsonAsync<SuccessResponse>(FlowsJsonContext.DefaultOptions, cancellation) ?? throw new InvalidOperationException("Invalid response");
         return payload.Success;
     }

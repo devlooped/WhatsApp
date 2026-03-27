@@ -21,11 +21,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.9" />
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.3.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.3" />
     <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
 
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
     <PackageReference Include="Devlooped.JQSharp" Version="1.0.1" />
@@ -51,7 +50,7 @@
     <InternalsVisibleTo Include="Devlooped.WhatsApp.Functions" />
     <InternalsVisibleTo Include="Devlooped.WhatsApp.AspNetCore" />
     <EmbeddedResource Include="Message.jq" Kind="Text" />
-    <EmbeddedResource Include="Flows\FlowJson.schema.json" Kind="Text" />
+    <EmbeddedResource Include="Flows\FlowJsonSchema.json" Kind="Text" />
   </ItemGroup>
 
   <ItemGroup>
