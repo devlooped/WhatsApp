@@ -1,61 +1,27 @@
-<!-- include ../../readme.md#cli -->
-<!-- #cli -->
+# {{PROJECT_NAME}}
 
-Provides a command-line interface for the [WhatsApp](https://nuget.org/packages/Devlooped.WhatsApp) 
-library and its backend functions. This allows you to interact with your WhatsApp pipeline without 
-having to set up your WhatsApp for Business app for local development. 
+[![Version](https://img.shields.io/nuget/vpre/{{PACKAGE_ID}}.svg?color=royalblue)](https://www.nuget.org/packages/{{PACKAGE_ID}})
+[![Downloads](https://img.shields.io/nuget/dt/{{PACKAGE_ID}}.svg?color=darkmagenta)](https://www.nuget.org/packages/{{PACKAGE_ID}})
+[![EULA](https://img.shields.io/badge/EULA-OSMF-blue?labelColor=black&color=C9FF30)](https://github.com/devlooped/oss/blob/main/osmfeula.txt)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/devlooped/oss/blob/main/license.txt)
 
-The backend functions are only enabled if the hosting environment is set to `Development` so that 
-in production, the CLI endpoint is not available. Example with text format:
+<!-- include https://github.com/devlooped/.github/raw/main/osmf.md -->
+## Open Source Maintenance Fee
 
-![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/cli-text.png)
+To ensure the long-term sustainability of this project, users of this package who generate 
+revenue must pay an [Open Source Maintenance Fee](https://opensourcemaintenancefee.org). 
+While the source code is freely available under the terms of the [License](license.txt), 
+this package and other aspects of the project require [adherence to the Maintenance Fee](osmfeula.txt).
 
-Yaml format:
+To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/devlooped) at the proper 
+OSMF tier. A single fee covers all of [Devlooped packages](https://www.nuget.org/profiles/Devlooped).
 
-![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/cli-yaml.png)
-
-JSON format:
-
-![](https://raw.githubusercontent.com/devlooped/WhatsApp/main/assets/img/cli-json.png)
-
-The console will automatically remember the last used WhatsApp endpoint, output format and simulated 
-user phone number.
-
-```bash
-Usage: whatsapp [OPTIONS]+
-Options:
-  -u, --url                  WhatsApp functions endpoint
-  -n, --number=VALUE         Your WhatsApp user phone number
-  -j, --json                 Format output as JSON
-  -t, --text                 Format output as text
-  -y, --yaml                 Format output as YAML
-  -?, -h, --help             Display this help.
-  -v, --version              Render tool version and updates.
-```
-
-to render the responses since it provides a more readable format than JSON.
-
-For non-text messages, the CLI falls short since you cannot attach files or images. For these 
-cases, you can continue to send messages via WhatsApp, but get the responses also in the CLI. 
-This works by inspecting messages in the current conversation (so it depends on `UseConversation`) 
-and detecting if any messages were sent by the CLI. If that is the case, non-console messages 
-will generate responses for the CLI as well:
-
-```csharp
-builder.Services.AddWhatsApp<MyWhatsAppHandler>()
-    .UseOpenTelemetry(builder.Environment.ApplicationName)
-    .UseConversation()
-    .UseConsole() // 👈 Enable CLI support for WhatsApp-originated messages
-
-```
-
-> [!IMPORTANT]
-> `UseConsole` will only be added to the pipeline if the hosting environment is set to `Development`, 
-> so it's not necessary to check for that in your code. This is to ensure that the CLI behaviors 
-> never impact production environments.
-
-<!-- #cli -->
-<!-- ../../readme.md#cli -->
+<!-- https://github.com/devlooped/.github/raw/main/osmf.md -->
+<!-- #content -->
+## Usage
+*{{PROJECT_NAME}}*
+<!-- #content -->
+---
 <!-- include https://github.com/devlooped/sponsors/raw/main/footer.md -->
 # Sponsors 
 
