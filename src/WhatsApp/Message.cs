@@ -21,6 +21,10 @@ namespace Devlooped.WhatsApp;
 [JsonDerivedType(typeof(UnsupportedMessage), "unsupported")]
 public abstract partial record Message(string Id, Service Service, User User, long Timestamp) : IMessage
 {
+    static readonly JqExpression expression;
+
+    static Message() => expression = Jq.Parse(ThisAssembly.Resources.Message.Text);
+
     /// <summary>For debugging purposes, exposes the original JSON used to deserialize this instance, if any.</summary>
     internal string? Json => AdditionalProperties?.GetValueOrDefault("__json") as string;
 
@@ -57,10 +61,12 @@ public abstract partial record Message(string Id, Service Service, User User, lo
         // NOTE: if we got a JQ-transformed payload, deserialization MUST work, or we have a bug.
         // So we don't try..catch things in that code path.
 
-        var jq = await JQ.ExecuteAsync(json, ThisAssembly.Resources.Message.Text);
-        if (!string.IsNullOrEmpty(jq))
+        //var jq = await JQ.ExecuteAsync(json, ThisAssembly.Resources.Message.Text);
+        var doc = JsonDocument.Parse(json);
+        var jq = expression.Evaluate(doc.RootElement);
+        if (jq.FirstOrDefault() is { } element)
         {
-            var message = JsonSerializer.Deserialize<Message>(jq, JsonContext.DefaultOptions);
+            var message = JsonSerializer.Deserialize<Message>(element, JsonContext.DefaultOptions);
 
             if (message is not null)
             {
