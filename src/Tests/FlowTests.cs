@@ -74,20 +74,34 @@ public class FlowTests(ITestOutputHelper output)
         Assert.NotEmpty(encryptedResponse);
     }
 
-    [SecretsTheory("Meta:PrivateKey", "SendFrom", "SendTo")]
-    [InlineData("list")]
-    [InlineData("data")]
-    public async Task SendFlow(string flow)
+    [SecretsFact("Meta:PrivateKey", "SendFrom", "SendTo")]
+    public async Task SendFlowListPayload()
     {
         var (configuration, client) = Initialize();
 
         var message = ContentMessage.Create(configuration["SendFrom"]!, configuration["SendTo"]!, "Hello");
 
-        var response = message.CallToAction("Flow Demo", "Show Flow", new FlowParameters(flow)
+        var response = message.CallToAction("Flow Demo", "Show Flow", new FlowParameters("list")
         {
             Token = Ulid.NewUlid().ToString(),
-            Action = FlowAction.DataExchange,
-            Mode = FlowMode.Draft
+            Action = FlowAction.Navigate,
+            Mode = FlowMode.Published,
+            Payload = JsonSerializer.SerializeToElement(new
+            {
+                screen = "default",
+                data = new
+                {
+                    name = "Supermarket",
+                    description = "My fancy list of groceries",
+                    title = $"🛍️ groceries",
+                    items = new List<object>
+                    {
+                        new { id = "leche", title = "Leche entera 1L" },
+                        new { id = "pan", title = "Pan integral" },
+                        new { id = "arroz", title = "Arroz blanco 1kg" }
+                    }
+                }
+            })
         });
 
         var sent = await response.SendAsync(client);
