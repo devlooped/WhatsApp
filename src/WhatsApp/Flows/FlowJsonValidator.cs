@@ -19,7 +19,8 @@ public record FlowValidationResult(bool IsValid, IReadOnlyList<ValidationError> 
 
 /// <summary>
 /// Validates WhatsApp Flow JSON against the v7.3 specification,
-/// combining JSON Schema structural validation with programmatic semantic rules.
+/// combining JSON Schema structural validation with programmatic semantic rules,
+/// and a JQ-based rules engine for declarative cross-reference checks.
 /// </summary>
 public class FlowJsonValidator
 {
@@ -28,6 +29,9 @@ public class FlowJsonValidator
         var schemaJson = ThisAssembly.Resources.Flows.FlowJsonSchema.Text;
         return JsonSchema.FromText(schemaJson);
     });
+
+    static readonly Lazy<JsonRulesEngine> rulesEngine = new(() =>
+        JsonRulesEngine.Load(ThisAssembly.Resources.Flows.FlowRules.Text));
 
     /// <summary>
     /// Validates Flow JSON, returning all structural and semantic errors.
@@ -79,6 +83,18 @@ public class FlowJsonValidator
         // Tier 2: Programmatic semantic validation
         var semanticErrors = FlowJsonRules.Validate(node, json);
         errors.AddRange(semanticErrors);
+
+        // Tier 3: JQ-based declarative rules engine
+        var ruleViolations = rulesEngine.Value.Validate(json);
+        foreach (var violation in ruleViolations)
+        {
+            errors.Add(new ValidationError(
+                violation.ErrorCode,
+                "RULES_VALIDATION",
+                violation.Message,
+                violation.LineStart, violation.LineEnd,
+                violation.ColumnStart, violation.ColumnEnd));
+        }
 
         return new FlowValidationResult(errors.Count == 0, errors);
     }
