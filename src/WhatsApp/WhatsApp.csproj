@@ -15,17 +15,17 @@
 
   <ItemGroup>
     <PackageReference Include="Azure.Messaging.EventGrid" Version="5.0.0" />
-    <PackageReference Include="Devlooped.JQSharp" Version="1.0.0" />
-    <PackageReference Include="JsonSchema.Net" Version="9.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.9" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.9" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.9" />
-    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.3.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.3" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.AI.Abstractions" Version="10.4.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="10.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.5" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.5" />
 
     <PackageReference Include="Azure.Data.Tables" Version="12.11.0" />
     <PackageReference Include="Devlooped.JQSharp" Version="1.0.1" />
@@ -33,13 +33,14 @@
 
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.76.0" />
 
+    <PackageReference Include="JsonSchema.Net" Version="9.1.3" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="NuGetizer" Version="1.4.7" />
     <PackageReference Include="PolySharp" Version="1.15.0" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
     <PackageReference Include="ThisAssembly.AssemblyInfo" Version="2.1.2" PrivateAssets="all" />
     <PackageReference Include="ThisAssembly.Resources" Version="2.1.2" PrivateAssets="all" />
-    <PackageReference Include="Ulid" Version="1.4.1" />
+    <PackageReference Include="Ulid " Version="1.4.1" />
   </ItemGroup>
 
   <ItemGroup>

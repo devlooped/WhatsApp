@@ -1,4 +1,6 @@
+using System.Text.Json;
 using System.Text.Json.Nodes;
+using Json.More;
 
 namespace Devlooped.WhatsApp.Flows;
 
@@ -14,9 +16,10 @@ static partial class FlowJsonRules
     /// <summary>
     /// Runs all programmatic validation rules against the parsed Flow JSON.
     /// </summary>
-    public static List<ValidationError> Validate(JsonNode node, string json)
+    public static List<ValidationError> Validate(JsonElement element, string json)
     {
         var errors = new List<ValidationError>();
+        var node = element.AsNode();
 
         if (node is not JsonObject root)
             return errors;

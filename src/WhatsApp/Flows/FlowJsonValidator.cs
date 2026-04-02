@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Json.More;
 using Json.Schema;
 
 namespace Devlooped.WhatsApp.Flows;
@@ -40,6 +41,15 @@ public class FlowJsonValidator
     static readonly Lazy<JsonRulesEngine> rulesEngine = new(() =>
         JsonRulesEngine.Load(ThisAssembly.Resources.Flows.FlowJsonRules.Text));
 
+    public static FlowJsonValidator Instance { get; } = new();
+
+    /// <summary>
+    /// Validates Flow JSON, returning all structural and semantic errors.
+    /// </summary>
+    /// <param name="json">The Flow JSON string to validate.</param>
+    /// <returns>A validation result containing any errors found.</returns>
+    public FlowValidationResult Validate(JsonElement element) => Validate(element, element.ToJsonString());
+
     /// <summary>
     /// Validates Flow JSON, returning all structural and semantic errors.
     /// </summary>
@@ -49,10 +59,10 @@ public class FlowJsonValidator
     {
         Throw.IfNullOrEmpty(json);
 
-        JsonNode? node;
+        JsonElement? element;
         try
         {
-            node = JsonNode.Parse(json, documentOptions: new JsonDocumentOptions
+            element = JsonElement.Parse(json, new JsonDocumentOptions
             {
                 CommentHandling = JsonCommentHandling.Skip,
                 AllowTrailingCommas = true,
@@ -73,7 +83,7 @@ public class FlowJsonValidator
             ]);
         }
 
-        if (node is null)
+        if (element is null)
         {
             return new FlowValidationResult(false,
             [
@@ -81,14 +91,21 @@ public class FlowJsonValidator
             ]);
         }
 
+        return Validate(element.Value, json);
+    }
+
+    FlowValidationResult Validate(JsonElement element, string json)
+    {
+        Throw.IfNullOrEmpty(json);
+
         var errors = new List<ValidationError>();
 
         // Tier 1: JSON Schema validation
-        var schemaErrors = ValidateSchema(node, json);
+        var schemaErrors = ValidateSchema(element, json);
         errors.AddRange(schemaErrors);
 
         // Tier 2: Programmatic semantic validation
-        var semanticErrors = FlowJsonRules.Validate(node, json);
+        var semanticErrors = FlowJsonRules.Validate(element, json);
         errors.AddRange(semanticErrors);
 
         // Tier 3: JQ-based declarative rules engine
@@ -106,11 +123,11 @@ public class FlowJsonValidator
         return new FlowValidationResult(errors.Count == 0, errors);
     }
 
-    static List<ValidationError> ValidateSchema(JsonNode node, string json)
+    static List<ValidationError> ValidateSchema(JsonElement element, string json)
     {
         var errors = new List<ValidationError>();
 
-        var result = schema.Value.Evaluate(node, new EvaluationOptions
+        var result = schema.Value.Evaluate(element, new EvaluationOptions
         {
             OutputFormat = OutputFormat.List,
             RequireFormatValidation = true,
@@ -123,7 +140,7 @@ public class FlowJsonValidator
         {
             foreach (var detail in result.Details)
             {
-                if (detail.IsValid || !detail.HasErrors)
+                if (detail.IsValid)
                     continue;
 
                 // Skip if-condition evaluation failures from allOf+if/then type discrimination.

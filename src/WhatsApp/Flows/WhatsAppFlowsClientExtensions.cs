@@ -1,10 +1,6 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using System.Net.Http.Json;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Web;
 
 namespace Devlooped.WhatsApp.Flows;
 
@@ -21,7 +17,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="client">The WhatsApp Flows client (unused, provides API discoverability).</param>
     /// <param name="flowJson">The Flow JSON content to validate.</param>
     /// <returns>Validation result with any errors found.</returns>
-    public static FlowValidationResult ValidateFlowJson(this IWhatsAppFlowsClient client, string flowJson)
+    public static FlowValidationResult ValidateFlowJson(this IWhatsAppClient client, string flowJson)
         => new FlowJsonValidator().Validate(flowJson);
 
     /// <summary>
@@ -35,7 +31,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The update flow JSON response.</returns>
     /// <exception cref="FlowValidationException">Thrown when local validation fails and <paramref name="validate"/> is <see langword="true"/>.</exception>
-    public static async Task<UpdateFlowJsonResponse> UpdateFlowJsonAsync(this IWhatsAppFlowsClient client, string accountId, string flowId, string flowJson, bool validate, CancellationToken cancellation = default)
+    public static async Task<UpdateFlowJsonResponse> UpdateFlowJsonAsync(this IWhatsAppClient client, string accountId, string flowId, string flowJson, bool validate, CancellationToken cancellation = default)
     {
         if (validate)
         {
@@ -54,7 +50,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="request">The create flow request.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The create flow response.</returns>
-    public static async Task<CreateFlowResponse> CreateFlowAsync(this IWhatsAppFlowsClient client, string accountId, CreateFlowRequest request, CancellationToken cancellation = default)
+    public static async Task<CreateFlowResponse> CreateFlowAsync(this IWhatsAppClient client, string accountId, CreateFlowRequest request, CancellationToken cancellation = default)
     {
         using var http = client.CreateHttp(accountId);
         var response = await http.PostAsJsonAsync($"{accountId}/flows", request, FlowsJsonContext.DefaultOptions, cancellation);
@@ -70,7 +66,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="request">The update flow request.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The update flow response.</returns>
-    public static async Task<bool> UpdateFlowAsync(this IWhatsAppFlowsClient client, string accountId, UpdateFlowMetadataRequest request, CancellationToken cancellation = default)
+    public static async Task<bool> UpdateFlowAsync(this IWhatsAppClient client, string accountId, UpdateFlowMetadataRequest request, CancellationToken cancellation = default)
     {
         using var http = client.CreateHttp(accountId);
         var response = await http.PostAsJsonAsync(request.Id, request, FlowsJsonContext.DefaultOptions, cancellation);
@@ -90,7 +86,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="flowJson">The Flow JSON content.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The update flow JSON response.</returns>
-    public static async Task<UpdateFlowJsonResponse> UpdateFlowJsonAsync(this IWhatsAppFlowsClient client, string accountId, string flowId, string flowJson, CancellationToken cancellation = default)
+    public static async Task<UpdateFlowJsonResponse> UpdateFlowJsonAsync(this IWhatsAppClient client, string accountId, string flowId, string flowJson, CancellationToken cancellation = default)
     {
         using var http = client.CreateHttp(accountId);
         using var content = new MultipartFormDataContent
@@ -113,7 +109,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="invalidate">Whether to invalidate the current preview.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The flow preview response.</returns>
-    public static async Task<FlowPreview> GetFlowPreviewAsync(this IWhatsAppFlowsClient client, string accountId, string flowId, bool invalidate = false, CancellationToken cancellation = default)
+    public static async Task<FlowPreview> GetFlowPreviewAsync(this IWhatsAppClient client, string accountId, string flowId, bool invalidate = false, CancellationToken cancellation = default)
     {
         using var http = client.CreateHttp(accountId);
         var response = await http.GetAsync($"{flowId}?fields=preview.invalidate({invalidate.ToString().ToLowerInvariant()})", cancellation);
@@ -132,7 +128,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="flowId">The Flow ID.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The delete flow response.</returns>
-    public static async Task<bool> DeleteFlowAsync(this IWhatsAppFlowsClient client, string accountId, string flowId, CancellationToken cancellation = default)
+    public static async Task<bool> DeleteFlowAsync(this IWhatsAppClient client, string accountId, string flowId, CancellationToken cancellation = default)
     {
         using var http = client.CreateHttp(accountId);
         var response = await http.DeleteAsync(flowId, cancellation);
@@ -150,7 +146,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="accountId">The WhatsApp Business Account ID.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>An async enumerable of flows.</returns>
-    public static async IAsyncEnumerable<Flow> GetFlowsAsync(this IWhatsAppFlowsClient client, string accountId, [EnumeratorCancellation] CancellationToken cancellation = default)
+    public static async IAsyncEnumerable<Flow> GetFlowsAsync(this IWhatsAppClient client, string accountId, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         string? after = null;
         using var http = client.CreateHttp(accountId);
@@ -179,7 +175,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="fields">Fields to retrieve.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The get flow response.</returns>
-    public static async Task<FlowDetails> GetFlowAsync(this IWhatsAppFlowsClient client, string accountId, string flowId, string? fields = null, CancellationToken cancellation = default)
+    public static async Task<FlowDetails> GetFlowAsync(this IWhatsAppClient client, string accountId, string flowId, string? fields = null, CancellationToken cancellation = default)
     {
         using var http = client.CreateHttp(accountId);
         var query = string.IsNullOrEmpty(fields) ? "" : $"?fields={Uri.EscapeDataString(fields)}";
@@ -197,7 +193,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="flowId">The Flow ID.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The get flow assets response.</returns>
-    public static async IAsyncEnumerable<FlowAsset> GetFlowAssetsAsync(this IWhatsAppFlowsClient client, string accountId, string flowId, [EnumeratorCancellation] CancellationToken cancellation = default)
+    public static async IAsyncEnumerable<FlowAsset> GetFlowAssetsAsync(this IWhatsAppClient client, string accountId, string flowId, [EnumeratorCancellation] CancellationToken cancellation = default)
     {
         string? after = null;
         using var http = client.CreateHttp(accountId);
@@ -225,7 +221,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="flowId">The Flow ID.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The publish flow response.</returns>
-    public static async Task<bool> PublishFlowAsync(this IWhatsAppFlowsClient client, string accountId, string flowId, CancellationToken cancellation = default)
+    public static async Task<bool> PublishFlowAsync(this IWhatsAppClient client, string accountId, string flowId, CancellationToken cancellation = default)
     {
         using var http = client.CreateHttp(accountId);
         var response = await http.PostAsync($"{flowId}/publish", null, cancellation);
@@ -244,7 +240,7 @@ public static class WhatsAppFlowsClientExtensions
     /// <param name="flowId">The Flow ID.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The deprecate flow response.</returns>
-    public static async Task<bool> DeprecateFlowAsync(this IWhatsAppFlowsClient client, string accountId, string flowId, CancellationToken cancellation = default)
+    public static async Task<bool> DeprecateFlowAsync(this IWhatsAppClient client, string accountId, string flowId, CancellationToken cancellation = default)
     {
         using var http = client.CreateHttp(accountId);
         var response = await http.PostAsync($"{flowId}/deprecate", null, cancellation);
