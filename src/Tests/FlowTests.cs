@@ -2,12 +2,9 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Devlooped.WhatsApp.Flows;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.OData.Client;
-using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Encodings;
@@ -82,7 +79,7 @@ public class FlowTests(ITestOutputHelper output)
     [InlineData("data")]
     public async Task SendFlow(string flow)
     {
-        var (configuration, client, _) = Initialize();
+        var (configuration, client) = Initialize();
 
         var message = ContentMessage.Create(configuration["SendFrom"]!, configuration["SendTo"]!, "Hello");
 
@@ -101,7 +98,7 @@ public class FlowTests(ITestOutputHelper output)
     [SecretsFact("Meta:PrivateKey", "SendFrom", "SendTo")]
     public async Task SendFlowNavigateData()
     {
-        var (configuration, client, _) = Initialize();
+        var (configuration, client) = Initialize();
 
         var message = ContentMessage.Create(configuration["SendFrom"]!, configuration["SendTo"]!, "Hello");
 
@@ -132,7 +129,7 @@ public class FlowTests(ITestOutputHelper output)
     [SecretsFact("Meta:PrivateKey", "SendFrom", "SendTo")]
     public async Task SendBlankNavigate()
     {
-        var (configuration, client, _) = Initialize();
+        var (configuration, client) = Initialize();
 
         var message = ContentMessage.Create(configuration["SendFrom"]!, configuration["SendTo"]!, "Hello");
 
@@ -146,7 +143,7 @@ public class FlowTests(ITestOutputHelper output)
     [SecretsFact("Meta:PrivateKey")]
     public async Task SendFlowWithData()
     {
-        var (configuration, client, _) = Initialize();
+        var (configuration, client) = Initialize();
 
         await client.SendAsync(configuration["SendFrom"]!, new
         {
@@ -332,7 +329,7 @@ public class FlowTests(ITestOutputHelper output)
     [SecretsFact("Meta:Accounts:539235785933710")]
     public async Task ListFlows()
     {
-        var (_, _, client) = Initialize();
+        var (_, client) = Initialize();
         var flows = await client.GetFlowsAsync("539235785933710").ToArrayAsync();
 
         Assert.NotEmpty(flows);
@@ -343,7 +340,7 @@ public class FlowTests(ITestOutputHelper output)
     [InlineData("539235785933710")]
     public async Task FlowCrud(string accountId)
     {
-        var (_, _, client) = Initialize();
+        var (_, client) = Initialize();
 
         var json =
             /* lang=json */
@@ -458,7 +455,7 @@ public class FlowTests(ITestOutputHelper output)
         return oaep.ProcessBlock(data, 0, data.Length);
     }
 
-    (IConfiguration configuration, IWhatsAppClient client, IWhatsAppFlowsClient flows) Initialize()
+    (IConfiguration configuration, IWhatsAppClient client) Initialize()
     {
         var configuration = new ConfigurationBuilder()
             .AddUserSecrets<WhatsAppClientTests>()
@@ -474,9 +471,8 @@ public class FlowTests(ITestOutputHelper output)
             .ValidateDataAnnotations();
 
         collection.AddSingleton<WhatsAppClient>();
-        collection.AddSingleton<WhatsAppFlowsClient>();
 
         var services = collection.BuildServiceProvider();
-        return (configuration, services.GetRequiredService<WhatsAppClient>(), services.GetRequiredService<WhatsAppFlowsClient>());
+        return (configuration, services.GetRequiredService<WhatsAppClient>());
     }
 }

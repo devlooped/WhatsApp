@@ -27,6 +27,6 @@ public interface IWhatsAppClient
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages"/>
     /// <exception cref="ArgumentException">The number <paramref name="numberId"/> is not registered in <see cref="MetaOptions"/>.</exception>
     /// <exception cref="HttpRequestException">The HTTP request failed. Exception message contains the error response body from WhatsApp.</exception>
-    [Description(nameof(Devlooped) + nameof(WhatsApp) + nameof(IWhatsAppClient) + nameof(SendAsync))]
+    [Description(nameof(Devlooped) + "." + nameof(WhatsApp) + "." + nameof(IWhatsAppClient) + "." + nameof(SendAsync))]
     Task<string?> SendAsync(string numberId, object payload, CancellationToken cancellationToken = default);
 }
