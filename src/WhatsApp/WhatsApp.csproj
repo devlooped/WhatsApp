@@ -52,7 +52,7 @@
     <InternalsVisibleTo Include="Devlooped.WhatsApp.AspNetCore" />
     <EmbeddedResource Include="Message.jq" Kind="Text" />
     <EmbeddedResource Include="Flows\FlowJsonSchema.json" Kind="Text" />
-    <EmbeddedResource Include="Flows\FlowRules.json" Kind="Text" />
+    <EmbeddedResource Include="Flows\FlowJsonRules.json" Kind="Text" />
   </ItemGroup>
 
   <ItemGroup>

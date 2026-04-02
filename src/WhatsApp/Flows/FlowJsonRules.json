@@ -1,4 +1,23 @@
 {
+  // WhatsApp Flow JSON — JQ-based declarative validation rules (Tier 3)
+  //
+  // These rules use a Schematron-inspired format:
+  //   "context": JQ expression selecting 0..N nodes from the document to test.
+  //   "test":    JQ expression evaluated on each node; must return true (pass) or false (fail).
+  //              Use `.` for the current context node and `$root` for the full document.
+  //
+  // This file covers cross-reference checks expressible as single JQ predicates.
+  // Structural constraints are in FlowJsonSchema.json (Tier 1 / JSON Schema).
+  //
+  // C# programmatic rules (Tier 2 / FlowJsonRules.cs) handle checks that require recursion
+  // or graph analysis and cannot be expressed in JQ. Those rules are:
+  //   - MAX_NESTING_EXCEEDED        (error code): If component nesting must not exceed 3 levels.
+  //   - MISSING_FOOTER_IN_BRANCH    (error code): If an If component has a Footer in one branch
+  //                                               (then/else), it must have Footer in both.
+  //   - INVALID_ROUTING_MODEL       (error code): routing_model total branches ≤ 10.
+  //   - INVALID_ROUTING_MODEL       (error code): All routing_model screen IDs must exist.
+  //   - INVALID_ROUTING_MODEL       (error code): No self-referencing routes in routing_model.
+  //   - INVALID_ROUTING_MODEL       (error code): No cycles in routing_model (DFS detection).
   "rules": [
     {
       "id": "unique_screen_ids",
