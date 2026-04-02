@@ -6,6 +6,7 @@
     <PackFolder>analyzers/dotnet/cs</PackFolder>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="NuGetizer" Version="1.4.7" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" Pack="false" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" Pack="false" />
     <PackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="all" />
   </ItemGroup>
 
