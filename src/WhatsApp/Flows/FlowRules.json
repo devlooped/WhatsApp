@@ -1,0 +1,130 @@
+{
+  "rules": [
+    {
+      "id": "unique_screen_ids",
+      "context": ".screens",
+      "test": "map(.id) | length == (unique | length)",
+      "message": "Screen IDs must be unique.",
+      "errorCode": "DUPLICATE_SCREEN_ID"
+    },
+    {
+      "id": "missing_terminal_screen",
+      "context": ".",
+      "test": "[.screens[] | select(.terminal == true)] | length > 0",
+      "message": "Flow must have at least one terminal screen.",
+      "errorCode": "MISSING_TERMINAL_SCREEN"
+    },
+    {
+      "id": "navigate_target_exists",
+      "context": ".screens[] | [.. | objects | (.[\"on-click-action\"], .[\"on-select-action\"], .[\"on-unselect-action\"]) | select(. != null and .name == \"navigate\")] | .[]",
+      "test": ".next.name as $target | $root.screens | any(.id == $target)",
+      "message": "Navigate action references a screen that does not exist.",
+      "errorCode": "INVALID_NAVIGATE_ACTION_NEXT_SCREEN_NAME"
+    },
+    {
+      "id": "no_self_navigation",
+      "context": ".screens[] | . as $screen | [.. | objects | (.[\"on-click-action\"], .[\"on-select-action\"], .[\"on-unselect-action\"]) | select(. != null and .name == \"navigate\" and .next.name == $screen.id)] | .[]",
+      "test": "false",
+      "message": "A screen cannot navigate to itself.",
+      "errorCode": "INVALID_NAVIGATE_ACTION_NEXT_SCREEN_NAME"
+    },
+    {
+      "id": "terminal_has_footer",
+      "context": ".screens[] | select(.terminal == true)",
+      "test": "[.. | objects | select(.type == \"Footer\")] | length > 0",
+      "message": "Terminal screens must contain a Footer component.",
+      "errorCode": "MISSING_FOOTER_ON_TERMINAL"
+    },
+    {
+      "id": "complete_only_on_terminal",
+      "context": ".screens[] | select((.terminal // false) == false) | [.. | objects | (.[\"on-click-action\"], .[\"on-select-action\"], .[\"on-unselect-action\"]) | select(. != null and .name == \"complete\")] | .[]",
+      "test": "false",
+      "message": "The 'complete' action is only allowed on terminal screens.",
+      "errorCode": "INVALID_COMPLETE_ACTION"
+    },
+    {
+      "id": "photopicker_documentpicker_exclusive",
+      "context": ".screens[]",
+      "test": "([.. | objects | select(.type == \"PhotoPicker\")] | length > 0) and ([.. | objects | select(.type == \"DocumentPicker\")] | length > 0) | not",
+      "message": "A screen cannot contain both a PhotoPicker and a DocumentPicker.",
+      "errorCode": "INCOMPATIBLE_COMPONENTS"
+    },
+    {
+      "id": "navigationlist_not_on_terminal",
+      "context": ".screens[] | select(.terminal == true)",
+      "test": "[.. | objects | select(.type == \"NavigationList\")] | length == 0",
+      "message": "NavigationList cannot be placed on a terminal screen.",
+      "errorCode": "INVALID_COMPONENT_PLACEMENT"
+    },
+    {
+      "id": "max_components_per_screen",
+      "context": ".screens[]",
+      "test": "[.. | objects | select(has(\"type\"))] | length <= 50",
+      "message": "A screen cannot have more than 50 components.",
+      "errorCode": "MAX_COMPONENTS_EXCEEDED"
+    },
+    {
+      "id": "max_embedded_links",
+      "context": ".screens[]",
+      "test": "[.. | objects | select(.type == \"EmbeddedLink\")] | length <= 2",
+      "message": "A screen cannot have more than 2 EmbeddedLink components.",
+      "errorCode": "MAX_COMPONENT_COUNT_EXCEEDED"
+    },
+    {
+      "id": "max_optins",
+      "context": ".screens[]",
+      "test": "[.. | objects | select(.type == \"OptIn\")] | length <= 5",
+      "message": "A screen cannot have more than 5 OptIn components.",
+      "errorCode": "MAX_COMPONENT_COUNT_EXCEEDED"
+    },
+    {
+      "id": "max_images",
+      "context": ".screens[]",
+      "test": "[.. | objects | select(.type == \"Image\")] | length <= 3",
+      "message": "A screen cannot have more than 3 Image components.",
+      "errorCode": "MAX_COMPONENT_COUNT_EXCEEDED"
+    },
+    {
+      "id": "max_photopickers",
+      "context": ".screens[]",
+      "test": "[.. | objects | select(.type == \"PhotoPicker\")] | length <= 1",
+      "message": "A screen cannot have more than 1 PhotoPicker component.",
+      "errorCode": "MAX_COMPONENT_COUNT_EXCEEDED"
+    },
+    {
+      "id": "max_documentpickers",
+      "context": ".screens[]",
+      "test": "[.. | objects | select(.type == \"DocumentPicker\")] | length <= 1",
+      "message": "A screen cannot have more than 1 DocumentPicker component.",
+      "errorCode": "MAX_COMPONENT_COUNT_EXCEEDED"
+    },
+    {
+      "id": "max_navigationlists",
+      "context": ".screens[]",
+      "test": "[.. | objects | select(.type == \"NavigationList\")] | length <= 2",
+      "message": "A screen cannot have more than 2 NavigationList components.",
+      "errorCode": "MAX_COMPONENT_COUNT_EXCEEDED"
+    },
+    {
+      "id": "max_imagecarousels",
+      "context": ".screens[]",
+      "test": "[.. | objects | select(.type == \"ImageCarousel\")] | length <= 2",
+      "message": "A screen cannot have more than 2 ImageCarousel components.",
+      "errorCode": "MAX_COMPONENT_COUNT_EXCEEDED"
+    },
+    {
+      "id": "max_imagecarousels_flow",
+      "context": ".",
+      "test": "[.screens[] | .. | objects | select(.type == \"ImageCarousel\")] | length <= 3",
+      "message": "A flow cannot have more than 3 ImageCarousel components in total.",
+      "errorCode": "MAX_COMPONENT_COUNT_EXCEEDED"
+    },
+    {
+      "id": "footer_caption_constraints",
+      "context": ".screens[] | [.. | objects | select(.type == \"Footer\")] | .[]",
+      "test": "(has(\"center-caption\") and (has(\"left-caption\") or has(\"right-caption\"))) | not",
+      "message": "Footer center-caption cannot be combined with left-caption or right-caption.",
+      "errorCode": "INCOMPATIBLE_FOOTER_CAPTIONS"
+    }
+  ]
+}
