@@ -1,4 +1,22 @@
 {
+  // WhatsApp Flow JSON v7.3 — JSON Schema (Draft 2020-12)
+  //
+  // Validation is performed in three tiers:
+  //   Tier 1 (this file): JSON Schema structural validation — types, enums, required properties,
+  //                       character limits, patterns, and component-level constraints.
+  //   Tier 2 (FlowJsonRules.cs): Programmatic C# semantic rules — recursive depth tracking,
+  //                       graph cycle detection, and cross-branch symmetry checks that cannot
+  //                       be expressed in JSON Schema or JQ. Rules are:
+  //     - MAX_NESTING_EXCEEDED        : If component nesting must not exceed 3 levels deep.
+  //     - MISSING_FOOTER_IN_BRANCH    : If an If component has a Footer in one branch (then/else),
+  //                                     it must have a Footer in the other branch too.
+  //     - INVALID_ROUTING_MODEL       : routing_model total branches must not exceed 10.
+  //     - INVALID_ROUTING_MODEL       : All screen IDs referenced in routing_model must exist.
+  //     - INVALID_ROUTING_MODEL       : routing_model must not contain self-referencing routes.
+  //     - INVALID_ROUTING_MODEL       : routing_model must not contain cycles (detected via DFS).
+  //   Tier 3 (FlowJsonRules.json): JQ-based declarative rules engine — cross-reference checks
+  //                       (e.g. navigate targets exist, complete only on terminal screens,
+  //                        component count limits per screen, mutual exclusions).
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://devlooped.com/schemas/whatsapp/flow-json-v7.3.schema.json",
   "title": "WhatsApp Flow JSON v7.3",
@@ -18,6 +36,11 @@
       "description": "Array of screen definitions."
     },
     "routing_model": {
+      // Additional rules for routing_model (INVALID_ROUTING_MODEL):
+      //   - Total number of branches across all screen entries must not exceed 10.
+      //   - Every screen ID used as a key or target must correspond to a screen defined in .screens[].
+      //   - No self-referencing routes: a screen must not list itself as a target.
+      //   - No cycles: DFS is used to detect circular paths (A→B→...→A).
       "type": "object",
       "additionalProperties": {
         "type": "array",
@@ -905,6 +928,10 @@
       }
     },
     "If": {
+      // Additional rules for If
+      //   - MAX_NESTING_EXCEEDED     : If components may not be nested more than 3 levels deep.
+      //   - MISSING_FOOTER_IN_BRANCH : If either 'then' or 'else' branch contains a Footer
+      //                                component, the other branch must contain one too.
       "type": "object",
       "required": ["type", "condition", "then"],
       "additionalProperties": false,

@@ -27,11 +27,18 @@ public class FlowJsonValidator
     static readonly Lazy<JsonSchema> schema = new(() =>
     {
         var schemaJson = ThisAssembly.Resources.Flows.FlowJsonSchema.Text;
-        return JsonSchema.FromText(schemaJson);
+        // JsonSchema.FromText does not support JSONC comments, so we pre-strip them
+        // by round-tripping through JsonNode with CommentHandling.Skip.
+        var cleanSchemaJson = JsonNode.Parse(schemaJson, documentOptions: new JsonDocumentOptions
+        {
+            CommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+        })!.ToJsonString();
+        return JsonSchema.FromText(cleanSchemaJson);
     });
 
     static readonly Lazy<JsonRulesEngine> rulesEngine = new(() =>
-        JsonRulesEngine.Load(ThisAssembly.Resources.Flows.FlowRules.Text));
+        JsonRulesEngine.Load(ThisAssembly.Resources.Flows.FlowJsonRules.Text));
 
     /// <summary>
     /// Validates Flow JSON, returning all structural and semantic errors.
