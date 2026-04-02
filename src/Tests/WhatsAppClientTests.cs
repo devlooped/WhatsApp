@@ -197,7 +197,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
     {
         var (configuration, client) = Initialize();
 
-        await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, new MessageTemplate("reminder2", "en")
+        await client.SendTemplateAsync(configuration["SendFrom"]!, configuration["SendTo"]!, new MessageTemplate("reminder", "es")
         {
             Header = new HeaderComponent(new LocationParameter(37.483307, -122.148981, "Pablo Morales", "1 Hacker Way, Menlo Park, CA 94025")),
             Body = new(
