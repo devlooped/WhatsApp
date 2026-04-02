@@ -199,6 +199,11 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
         personTimer.Interval = 1000; // moves event .5'' into the future if already started
     }
 
+    static readonly JqExpression typeExpr = Jq.Parse(
+        """
+        { "$type": (."type" // "typing") } + .
+        """);
+
     async Task RenderAsync(string json)
     {
         if (needsNewline)
@@ -223,12 +228,8 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
             try
             {
                 // Move discriminator to top.
-                json = await JQ.ExecuteAsync(json,
-                    """
-                    { "$type": (."type" // "typing") } + .
-                    """);
-
-                if (JsonSerializer.Deserialize(json, ClientContext.Default.ClientMessage) is { } message &&
+                if (typeExpr.Evaluate(JsonDocument.Parse(json).RootElement).FirstOrDefault() is { } element &&
+                    JsonSerializer.Deserialize(element, ClientContext.Default.ClientMessage) is { } message &&
                     message.ToString() is { } text)
                 {
                     if (message.Type == Client.MessageType.Typing)
