@@ -12,6 +12,7 @@ BenchmarkDotNet.Artifacts
 .idea
 local.settings.json
 .env
+*.local
 
 *.suo
 *.sdf
@@ -26,7 +27,6 @@ local.settings.json
 *.zip
 __azurite*.*
 __*__
-.azurite
 
 .nuget
 *.lock.json
@@ -34,7 +34,6 @@ __*__
 *.nuget.targets
 
 node_modules
-package.json
 _site
 .jekyll-metadata
 .jekyll-cache
