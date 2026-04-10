@@ -114,15 +114,15 @@
 	
 [file "src/Directory.Build.props"]
 	url = https://github.com/devlooped/oss/blob/main/src/Directory.Build.props
-	sha = 0ff8b7b79a82112678326d1dc5543ed890311366
+	sha = fd0367204c8dc88bbbebcbd40d208274659d21cf
 
-	etag = 3ebde0a8630d526b80f15801179116e17a857ff880a4442e7db7b075efa4fd63
+	etag = 6ea4f39af18f00368e5e0e78b1a2ba5b5826bcda473b22ccdc97506fe7331a01
 	weak
 [file "src/Directory.Build.targets"]
 	url = https://github.com/devlooped/oss/blob/main/src/Directory.Build.targets
-	sha = 4339749ef4b8f66def75931df09ef99c149f8421
+	sha = 4b84c540df6f37c30fb38df7947d79871c34f036
 
-	etag = 8b4492765755c030c4c351e058a92f53ab493cab440c1c0ef431f6635c4dae0e
+	etag = 09ce6b3f9521f8eedc44b77e7b7eaf90bf5df36e1ffb7f78ca27658812180977
 	weak
 [file "src/nuget.config"]
 	url = https://github.com/devlooped/oss/blob/main/src/nuget.config
