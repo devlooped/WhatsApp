@@ -1,5 +1,24 @@
 # Changelog
 
+## [v2.0.0-alpha](https://github.com/devlooped/WhatsApp/tree/v2.0.0-alpha) (2026-04-10)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v1.0.0...v2.0.0-alpha)
+
+:sparkles: Implemented enhancements:
+
+- Comprehensive client-side validation of flow json definitions [\#374](https://github.com/devlooped/WhatsApp/pull/374) (@kzu)
+- Switch to JQSharp for vastly improved performance of JQ execution [\#372](https://github.com/devlooped/WhatsApp/pull/372) (@kzu)
+- Introduces schema-based validation for WhatsApp Flow JSON and improves documentation [\#358](https://github.com/devlooped/WhatsApp/pull/358) (@kzu)
+- Add missing overloads for Reply with/without buttons [\#355](https://github.com/devlooped/WhatsApp/pull/355) (@kzu)
+
+:bug: Fixed bugs:
+
+- Fix marching of response type for storage [\#370](https://github.com/devlooped/WhatsApp/pull/370) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Add support for ASP.NET Core hosting [\#340](https://github.com/devlooped/WhatsApp/pull/340) (@Copilot)
+
 ## [v1.0.0](https://github.com/devlooped/WhatsApp/tree/v1.0.0) (2025-12-19)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v1.0.0-rc.15...v1.0.0)
