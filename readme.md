@@ -26,6 +26,8 @@ To pay the Maintenance Fee, [become a Sponsor](https://github.com/sponsors/devlo
 ## Usage
 
 ### Azure Functions
+[![Version](https://img.shields.io/nuget/vpre/Devlooped.WhatsApp.Functions.svg?color=royalblue)](https://www.nuget.org/packages/Devlooped.WhatsApp.Functions)
+[![Downloads](https://img.shields.io/nuget/dt/Devlooped.WhatsApp.Functions.svg?color=darkmagenta)](https://www.nuget.org/packages/Devlooped.WhatsApp.Functions)
 <!-- #usage-functions -->
 ```csharp
 var builder = FunctionsApplication.CreateBuilder(args);
@@ -39,6 +41,8 @@ builder.Build().Run();
 <!-- #usage-functions -->
 
 ### ASP.NET Core
+[![Version](https://img.shields.io/nuget/vpre/Devlooped.WhatsApp.AspNetCore.svg?color=royalblue)](https://www.nuget.org/packages/Devlooped.WhatsApp.AspNetCore)
+[![Downloads](https://img.shields.io/nuget/dt/Devlooped.WhatsApp.AspNetCore.svg?color=darkmagenta)](https://www.nuget.org/packages/Devlooped.WhatsApp.AspNetCore)
 <!-- #usage-aspnet -->
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
@@ -53,6 +57,7 @@ app.UseWhatsApp(); // 👈 map webhook endpoints
 app.Run();
 ```
 <!-- #usage-aspnet -->
+
 <!-- #content -->
 Both integrations (Azure Functions and ASP.NET Core) map the following endpoints:
 - `POST /whatsapp` - Main webhook for receiving messages
