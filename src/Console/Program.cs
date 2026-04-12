@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+using System.CommandLine;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Devlooped.WhatsApp;
@@ -14,39 +15,49 @@ using Spectre.Console;
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
     Console.InputEncoding = Console.OutputEncoding = Encoding.UTF8;
 
-var debug = false;
-var help = false;
-var version = false;
+var urlOption = new Option<string?>("--url", "-u") { Description = "WhatsApp functions endpoint URL" };
+var numberOption = new Option<string?>("--number", "-n") { Description = "Your WhatsApp user phone number" };
+var jsonOption = new Option<bool>("--json", "-j") { Description = "Format output as JSON" };
+var textOption = new Option<bool>("--text", "-t") { Description = "Format output as text" };
+var yamlOption = new Option<bool>("--yaml", "-y") { Description = "Format output as YAML" };
+var debugOption = new Option<bool>("--debug", "-d") { Description = "Launch debugger on start", Hidden = true };
+var versionOption = new Option<bool>("--version", "-v") { Description = "Render tool version and updates." };
 
-var options = new ConsoleOption
-{
-    { "?|h|help", "Display this help.", h => help = h != null },
-    { "d|debug", "Debug the WhatsApp CLI.", d => debug = d != null, true },
-    { "v|version", "Render tool version and updates.", v => version = v != null },
-};
+var rootCommand = new RootCommand("WhatsApp CLI simulator");
+rootCommand.Options.Add(urlOption);
+rootCommand.Options.Add(numberOption);
+rootCommand.Options.Add(jsonOption);
+rootCommand.Options.Add(textOption);
+rootCommand.Options.Add(yamlOption);
+rootCommand.Options.Add(debugOption);
+rootCommand.Options.Add(versionOption);
 
-options.Parse(args);
+var parsed = rootCommand.Parse(args);
 
-if (debug)
+// Let System.CommandLine handle --help and parse errors
+if (args.Any(a => a is "--help" or "-h" or "-?" or "/?") || parsed.Errors.Count > 0)
+    return await parsed.InvokeAsync();
+
+if (parsed.GetValue(debugOption))
     Debugger.Launch();
 
-if (help)
-{
-    AnsiConsole.MarkupLine("Usage: [green]whatsapp[/] [grey][[OPTIONS]]+[/]");
-    AnsiConsole.WriteLine("Options:");
-    options.WriteOptionDescriptions(Console.Out);
-    return 0;
-}
+var url = parsed.GetValue(urlOption);
+var number = parsed.GetValue(numberOption);
+OutputFormat? format = parsed.GetValue(jsonOption) ? OutputFormat.Json
+                     : parsed.GetValue(textOption) ? OutputFormat.Text
+                     : parsed.GetValue(yamlOption) ? OutputFormat.Yaml
+                     : null;
 
-if (options.Endpoint != null || options.Number != null || options.Format != null)
+// Apply to DotNetConfig BEFORE building host (so AddDotNetConfig reads updated values)
+if (url != null || number != null || format != null)
 {
     var config = Config.Build(ConfigLevel.Global);
-    if (options.Endpoint != null)
-        config = config.SetString("whatsapp", "endpoint", options.Endpoint);
-    if (options.Number != null)
-        config = config.SetNumber("whatsapp", "number", (long)options.Number);
-    if (options.Format != null)
-        config = config.SetString("whatsapp", "format", options.Format.ToString()!.ToLowerInvariant());
+    if (url != null)
+        config = config.SetString("whatsapp", "endpoint", url);
+    if (number != null)
+        config = config.SetNumber("whatsapp", "number", long.Parse([.. number.Where(char.IsDigit)]));
+    if (format != null)
+        config = config.SetString("whatsapp", "format", format.ToString()!.ToLowerInvariant());
 }
 
 var host = Host.CreateApplicationBuilder(args);
@@ -66,7 +77,7 @@ host.Services.AddServices();
 
 var app = host.Build();
 
-if (version)
+if (parsed.GetValue(versionOption))
 {
     app.ShowVersion();
     await app.ShowUpdatesAsync();
