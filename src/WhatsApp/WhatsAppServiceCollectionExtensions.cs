@@ -256,7 +256,7 @@ static class WhatsAppServiceCollectionExtensions
                 services.GetRequiredService<IConfiguration>()["AzureWebJobsStorage"]!));
         }
 
-        services.AddOptions<MetaOptions>()
+        builder.Services.AddOptionsWithValidateOnStart<MetaOptions>()
             .BindConfiguration("Meta")
             .ValidateDataAnnotations();
 
