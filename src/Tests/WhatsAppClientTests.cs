@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Nodes;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,7 +12,6 @@ public class WhatsAppClientTests(ITestOutputHelper output)
     {
         var client = WhatsAppClient.Create(MockHttpClientFactory.Default, new MetaOptions
         {
-            VerifyToken = "asdf"
         }, MockLogger.Create<WhatsAppClient>());
 
         var ex = await Assert.ThrowsAsync<ArgumentException>(() => client.SendAsync("1234", new { }));
@@ -20,7 +19,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         Assert.Equal("numberId", ex.ParamName);
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendsMessageAsync()
     {
         var (configuration, client) = Initialize();
@@ -31,7 +30,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         Assert.NotEmpty(id);
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task ReactToSentMessageAsync()
     {
         var (configuration, client) = Initialize();
@@ -44,7 +43,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         await client.ReactAsync(configuration["SendFrom"]!, configuration["SendTo"]!, id, "🙏");
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task ReplyToSentMessageAsync()
     {
         var (configuration, client) = Initialize();
@@ -68,7 +67,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         Assert.NotEqual(id, reply);
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendsButtonAsync()
     {
         var (configuration, client) = Initialize();
@@ -100,7 +99,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         });
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendsListAsync()
     {
         var (configuration, client) = Initialize();
@@ -160,7 +159,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         });
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendsTemplateAsync()
     {
         var (configuration, client) = Initialize();
@@ -175,7 +174,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         });
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendsTemplateMeetingAsync()
     {
         var (configuration, client) = Initialize();
@@ -192,7 +191,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         });
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendsTemplate2Async()
     {
         var (configuration, client) = Initialize();
@@ -209,7 +208,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         });
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendsTemplateUrlAsync()
     {
         var (configuration, client) = Initialize();
@@ -229,7 +228,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         });
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendsTemplateButtonsAsync()
     {
         var (configuration, client) = Initialize();
@@ -249,7 +248,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         });
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendsCallToActionAsync()
     {
         var (configuration, client) = Initialize();
@@ -282,7 +281,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         });
     }
 
-    [SecretsFact("Meta:VerifyToken", "MediaTo", Skip = "Media attachments are deleted if user deletes them, so skip.")]
+    [SecretsFact("MediaTo", Skip = "Media attachments are deleted if user deletes them, so skip.")]
     public async Task ResolvesMediaIdFromHttpClient()
     {
         var (configuration, client) = Initialize();
@@ -297,7 +296,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         await stream.CopyToAsync(fs);
     }
 
-    [SecretsFact("Meta:VerifyToken", "MediaTo", Skip = "Media are transient and therefore this test requires an active message present")]
+    [SecretsFact("MediaTo", Skip = "Media are transient and therefore this test requires an active message present")]
     public async Task ResolveMediaThrowsForNonExistentId()
     {
         var (configuration, client) = Initialize();
@@ -309,7 +308,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         Assert.Equal(33, ex.Subcode);
     }
 
-    [SecretsFact("Meta:VerifyToken", "MediaTo")]
+    [SecretsFact("MediaTo")]
     public async Task ResolveMediaThrowsForNonMediaMessage()
     {
         var (configuration, client) = Initialize();
@@ -319,7 +318,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
                 new UnknownContent(new System.Text.Json.JsonElement()))));
     }
 
-    [SecretsFact("Meta:VerifyToken", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendsTemplateWithMessageTemplateObjectAsync()
     {
         var (configuration, client) = Initialize();

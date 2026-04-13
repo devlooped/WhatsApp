@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Devlooped.WhatsApp.Flows;
@@ -74,7 +74,7 @@ public class FlowTests(ITestOutputHelper output)
         Assert.NotEmpty(encryptedResponse);
     }
 
-    [SecretsFact("Meta:PrivateKey", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendFlowListPayload()
     {
         var (configuration, client) = Initialize();
@@ -109,7 +109,7 @@ public class FlowTests(ITestOutputHelper output)
         Assert.NotEqual(response, sent);
     }
 
-    [SecretsFact("Meta:PrivateKey", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendFlowNavigateData()
     {
         var (configuration, client) = Initialize();
@@ -140,7 +140,7 @@ public class FlowTests(ITestOutputHelper output)
         Assert.NotEqual(response, sent);
     }
 
-    [SecretsFact("Meta:PrivateKey", "SendFrom", "SendTo")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendBlankNavigate()
     {
         var (configuration, client) = Initialize();
@@ -154,7 +154,7 @@ public class FlowTests(ITestOutputHelper output)
         Assert.NotEqual(response, sent);
     }
 
-    [SecretsFact("Meta:PrivateKey")]
+    [SecretsFact("SendFrom", "SendTo")]
     public async Task SendFlowWithData()
     {
         var (configuration, client) = Initialize();
@@ -340,7 +340,7 @@ public class FlowTests(ITestOutputHelper output)
         Assert.Equal("bar", message.Data.GetProperty("foo").GetString());
     }
 
-    [SecretsFact("Meta:Accounts:539235785933710")]
+    [SecretsFact("Meta:Accounts:539235785933710:AccessToken")]
     public async Task ListFlows()
     {
         var (_, client) = Initialize();
@@ -350,7 +350,7 @@ public class FlowTests(ITestOutputHelper output)
     }
 
 
-    [SecretsTheory("Meta:Accounts:539235785933710")]
+    [SecretsTheory("Meta:Accounts:539235785933710:AccessToken")]
     [InlineData("539235785933710")]
     public async Task FlowCrud(string accountId)
     {

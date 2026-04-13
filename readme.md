@@ -257,8 +257,12 @@ as follows:
 ```csharp
 builder.Services.Configure<MetaOptions>(options =>
 {
-    options.VerifyToken = "my-webhook-1234";
-    options.Numbers["12345678"] = "asff=";
+    options.Accounts["123456"] = new AccountOptions
+    {
+        AccessToken = "asff=",
+        VerifyToken = "my-webhook-1234",
+        Numbers = ["12345678", "98765432"]
+    };
 });
 ```
 
@@ -267,18 +271,51 @@ Via configuration:
 ```json
 {
   "Meta": {
-    "VerifyToken": "my-webhook-1234",
-    "Numbers": {
-      "12345678": "asff="
+    "Accounts": {
+      "123456": {
+        "AccessToken": "asff=",
+        "VerifyToken": "my-webhook-1234",
+        "Numbers": ["12345678", "98765432"]
+      }
     }
   }
 }
 ```
 
-The `Numbers` dictionary is a map of WhatsApp phone identifiers and the 
-corresponding access token for it. To get a permanent access token for 
-use, you'd need to create a [system user](https://business.facebook.com/latest/settings/system_users) 
-with full control permissions to the WhatsApp Business API (app).
+The `Accounts` dictionary maps WhatsApp Business Account (WABA) IDs to their settings. 
+Each account has:
+- `AccessToken` — the access token used for both messaging and Flows management API calls. 
+  To get a permanent access token, create a [system user](https://business.facebook.com/latest/settings/system_users) 
+  with full control permissions to the WhatsApp Business API (app).
+- `VerifyToken` — an arbitrary string you choose when registering the webhook in the 
+  [Meta App Dashboard](https://developers.facebook.com/apps/) under WhatsApp > Configuration.
+- `Numbers` — list of phone number IDs belonging to this account. All share the account's access token.
+- `PrivateKey` *(optional)* — RSA private key (PEM format) for decrypting WhatsApp Flows data exchange requests.
+
+Multiple accounts can be configured simultaneously, enabling a single deployment to serve 
+several WhatsApp Business Accounts:
+
+```json
+{
+  "Meta": {
+    "Accounts": {
+      "111111": {
+        "AccessToken": "token-a",
+        "VerifyToken": "verify-a",
+        "Numbers": ["10000001"]
+      },
+      "222222": {
+        "AccessToken": "token-b",
+        "VerifyToken": "verify-b",
+        "Numbers": ["20000001", "20000002"]
+      }
+    }
+  }
+}
+```
+
+When using multiple accounts, each account registers its own webhook at 
+`/whatsapp/{accountId}` in addition to the default `/whatsapp` endpoint.
 
 You can also configure how the WhatsApp webhook and processing pipeline behaves by passing 
 in an additional delegate to the `AddWhatsApp` method via the `configure` parameter:

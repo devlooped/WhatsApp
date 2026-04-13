@@ -40,6 +40,13 @@ class AzureFunctionsWebhook(
 
     [Function("whatsapp_message")]
     public async Task<IActionResult> Message([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp")] HttpRequest req)
+        => await MessageCoreAsync(req, accountId: null);
+
+    [Function("whatsapp_message_account")]
+    public async Task<IActionResult> MessageWithAccount([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "whatsapp/{accountId}")] HttpRequest req, string accountId)
+        => await MessageCoreAsync(req, accountId);
+
+    async Task<IActionResult> MessageCoreAsync(HttpRequest req, string? accountId)
     {
         using var reader = new StreamReader(req.Body, Encoding.UTF8);
         var json = await reader.ReadToEndAsync();
@@ -51,7 +58,7 @@ class AzureFunctionsWebhook(
         // Detect encrypted flow request setup for flows endpoints
         if (JsonSerializer.Deserialize<EncryptedFlowData>(json) is { Data.Length: > 0, IV.Length: > 0, Key.Length: > 0 } encrypted)
         {
-            return await ProcessFlowDataAsync(json, encrypted);
+            return await ProcessFlowDataAsync(json, encrypted, accountId);
         }
 
         if (await WhatsApp.Message.DeserializeAsync(json) is { } message)
@@ -75,14 +82,37 @@ class AzureFunctionsWebhook(
     }
 
 
-    async Task<IActionResult> ProcessFlowDataAsync(string json, EncryptedFlowData encrypted)
+    async Task<IActionResult> ProcessFlowDataAsync(string json, EncryptedFlowData encrypted, string? accountId)
     {
-        if (string.IsNullOrEmpty(metaOptions.Value.PrivateKey))
-            return new StatusCodeResult(421);
+        FlowCryptography? crypto = null;
+        FlowData? data = null;
 
-        var crypto = new FlowCryptography(metaOptions.Value.PrivateKey);
-        if (!crypto.TryDecrypt(encrypted, out var data) || data is null)
-            return new StatusCodeResult(421);
+        if (accountId is not null)
+        {
+            var key = metaOptions.Value.GetPrivateKey(accountId);
+            if (key is null)
+                return new StatusCodeResult(421);
+
+            crypto = new FlowCryptography(key);
+            if (!crypto.TryDecrypt(encrypted, out data) || data is null)
+                return new StatusCodeResult(421);
+        }
+        else
+        {
+            foreach (var key in metaOptions.Value.GetPrivateKeys())
+            {
+                var candidate = new FlowCryptography(key);
+                if (candidate.TryDecrypt(encrypted, out data) && data is not null)
+                {
+                    crypto = candidate;
+                    break;
+                }
+                candidate.Dispose();
+            }
+
+            if (crypto is null || data is null)
+                return new StatusCodeResult(421);
+        }
 
         if (data.Data.TryGetProperty("action", out var action) &&
             action.ValueKind == JsonValueKind.String &&
@@ -148,19 +178,33 @@ class AzureFunctionsWebhook(
 
     [Function("whatsapp_register")]
     public IActionResult Register([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "whatsapp")] HttpRequest req)
+        => RegisterCore(req);
+
+    [Function("whatsapp_register_account")]
+    public IActionResult RegisterWithAccount([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "whatsapp/{accountId}")] HttpRequest req, string accountId)
+        => RegisterCore(req, accountId);
+
+    IActionResult RegisterCore(HttpRequest req, string? accountId = null)
     {
         StringValues token = default;
         if (req.Query.TryGetValue("hub.mode", out var mode) && mode == "subscribe" &&
-            req.Query.TryGetValue("hub.verify_token", out token) && token == metaOptions.Value.VerifyToken &&
+            req.Query.TryGetValue("hub.verify_token", out token) &&
+            token.ToString() is { Length: > 0 } receivedToken &&
             req.Query.TryGetValue("hub.challenge", out var values) &&
             values.ToString() is { } challenge)
         {
-            logger.LogInformation("Registering webhook callback.");
+            var valid = accountId is not null
+                ? metaOptions.Value.GetVerifyToken(accountId) == receivedToken
+                : metaOptions.Value.FindAccountByVerifyToken(receivedToken) is not null;
 
-            return new OkObjectResult(challenge);
+            if (valid)
+            {
+                logger.LogInformation("Registering webhook callback.");
+                return new OkObjectResult(challenge);
+            }
         }
 
-        logger.LogError("Received token {ACTUAL} but expected {EXPECTED}.", token, metaOptions.Value.VerifyToken);
-        return new BadRequestObjectResult("Received verification token doesn't match the configured one.");
+        logger.LogError("Received token {ACTUAL} but no matching account verify token found.", token.ToString());
+        return new BadRequestObjectResult("Received verification token doesn't match any configured account.");
     }
 }

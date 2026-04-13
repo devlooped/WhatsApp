@@ -31,9 +31,9 @@ public class IntegrationTests : IDisposable
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>()
             {
-                { "Meta:VerifyToken", "test-challenge" },
-                { "Meta:Accounts:1234567890", "test-access-token" },
-                { "Meta:Numbers:1234567890", "test-access-token" }
+                { "Meta:Accounts:1234567890:VerifyToken", "test-challenge" },
+                { "Meta:Accounts:1234567890:AccessToken", "test-access-token" },
+                { "Meta:Accounts:1234567890:Numbers:0", "1234567890" }
             })
             .Build();
 
