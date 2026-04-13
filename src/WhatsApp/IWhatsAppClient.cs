@@ -12,7 +12,7 @@ public interface IWhatsAppClient
     /// base address of <c>https://graph.facebook.com/{api_version}/</c> as 
     /// configured for it via <see cref="MetaOptions.ApiVersion"/>.
     /// </summary>
-    /// <param name="numberId">The configured number ID to use for authentication via <see cref="MetaOptions.Numbers"/>.</param>
+    /// <param name="numberId">The configured number ID to use for authentication via <see cref="AccountOptions.Numbers"/>.</param>
     /// <returns>An HTTP client that can safely be disposed after usage.</returns>
     /// <exception cref="ArgumentException">The number <paramref name="numberId"/> is not registered in <see cref="MetaOptions"/>.</exception>
     HttpClient CreateHttp(string numberId);
@@ -20,7 +20,7 @@ public interface IWhatsAppClient
     /// <summary>
     /// Sends a raw payload object that must match the WhatsApp API.
     /// </summary>
-    /// <param name="numberId">The phone identifier to send the message from, which must be configured via <see cref="MetaOptions.Numbers"/>.</param>
+    /// <param name="numberId">The phone identifier to send the message from, which must be configured via <see cref="AccountOptions.Numbers"/>.</param>
     /// <param name="payload">The message payload.</param>>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>The message id that was sent/reacted/marked, if any.</returns>

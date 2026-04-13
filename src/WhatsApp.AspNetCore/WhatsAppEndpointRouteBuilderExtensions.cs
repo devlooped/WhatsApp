@@ -48,9 +48,11 @@ public static class WhatsAppEndpointRouteBuilderExtensions
 
         // POST /whatsapp - Main webhook endpoint for receiving messages
         endpoints.MapPost("/whatsapp", HandleMessageAsync);
+        endpoints.MapPost("/whatsapp/{accountId}", HandleMessageAsync);
 
         // GET /whatsapp - Webhook verification endpoint
         endpoints.MapGet("/whatsapp", HandleRegisterAsync);
+        endpoints.MapGet("/whatsapp/{accountId}", HandleRegisterAsync);
 
         // POST /whatsapp/process - Direct message processing endpoint
         endpoints.MapPost("/whatsapp/process", HandleProcessAsync);
@@ -79,7 +81,8 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         IOptions<WhatsAppOptions> whatsappOptions,
         IHostEnvironment hosting,
         Func<IWhatsAppHandler> handlerFactory,
-        ILogger<WhatsAppEndpoints> logger)
+        ILogger<WhatsAppEndpoints> logger,
+        string? accountId = null)
     {
         var json = body.GetRawText();
 
@@ -90,7 +93,7 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         // Detect encrypted flow request setup for flows endpoints
         if (JsonSerializer.Deserialize<EncryptedFlowData>(json) is { Data.Length: > 0, IV.Length: > 0, Key.Length: > 0 } encrypted)
         {
-            return await ProcessFlowDataAsync(json, encrypted, metaOptions.Value, handlerFactory(), logger);
+            return await ProcessFlowDataAsync(json, encrypted, metaOptions.Value, handlerFactory(), logger, accountId);
         }
 
         if (await Message.DeserializeAsync(json) is { } message)
@@ -113,14 +116,37 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         return Results.Ok();
     }
 
-    static async Task<IResult> ProcessFlowDataAsync(string json, EncryptedFlowData encrypted, MetaOptions metaOptions, IWhatsAppHandler handler, ILogger logger)
+    static async Task<IResult> ProcessFlowDataAsync(string json, EncryptedFlowData encrypted, MetaOptions metaOptions, IWhatsAppHandler handler, ILogger logger, string? accountId = null)
     {
-        if (string.IsNullOrEmpty(metaOptions.PrivateKey))
-            return Results.StatusCode(421);
+        FlowCryptography? crypto = null;
+        FlowData? data = null;
 
-        var crypto = new FlowCryptography(metaOptions.PrivateKey);
-        if (!crypto.TryDecrypt(encrypted, out var data) || data is null)
-            return Results.StatusCode(421);
+        if (accountId is not null)
+        {
+            var key = metaOptions.GetPrivateKey(accountId);
+            if (key is null)
+                return Results.StatusCode(421);
+
+            crypto = new FlowCryptography(key);
+            if (!crypto.TryDecrypt(encrypted, out data) || data is null)
+                return Results.StatusCode(421);
+        }
+        else
+        {
+            foreach (var key in metaOptions.GetPrivateKeys())
+            {
+                var candidate = new FlowCryptography(key);
+                if (candidate.TryDecrypt(encrypted, out data) && data is not null)
+                {
+                    crypto = candidate;
+                    break;
+                }
+                candidate.Dispose();
+            }
+
+            if (crypto is null || data is null)
+                return Results.StatusCode(421);
+        }
 
         if (data.Data.TryGetProperty("action", out var action) &&
             action.ValueKind == JsonValueKind.String &&
@@ -189,16 +215,25 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         [FromQuery(Name = "hub.verify_token")] string? verifyToken,
         [FromQuery(Name = "hub.challenge")] string? challenge,
         IOptions<MetaOptions> metaOptions,
-        ILogger<WhatsAppEndpoints> logger)
+        ILogger<WhatsAppEndpoints> logger,
+        string? accountId = null)
     {
-        if (mode == "subscribe" && verifyToken == metaOptions.Value.VerifyToken && challenge is { Length: > 0 })
+        var valid = false;
+        if (mode == "subscribe" && verifyToken is { Length: > 0 } && challenge is { Length: > 0 })
+        {
+            valid = accountId is not null
+                ? metaOptions.Value.GetVerifyToken(accountId) == verifyToken
+                : metaOptions.Value.FindAccountByVerifyToken(verifyToken) is not null;
+        }
+
+        if (valid)
         {
             logger.LogInformation("Registering webhook callback.");
             return Results.Ok(challenge);
         }
 
-        logger.LogError("Received token {ACTUAL} but expected {EXPECTED}.", verifyToken, metaOptions.Value.VerifyToken);
-        return Results.BadRequest("Received verification token doesn't match the configured one.");
+        logger.LogError("Received token {ACTUAL} but no matching account verify token found.", verifyToken);
+        return Results.BadRequest("Received verification token doesn't match any configured account.");
     }
 
     static async Task<IResult> HandleProcessAsync(

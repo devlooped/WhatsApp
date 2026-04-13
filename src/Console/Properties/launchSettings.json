@@ -2,7 +2,7 @@
   "profiles": {
     "Console": {
       "commandName": "Project",
-      "commandLineArgs": ""
+      "commandLineArgs": "--url https://localhost:7254/whatsapp/cli"
     }
   }
 }
