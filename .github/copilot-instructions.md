@@ -29,12 +29,14 @@
 ### Code Style and Formatting
 
 #### EditorConfig Rules
-The repository uses `.editorconfig` for consistent code style:
+The repository uses `.editorconfig` at the repo root for consistent code style.
+
 - **Indentation**: 4 spaces for C# files, 2 spaces for XML/YAML/JSON
 - **Line endings**: LF (Unix-style)
 - **Sort using directives**: System.* namespaces first (`dotnet_sort_system_directives_first = true`)
 - **Type references**: Prefer language keywords over framework type names (`int` vs `Int32`)
-- **Modern C# features**: Use object/collection initializers, coalesce expressions when possible
+- **Modern C# features**: Use object/collection initializers, coalesce expressions when possible, use var when the type is apparent from the right-hand side of the assignment
+- **Visibility modifiers**: only explicitly specify visibility when different from the default (e.g. `public` for classes, no `internal` for classes or `private` for fields, etc.)
 
 #### Formatting Validation
 - CI enforces formatting with `dotnet format whitespace` and `dotnet format style`
@@ -49,7 +51,7 @@ The repository uses `.editorconfig` for consistent code style:
 - Located in `src/*.Tests/`
 
 #### Test Attributes
-Custom xUnit attributes for conditional test execution:
+Custom xUnit attributes are sometimes used for conditional test execution:
 - `[SecretsFact("XAI_API_KEY")]` - Skips test if required secrets are missing from user secrets or environment variables
 - `[LocalFact("SECRET")]` - Runs only locally (skips in CI), requires specified secrets
 - `[CIFact]` - Runs only in CI environment
@@ -83,3 +85,10 @@ Custom xUnit attributes for conditional test execution:
 - All PRs must pass format validation
 - Tests must pass on all target frameworks
 - Follow existing patterns and conventions in the codebase
+
+## Documenting Work
+
+Project implemention details, design and key decisions should be documented in a top-level AGENTS.md file at the repo root. 
+Keep this file updated whenever you make change significant changes for future reference.
+
+User-facing features and APIs should be documented to highlight (not extensively, as an overview) key project features and capabilities, in the readme.md file at the repo root.
