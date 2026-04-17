@@ -246,6 +246,9 @@ public static class WhatsAppFunctionsBuilderExtensions
         // Register the queue processor as the default message processor for Azure Functions
         handlerBuilder.UseQueueProcessor(configure);
 
+        // Use Azure Table Storage for durable idempotency tracking in Azure Functions
+        handlerBuilder.UseIdempotencyStorage("AzureWebJobsStorage");
+
         return handlerBuilder;
     }
 }
