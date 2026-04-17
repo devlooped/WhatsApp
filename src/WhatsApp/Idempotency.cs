@@ -22,7 +22,15 @@ static class IdempotencyExtensions
         => message.Id.StartsWith("wamid.", StringComparison.Ordinal) ? message.Id : Base62.Encode(new BigInteger(MD5.HashData(Encoding.UTF8.GetBytes(payload)), isUnsigned: true, isBigEndian: true));
 }
 
-class Idempotency(TableServiceClient client, HybridCache cache)
+/// <summary>
+/// Tracks which messages have already been processed to avoid duplicate handling.
+/// When a <see cref="TableServiceClient"/> is provided (via
+/// <see cref="IdempotencyStorageExtensions.UseIdempotencyStorage(WhatsAppHandlerBuilder, string)"/>),
+/// idempotency is backed by Azure Table Storage for durability and atomic cross-instance claims.
+/// Otherwise, it operates in cache-only mode using <see cref="HybridCache"/>, suitable for
+/// single-process deployments or when a distributed cache (e.g. Redis) is configured.
+/// </summary>
+class Idempotency(HybridCache cache, TableServiceClient? table = null)
 {
     static readonly HybridCacheEntryOptions options = new()
     {
@@ -30,24 +38,42 @@ class Idempotency(TableServiceClient client, HybridCache cache)
         Expiration = TimeSpan.FromDays(30)
     };
 
-    readonly AsyncLazy<TableClient> table = new(async () =>
+    readonly AsyncLazy<TableClient>? tableClient = table is null ? null : new(async () =>
         {
-            var table = client.GetTableClient("WhatsAppWebhook");
-            await table.CreateIfNotExistsAsync();
-            return table;
+            var t = table.GetTableClient("WhatsAppWebhook");
+            await t.CreateIfNotExistsAsync();
+            return t;
         });
 
     public ValueTask<bool> IsProcessedAsync(string partitionKey, string rowKey, CancellationToken token = default)
-        => cache.GetOrCreateAsync(Key(partitionKey, rowKey),
-            async key => await (await table).GetEntityIfExistsAsync<TableEntity>(partitionKey, rowKey, cancellationToken: token) is { HasValue: true },
+    {
+        var key = Key(partitionKey, rowKey);
+        if (tableClient is null)
+            return cache.GetOrCreateAsync(key, _ => ValueTask.FromResult(false), options, cancellationToken: token);
+
+        return cache.GetOrCreateAsync(key,
+            async _ => await (await tableClient).GetEntityIfExistsAsync<TableEntity>(partitionKey, rowKey, cancellationToken: token) is { HasValue: true },
             options, cancellationToken: token);
+    }
 
     public async ValueTask<ETag?> TrySetProcessedAsync(string partitionKey, string rowKey, CancellationToken token = default)
     {
         var key = Key(partitionKey, rowKey);
+
+        if (tableClient is null)
+        {
+            // Cache-only mode: best-effort claim. Suitable for single-process or distributed-cache scenarios.
+            // A small TOCTOU race exists in multi-instance deployments without a distributed cache.
+            if (await IsProcessedAsync(partitionKey, rowKey, token))
+                return null;
+
+            await cache.SetAsync(key, true, options, cancellationToken: token);
+            return ETag.All;
+        }
+
         try
         {
-            var entity = await (await table).AddEntityAsync(new TableEntity(partitionKey, rowKey), token);
+            var entity = await (await tableClient).AddEntityAsync(new TableEntity(partitionKey, rowKey), token);
             await cache.SetAsync(key, true, options, cancellationToken: token);
             return entity.Headers.ETag ?? ETag.All;
         }
@@ -62,7 +88,14 @@ class Idempotency(TableServiceClient client, HybridCache cache)
     {
         // If actual processing of a previously marked item failed, we want to return its unprocessed state
         var key = Key(partitionKey, rowKey);
-        await (await table).DeleteEntityAsync(partitionKey, rowKey, etag, token);
+
+        if (tableClient is null)
+        {
+            await cache.RemoveAsync(key, token);
+            return;
+        }
+
+        await (await tableClient).DeleteEntityAsync(partitionKey, rowKey, etag, token);
         await cache.RemoveAsync(key, token);
     }
 

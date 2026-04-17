@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using Azure.Data.Tables;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -229,26 +230,12 @@ static class WhatsAppServiceCollectionExtensions
     {
         services.AddHttpClient("whatsapp").AddStandardResilienceHandler();
         services.AddHybridCache();
-        services.AddSingleton<Idempotency>();
+        services.AddSingleton<Idempotency>(sp => new Idempotency(
+            sp.GetRequiredService<HybridCache>(),
+            sp.GetKeyedService<TableServiceClient>(IdempotencyStorageExtensions.ServiceKey)));
 
         if (services.FirstOrDefault(x => x.ServiceType == typeof(IWhatsAppClient)) == null)
             services.Add(new ServiceDescriptor(typeof(IWhatsAppClient), typeof(WhatsAppClient), lifetime));
-
-        if (services.FirstOrDefault(x => x.ServiceType == typeof(TableServiceClient)) == null)
-        {
-            services.AddSingleton(services => new TableServiceClient(
-                services.GetRequiredService<IConfiguration>()["AzureWebJobsStorage"]!,
-                new TableClientOptions
-                {
-#if DEBUG
-                    Diagnostics =
-                    {
-                        IsLoggingEnabled = true,
-                        IsLoggingContentEnabled = true,
-                    },
-#endif
-                }));
-        }
 
         if (services.FirstOrDefault(x => x.ServiceType == typeof(CloudStorageAccount)) == null)
         {

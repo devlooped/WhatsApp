@@ -6,17 +6,21 @@ namespace Devlooped.WhatsApp;
 
 public class IdempotencyTests
 {
-    [Fact]
-    public async Task CanAddProcessedItem()
+    static HybridCache BuildCache()
     {
-        var client = CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient();
-        var table = client.GetTableClient("WhatsAppWebhook");
-        var collection = new ServiceCollection();
-        collection.AddHybridCache();
-        var cache = collection.BuildServiceProvider().GetRequiredService<HybridCache>();
+        var services = new ServiceCollection();
+        services.AddHybridCache();
+        return services.BuildServiceProvider().GetRequiredService<HybridCache>();
+    }
 
-        var idempotent = new Idempotency(client, cache);
-        var pk = nameof(CanAddProcessedItem);
+    [Fact]
+    public async Task TableBackedMode_TracksDurably()
+    {
+        var serviceClient = CloudStorageAccount.DevelopmentStorageAccount.CreateTableServiceClient();
+        var table = serviceClient.GetTableClient("WhatsAppWebhook");
+
+        var idempotent = new Idempotency(BuildCache(), serviceClient);
+        var pk = nameof(TableBackedMode_TracksDurably);
         var rk = Ulid.NewUlid().ToString();
 
         // Initially unprocessed
@@ -41,5 +45,40 @@ public class IdempotencyTests
 
         // The check would now re-read from storage and see it since we restored.
         Assert.True(await idempotent.IsProcessedAsync(pk, rk));
+    }
+
+    [Fact]
+    public async Task CacheOnlyMode_TracksDuplicates()
+    {
+        var idempotent = new Idempotency(BuildCache());
+        var pk = nameof(CacheOnlyMode_TracksDuplicates);
+        var rk = Ulid.NewUlid().ToString();
+
+        Assert.False(await idempotent.IsProcessedAsync(pk, rk));
+
+        var etag = await idempotent.TrySetProcessedAsync(pk, rk);
+
+        Assert.NotNull(etag);
+        Assert.True(await idempotent.IsProcessedAsync(pk, rk));
+
+        // Duplicate claim returns null
+        Assert.Null(await idempotent.TrySetProcessedAsync(pk, rk));
+    }
+
+    [Fact]
+    public async Task CacheOnlyMode_ResetAllowsReprocessing()
+    {
+        var idempotent = new Idempotency(BuildCache());
+        var pk = nameof(CacheOnlyMode_ResetAllowsReprocessing);
+        var rk = Ulid.NewUlid().ToString();
+
+        var etag = await idempotent.TrySetProcessedAsync(pk, rk);
+        Assert.NotNull(etag);
+
+        await idempotent.ResetProcessedAsync(pk, rk, etag.Value);
+
+        // After reset the item can be claimed again
+        Assert.False(await idempotent.IsProcessedAsync(pk, rk));
+        Assert.NotNull(await idempotent.TrySetProcessedAsync(pk, rk));
     }
 }
