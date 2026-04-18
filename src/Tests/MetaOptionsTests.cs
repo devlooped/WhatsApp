@@ -33,6 +33,82 @@ public class MetaOptionsTests
     }
 
     [Fact]
+    public void SingleStringNumberBindsAsArray()
+    {
+        var collection = new ServiceCollection()
+            .AddSingleton<IConfiguration>(new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>()
+            {
+                { "Meta:Accounts:1234567890:VerifyToken", "test-challenge" },
+                { "Meta:Accounts:1234567890:AccessToken", "test-access-token" },
+                { "Meta:Accounts:1234567890:Numbers", "9876543210" }
+            }).Build());
+
+        collection.AddOptions<MetaOptions>()
+            .BindConfiguration("Meta")
+            .PostConfigure<IConfiguration>((options, config) =>
+            {
+                foreach (var (accountId, account) in options.Accounts)
+                {
+                    if (account.Numbers.Length == 0)
+                    {
+                        var value = config[$"Meta:Accounts:{accountId}:Numbers"];
+                        if (!string.IsNullOrEmpty(value))
+                            account.Numbers = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    }
+                }
+            })
+            .ValidateDataAnnotations();
+
+        var options = collection
+            .BuildServiceProvider()
+            .GetRequiredService<IOptions<MetaOptions>>().Value;
+
+        Assert.NotNull(options);
+        Assert.Single(options.Accounts["1234567890"].Numbers);
+        Assert.Equal("9876543210", options.Accounts["1234567890"].Numbers[0]);
+        Assert.Equal("test-access-token", options.GetToken("9876543210"));
+    }
+
+    [Fact]
+    public void CommaSeparatedNumbersStringBindsAsArray()
+    {
+        var collection = new ServiceCollection()
+            .AddSingleton<IConfiguration>(new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>()
+            {
+                { "Meta:Accounts:1234567890:VerifyToken", "test-challenge" },
+                { "Meta:Accounts:1234567890:AccessToken", "test-access-token" },
+                { "Meta:Accounts:1234567890:Numbers", "9876543210, 1111111111" }
+            }).Build());
+
+        collection.AddOptions<MetaOptions>()
+            .BindConfiguration("Meta")
+            .PostConfigure<IConfiguration>((options, config) =>
+            {
+                foreach (var (accountId, account) in options.Accounts)
+                {
+                    if (account.Numbers.Length == 0)
+                    {
+                        var value = config[$"Meta:Accounts:{accountId}:Numbers"];
+                        if (!string.IsNullOrEmpty(value))
+                            account.Numbers = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    }
+                }
+            })
+            .ValidateDataAnnotations();
+
+        var options = collection
+            .BuildServiceProvider()
+            .GetRequiredService<IOptions<MetaOptions>>().Value;
+
+        Assert.NotNull(options);
+        Assert.Equal(2, options.Accounts["1234567890"].Numbers.Length);
+        Assert.Equal("test-access-token", options.GetToken("9876543210"));
+        Assert.Equal("test-access-token", options.GetToken("1111111111"));
+    }
+
+    [Fact]
     public void FindAccountByVerifyTokenReturnsNullForUnknownToken()
     {
         var options = new MetaOptions

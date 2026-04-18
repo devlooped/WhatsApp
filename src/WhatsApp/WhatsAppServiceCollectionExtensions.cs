@@ -245,6 +245,20 @@ static class WhatsAppServiceCollectionExtensions
 
         builder.Services.AddOptionsWithValidateOnStart<MetaOptions>()
             .BindConfiguration("Meta")
+            .PostConfigure<IConfiguration>((options, config) =>
+            {
+                // The configuration system can't bind a scalar string to string[].
+                // Support "Numbers": "id" or "Numbers": "id1,id2" as alternatives to "Numbers:0": "id".
+                foreach (var (accountId, account) in options.Accounts)
+                {
+                    if (account.Numbers.Length == 0)
+                    {
+                        var value = config[$"Meta:Accounts:{accountId}:Numbers"];
+                        if (!string.IsNullOrEmpty(value))
+                            account.Numbers = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    }
+                }
+            })
             .ValidateDataAnnotations();
 
         var options = services.AddOptions<WhatsAppOptions>()
