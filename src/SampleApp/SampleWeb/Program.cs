@@ -71,12 +71,9 @@ class EchoHandler : IWhatsAppHandler
         IEnumerable<IMessage> messages,
         [EnumeratorCancellation] CancellationToken cancellation = default)
     {
-        foreach (var message in messages)
+        if (messages.OfType<ContentMessage>().LastOrDefault() is { } message)
         {
-            if (message is ContentMessage content)
-            {
-                yield return content.Reply($"Echo: {content.Content}");
-            }
+            yield return message.Reply($"Echo: {message.Content}");
         }
 
         await Task.CompletedTask;
