@@ -37,7 +37,7 @@ public static class WhatsAppEndpointRouteBuilderExtensions
     /// <item><description>GET /whatsapp - Webhook verification endpoint</description></item>
     /// <item><description>POST /whatsapp/process - Direct message processing endpoint (requires X-WHATSAPP-SECRET header)</description></item>
     /// <item><description>POST /whatsapp/eventgrid - Azure Event Grid event processing endpoint</description></item>
-    /// <item><description>POST/GET /whatsapp/cli - Development console endpoint</description></item>
+    /// <item><description>POST/GET/HEAD /whatsapp/cli - Development console endpoint</description></item>
     /// </list>
     /// </remarks>
     /// <param name="endpoints">The endpoint route builder.</param>
@@ -60,8 +60,8 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         // POST /whatsapp/eventgrid - Azure Event Grid event processing endpoint
         endpoints.MapPost("/whatsapp/eventgrid", HandleEventGridAsync);
 
-        // POST/GET /whatsapp/cli - Development console endpoint
-        endpoints.MapMethods("/whatsapp/cli", ["POST", "GET"], HandleConsoleAsync);
+        // POST/GET/HEAD /whatsapp/cli - Development console endpoint
+        endpoints.MapMethods("/whatsapp/cli", ["POST", "GET", "HEAD"], HandleConsoleAsync);
 
         // Legacy console endpoint redirect
         endpoints.MapMethods("/whatsappcli", ["POST", "GET"], (HttpRequest request) =>
@@ -289,6 +289,12 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         // This endpoint is only available in development environments, since it allows sending messages from the debug console.
         if (environment.IsProduction())
             return Results.Unauthorized();
+
+        if (request.Method.Equals("HEAD", StringComparison.OrdinalIgnoreCase))
+        {
+            request.HttpContext.Response.Headers["X-WhatsApp-Version"] = ThisAssembly.Info.InformationalVersion;
+            return Results.Ok();
+        }
 
         if (request.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
         {

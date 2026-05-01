@@ -29,7 +29,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
     Timer personTimer = new() { AutoReset = false };
     CancellationTokenSource? typingCancellation = null;
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
         if (string.IsNullOrEmpty(service))
         {
@@ -37,9 +37,44 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
             Config.Build(ConfigLevel.Global)
                 .SetString("whatsapp", "endpoint", service);
         }
+
+        // Connectivity check: HEAD the endpoint and show version if available.
+        while (true)
+        {
+            string? version = null;
+            var connected = false;
+            await AnsiConsole.Status().StartAsync($"Connecting to {service}...", async _ =>
+            {
+                try
+                {
+                    using var http = httpFactory.CreateClient("whatsapp");
+                    http.Timeout = TimeSpan.FromSeconds(10);
+                    using var response = await http.SendAsync(new HttpRequestMessage(HttpMethod.Head, service), cancellationToken);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        response.Headers.TryGetValues("X-WhatsApp-Version", out var values);
+                        version = values?.FirstOrDefault();
+                        connected = true;
+                    }
+                }
+                catch { }
+            });
+
+            if (connected)
+            {
+                var versionSuffix = version is { Length: > 0 } ? $" [grey](v{version})[/]" : "";
+                AnsiConsole.MarkupLine($":check_mark_button: [green]Connected[/]{versionSuffix}");
+                break;
+            }
+
+            AnsiConsole.MarkupLine($"[red]Could not connect to[/] {service}");
+            service = AnsiConsole.Ask("Enter WhatsApp functions endpoint", service);
+            Config.Build(ConfigLevel.Global)
+                .SetString("whatsapp", "endpoint", service);
+        }
+
         if (format == null)
         {
-            var choices = Enum.GetValues<MessageType>();
             format = AnsiConsole.Prompt(
                 new SelectionPrompt<OutputFormat>()
                     .Title("Select output format")
@@ -74,8 +109,6 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
 
         _ = Task.Run(ResponseListener, cancellationToken);
         _ = Task.Run(InputListener, cancellationToken);
-
-        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
