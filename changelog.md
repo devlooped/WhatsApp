@@ -1,5 +1,20 @@
 # Changelog
 
+## [v2.0.0-beta](https://github.com/devlooped/WhatsApp/tree/v2.0.0-beta) (2026-04-18)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v2.0.0-alpha...v2.0.0-beta)
+
+:sparkles: Implemented enhancements:
+
+- Update MetaOptions Numbers binding and EchoHandler logic [\#393](https://github.com/devlooped/WhatsApp/pull/393) (@kzu)
+- Add extensible Azure Table idempotency with DI support [\#392](https://github.com/devlooped/WhatsApp/pull/392) (@kzu)
+- Nest phone numbers inside their parent WhatsApp Business Accounts in MetaOptions [\#387](https://github.com/devlooped/WhatsApp/pull/387) (@kzu)
+- Modernize CLI by switching to System.CommandLine parsing [\#382](https://github.com/devlooped/WhatsApp/pull/382) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Validate Meta options/config on startup rather than run-time [\#381](https://github.com/devlooped/WhatsApp/pull/381) (@kzu)
+
 ## [v2.0.0-alpha](https://github.com/devlooped/WhatsApp/tree/v2.0.0-alpha) (2026-04-10)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v1.0.0...v2.0.0-alpha)
