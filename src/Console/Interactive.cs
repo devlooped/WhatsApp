@@ -33,7 +33,9 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
     {
         if (string.IsNullOrEmpty(service))
         {
-            service = AnsiConsole.Ask("Enter WhatsApp functions endpoint", "http://localhost:4242/whatsapp/cli");
+            service = await new TextPrompt<string>("Enter WhatsApp functions endpoint")
+                .DefaultValue("http://localhost:4242/whatsapp/cli")
+                .ShowAsync(AnsiConsole.Console, cancellationToken);
             Config.Build(ConfigLevel.Global)
                 .SetString("whatsapp", "endpoint", service);
         }
@@ -57,6 +59,7 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
                         connected = true;
                     }
                 }
+                catch (OperationCanceledException) { throw; }
                 catch { }
             });
 
@@ -68,7 +71,9 @@ partial class Interactive(IConfiguration configuration, IHttpClientFactory httpF
             }
 
             AnsiConsole.MarkupLine($"[red]Could not connect to[/] {service}");
-            service = AnsiConsole.Ask("Enter WhatsApp functions endpoint", service);
+            service = await new TextPrompt<string>("Enter WhatsApp functions endpoint")
+                .DefaultValue(service)
+                .ShowAsync(AnsiConsole.Console, cancellationToken);
             Config.Build(ConfigLevel.Global)
                 .SetString("whatsapp", "endpoint", service);
         }
