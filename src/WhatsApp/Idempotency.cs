@@ -10,13 +10,13 @@ namespace Devlooped.WhatsApp;
 static class IdempotencyExtensions
 {
     public static ValueTask<bool> IsProcessedAsync(this Idempotency idempotency, Message message, string json, CancellationToken token = default)
-        => idempotency.IsProcessedAsync(message.User.Number, RowKey(message, json), token);
+        => idempotency.IsProcessedAsync(message.User.Id, RowKey(message, json), token);
 
     public static async ValueTask<ETag?> TrySetProcessedAsync(this Idempotency idempotency, Message message, string json, CancellationToken token = default)
-        => await idempotency.TrySetProcessedAsync(message.User.Number, RowKey(message, json), token);
+        => await idempotency.TrySetProcessedAsync(message.User.Id, RowKey(message, json), token);
 
     public static async ValueTask ResetProcessedAsync(this Idempotency idempotency, Message message, string json, ETag etag, CancellationToken token = default)
-        => await idempotency.ResetProcessedAsync(message.User.Number, RowKey(message, json), etag, token);
+        => await idempotency.ResetProcessedAsync(message.User.Id, RowKey(message, json), etag, token);
 
     static string RowKey(Message message, string payload)
         => message.Id.StartsWith("wamid.", StringComparison.Ordinal) ? message.Id : Base62.Encode(new BigInteger(MD5.HashData(Encoding.UTF8.GetBytes(payload)), isUnsigned: true, isBigEndian: true));

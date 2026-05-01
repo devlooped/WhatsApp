@@ -2,6 +2,7 @@ using System.Text.Json.Nodes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Devlooped.WhatsApp;
 
@@ -314,7 +315,7 @@ public class WhatsAppClientTests(ITestOutputHelper output)
         var (configuration, client) = Initialize();
 
         await Assert.ThrowsAsync<NotSupportedException>(() => client.ResolveMediaAsync(
-            new ContentMessage("asdf", new Service("asdf", "1234"), new User("kzu", "2134"), 0,
+            new ContentMessage("asdf", new Service("asdf", "1234"), new User("kzu", "2134", "2134"), 0,
                 new UnknownContent(new System.Text.Json.JsonElement()))));
     }
 
@@ -349,13 +350,12 @@ public class WhatsAppClientTests(ITestOutputHelper output)
             .AddHttpClient()
             .AddSingleton<IConfiguration>(configuration);
 
-        collection.AddOptions<MetaOptions>()
-            .BindConfiguration("Meta")
-            .ValidateDataAnnotations();
-
+        collection.ConfigureCoreOptions();
         collection.AddSingleton<WhatsAppClient>();
 
         var services = collection.BuildServiceProvider();
+        var options = services.GetRequiredService<IOptions<MetaOptions>>().Value;
+
         return (configuration, services.GetRequiredService<WhatsAppClient>());
     }
 }

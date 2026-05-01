@@ -135,7 +135,7 @@ class AzureFunctionsWebhook(
         Debug.Assert(node != null, "Node should not be null after decryption.");
 
         node.Add("service", token.ServiceId);
-        node.Add("user", token.UserNumber);
+        node.Add("user", token.UserId);
 
         var flow = JsonSerializer.Deserialize<FlowDataRequest>(node, JsonContext.DefaultOptions);
         if (flow?.Flow is null)

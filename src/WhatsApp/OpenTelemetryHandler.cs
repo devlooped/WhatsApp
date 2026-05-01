@@ -84,7 +84,7 @@ public class OpenTelemetryHandler : DelegatingWhatsAppHandler
                 span.SetTag("messaging.system", "whatsapp");
                 span.SetTag("messaging.operation.name", "process");
                 span.SetTag("messaging.destination.name", message.ServiceId);
-                span.SetTag("messaging.client.id", message.UserNumber);
+                span.SetTag("messaging.client.id", message.UserId);
                 span.SetTag("messaging.message.id", message.Id);
                 if (message.ConversationId is string conversationId)
                     span.SetTag("messaging.message.conversation_id", conversationId);
@@ -96,7 +96,7 @@ public class OpenTelemetryHandler : DelegatingWhatsAppHandler
                 { "messaging.system", "whatsapp" },
                 { "messaging.operation.name", "process" },
                 { "messaging.destination.name", message.ServiceId },
-                { "messaging.client.id", message.UserNumber },
+                { "messaging.client.id", message.UserId },
             };
 
             return base.HandleAsync(messages, cancellation).WithErrorHandlingAsync(

@@ -6,20 +6,20 @@ namespace Devlooped.WhatsApp;
 /// A response that uses a function to send the message.
 /// </summary>
 /// <param name="ServiceId">The identifier of the service to use to send the response through.</param>
-/// <param name="UserNumber">The phone number of the recipient in international format.</param>
+/// <param name="UserId">The phone number of the recipient in international format.</param>
 /// <param name="Sender">The function that implements the response sending behavior.</param>
 /// <param name="Context">Optional identifier of the message to which this response may be a reply to.</param>
-public record AnonymousResponse(string ServiceId, string UserNumber,
-    [property: JsonIgnore] Func<IWhatsAppClient, CancellationToken, Task<string?>> Sender, string? Context = null) : Response(ServiceId, UserNumber, Context)
+public record AnonymousResponse(string ServiceId, string UserId,
+    [property: JsonIgnore] Func<IWhatsAppClient, CancellationToken, Task<string?>> Sender, string? Context = null) : Response(ServiceId, UserId, Context)
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="AnonymousResponse"/> class using an existing message and a sender function.
     /// </summary>
     public AnonymousResponse(IMessage message, Func<IWhatsAppClient, CancellationToken, Task<string?>> sender)
-        : this(message.ServiceId, message.UserNumber, sender) { }
+        : this(message.ServiceId, message.UserId, sender) { }
 
     [JsonConstructor]
-    internal AnonymousResponse(string ServiceId, string UserNumber, string? Context = null) : this(ServiceId, UserNumber, (client, cancellation) => Task.FromResult<string?>(null), Context)
+    internal AnonymousResponse(string ServiceId, string UserId, string? Context = null) : this(ServiceId, UserId, (client, cancellation) => Task.FromResult<string?>(null), Context)
     {
     }
 

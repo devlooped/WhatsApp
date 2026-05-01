@@ -7,20 +7,20 @@
 /// The template is identified by its name and code. The <see cref="SendCoreAsync"/> method handles the actual sending
 /// of the template message.</remarks>
 /// <param name="ServiceId">The identifier of the service handling the message.</param>
-/// <param name="UserNumber">The phone number of the recipient in international format.</param>
+/// <param name="UserId">The phone number of the recipient in international format.</param>
 /// <param name="Context">The unique identifier of the message to which the reaction is being sent.</param>
 /// <param name="Template">The message template, components and parameters.</param>
-public record TemplateResponse(string ServiceId, string UserNumber, string Context, MessageTemplate Template) : Response(ServiceId, UserNumber, Context)
+public record TemplateResponse(string ServiceId, string UserId, string Context, MessageTemplate Template) : Response(ServiceId, UserId, Context)
 {
-    public TemplateResponse(string ServiceId, string UserNumber, string Context, string Name, string Language)
-        : this(UserNumber, ServiceId, Context, new MessageTemplate(Name, Language))
+    public TemplateResponse(string ServiceId, string UserId, string Context, string Name, string Language)
+        : this(UserId, ServiceId, Context, new MessageTemplate(Name, Language))
     {
     }
 
     /// <inheritdoc/>
     protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
     {
-        await client.SendTemplateAsync(ServiceId, UserNumber, Template, cancellationToken);
+        await client.SendTemplateAsync(ServiceId, UserId, Template, cancellationToken);
 
         return Ulid.NewUlid().ToString();
     }

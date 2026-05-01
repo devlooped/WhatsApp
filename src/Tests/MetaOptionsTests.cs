@@ -18,9 +18,7 @@ public class MetaOptionsTests
                 { "Meta:Accounts:1234567890:Numbers:0", "1234567890" }
             }).Build());
 
-        collection.AddOptions<MetaOptions>()
-            .BindConfiguration("Meta")
-            .ValidateDataAnnotations();
+        collection.ConfigureCoreOptions();
 
         var options = collection
             .BuildServiceProvider()
@@ -44,21 +42,7 @@ public class MetaOptionsTests
                 { "Meta:Accounts:1234567890:Numbers", "9876543210" }
             }).Build());
 
-        collection.AddOptions<MetaOptions>()
-            .BindConfiguration("Meta")
-            .PostConfigure<IConfiguration>((options, config) =>
-            {
-                foreach (var (accountId, account) in options.Accounts)
-                {
-                    if (account.Numbers.Length == 0)
-                    {
-                        var value = config[$"Meta:Accounts:{accountId}:Numbers"];
-                        if (!string.IsNullOrEmpty(value))
-                            account.Numbers = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                    }
-                }
-            })
-            .ValidateDataAnnotations();
+        collection.ConfigureCoreOptions();
 
         var options = collection
             .BuildServiceProvider()
@@ -82,21 +66,7 @@ public class MetaOptionsTests
                 { "Meta:Accounts:1234567890:Numbers", "9876543210, 1111111111" }
             }).Build());
 
-        collection.AddOptions<MetaOptions>()
-            .BindConfiguration("Meta")
-            .PostConfigure<IConfiguration>((options, config) =>
-            {
-                foreach (var (accountId, account) in options.Accounts)
-                {
-                    if (account.Numbers.Length == 0)
-                    {
-                        var value = config[$"Meta:Accounts:{accountId}:Numbers"];
-                        if (!string.IsNullOrEmpty(value))
-                            account.Numbers = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                    }
-                }
-            })
-            .ValidateDataAnnotations();
+        collection.ConfigureCoreOptions();
 
         var options = collection
             .BuildServiceProvider()
@@ -132,9 +102,7 @@ public class MetaOptionsTests
             {
             }).Build());
 
-        collection.AddOptions<MetaOptions>()
-            .BindConfiguration("Meta")
-            .ValidateDataAnnotations();
+        collection.ConfigureCoreOptions();
 
         var ex = Assert.Throws<OptionsValidationException>(() => collection
             .BuildServiceProvider()

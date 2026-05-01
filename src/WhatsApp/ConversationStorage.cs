@@ -19,7 +19,7 @@ class ConversationStorage : IConversationStorage
     }
 
     protected virtual IDocumentRepository<IMessage> CreateMessagesRepository()
-        => DocumentRepository.Create<IMessage>(storage, "WhatsAppMessages", x => x.UserNumber, x => x.Id, defaultSerializer);
+        => DocumentRepository.Create<IMessage>(storage, "WhatsAppMessages", x => x.UserId, x => x.Id, defaultSerializer);
 
     protected virtual ITableStorage<Conversation> CreateConversationsRepository()
         => BlobStorage.Create<Conversation>(storage, "whatsapp-conversations",
@@ -36,8 +36,8 @@ class ConversationStorage : IConversationStorage
         var conversationId = message.ConversationId;
         if (!string.IsNullOrEmpty(conversationId))
         {
-            var conversation = await conversationsRepository.Value.GetAsync(message.UserNumber, conversationId, cancellationToken) ??
-                new(message.UserNumber, conversationId, [], message.Timestamp);
+            var conversation = await conversationsRepository.Value.GetAsync(message.UserId, conversationId, cancellationToken) ??
+                new(message.UserId, conversationId, [], message.Timestamp);
 
             if (conversation.Messages.FirstOrDefault(x => x.Id == message.Id) is { } existing)
             {
@@ -62,17 +62,17 @@ class ConversationStorage : IConversationStorage
     }
 
     /// <inheritdoc/>
-    public Task<IMessage?> GetMessageAsync(string number, string id, CancellationToken cancellationToken = default)
-        => messagesRepository.Value.GetAsync(number, id, cancellationToken);
+    public Task<IMessage?> GetMessageAsync(string userId, string id, CancellationToken cancellationToken = default)
+        => messagesRepository.Value.GetAsync(userId, id, cancellationToken);
 
     /// <inheritdoc/>
-    public IAsyncEnumerable<IMessage> GetMessagesAsync(string number, CancellationToken cancellationToken = default)
-        => messagesRepository.Value.EnumerateAsync(number, cancellationToken);
+    public IAsyncEnumerable<IMessage> GetMessagesAsync(string userId, CancellationToken cancellationToken = default)
+        => messagesRepository.Value.EnumerateAsync(userId, cancellationToken);
 
     /// <inheritdoc/>
-    public async IAsyncEnumerable<IMessage> GetMessagesAsync(string number, string conversationId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public async IAsyncEnumerable<IMessage> GetMessagesAsync(string userId, string conversationId, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        if (await conversationsRepository.Value.GetAsync(number, conversationId, cancellationToken) is Conversation conversation)
+        if (await conversationsRepository.Value.GetAsync(userId, conversationId, cancellationToken) is Conversation conversation)
         {
             foreach (var message in conversation.Messages)
             {
@@ -82,6 +82,6 @@ class ConversationStorage : IConversationStorage
     }
 
     /// <inheritdoc/>
-    public Task<Conversation?> GetActiveConversationAsync(string number, CancellationToken cancellationToken = default)
-        => activeConversationRepository.Value.GetAsync(number, "active", cancellationToken);
+    public Task<Conversation?> GetActiveConversationAsync(string userId, CancellationToken cancellationToken = default)
+        => activeConversationRepository.Value.GetAsync(userId, "active", cancellationToken);
 }

@@ -311,7 +311,7 @@ public class FlowTests(ITestOutputHelper output)
 
         Assert.NotNull(message);
         Assert.Equal("1234", message.ServiceId);
-        Assert.Equal("5678", message.UserNumber);
+        Assert.Equal("5678", message.UserId);
         Assert.Equal(FlowDataAction.Init, message.Action);
     }
 
@@ -334,7 +334,7 @@ public class FlowTests(ITestOutputHelper output)
 
         Assert.NotNull(message);
         Assert.Equal("1234", message.ServiceId);
-        Assert.Equal("5678", message.UserNumber);
+        Assert.Equal("5678", message.UserId);
         Assert.Equal(FlowDataAction.DataExchange, message.Action);
         Assert.Equal("Welcome", message.Screen);
         Assert.Equal("bar", message.Data.GetProperty("foo").GetString());
@@ -480,10 +480,7 @@ public class FlowTests(ITestOutputHelper output)
             .AddHttpClient()
             .AddSingleton<IConfiguration>(configuration);
 
-        collection.AddOptions<MetaOptions>()
-            .BindConfiguration("Meta")
-            .ValidateDataAnnotations();
-
+        collection.ConfigureCoreOptions();
         collection.AddSingleton<WhatsAppClient>();
 
         var services = collection.BuildServiceProvider();

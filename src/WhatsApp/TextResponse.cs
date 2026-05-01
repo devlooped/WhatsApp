@@ -16,14 +16,14 @@ public record TextResponse : Response
     /// Initializes a new instance of the <see cref="TextResponse"/> class with the specified parameters.
     /// </summary>
     /// <param name="serviceId">The identifier of the service handling the message.</param>
-    /// <param name="userNumber">The phone number of the recipient in international format.</param>
+    /// <param name="userId">The phone number of the recipient in international format.</param>
     /// <param name="context">Optional identifier of the message to which this response may be a reply to.</param>
     /// <param name="text">The text content of the response message.</param>
     /// <param name="button1">An optional button to include in the response for user interaction.</param>
     /// <param name="button2">An optional second button to include in the response for user interaction.</param>
     /// <param name="button3">An optional third button to include in the response for user interaction.</param>
-    public TextResponse(string serviceId, string userNumber, string? context, string? text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
-        : base(serviceId, userNumber, context)
+    public TextResponse(string serviceId, string userId, string? context, string? text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
+        : base(serviceId, userId, context)
     {
         sender = context == null ? SendTextAsync : SendReplyAsync;
 
@@ -50,8 +50,8 @@ public record TextResponse : Response
     /// </summary>
     public Button? Button3 { get; init; }
 
-    internal TextResponse(Service service, string userNumber, string? context, string? text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
-        : this(service.Id, userNumber, context, text, button1, button2, button3)
+    internal TextResponse(Service service, string userId, string? context, string? text, Button? button1 = default, Button? button2 = default, Button? button3 = default)
+        : this(service.Id, userId, context, text, button1, button2, button3)
         => this.service = service as CompositeService;
 
     /// <inheritdoc/>
@@ -77,15 +77,15 @@ public record TextResponse : Response
         if (Button1 != null)
         {
             if (Button2 == null)
-                return client.ReplyAsync(serviceId, UserNumber, Context!, text, Button1, cancellation);
+                return client.ReplyAsync(serviceId, UserId, Context!, text, Button1, cancellation);
             else if (Button3 == null)
-                return client.ReplyAsync(serviceId, UserNumber, Context!, text, Button1, Button2, cancellation);
+                return client.ReplyAsync(serviceId, UserId, Context!, text, Button1, Button2, cancellation);
             else
-                return client.ReplyAsync(serviceId, UserNumber, Context!, text, Button1, Button2, Button3, cancellation);
+                return client.ReplyAsync(serviceId, UserId, Context!, text, Button1, Button2, Button3, cancellation);
         }
         else
         {
-            return client.ReplyAsync(serviceId, UserNumber, Context!, text, cancellation);
+            return client.ReplyAsync(serviceId, UserId, Context!, text, cancellation);
         }
     }
 
@@ -94,15 +94,15 @@ public record TextResponse : Response
         if (Button1 != null)
         {
             if (Button2 == null)
-                return client.SendAsync(serviceId, UserNumber, text, Button1, cancellation);
+                return client.SendAsync(serviceId, UserId, text, Button1, cancellation);
             else if (Button3 == null)
-                return client.SendAsync(serviceId, UserNumber, text, Button1, Button2, cancellation);
+                return client.SendAsync(serviceId, UserId, text, Button1, Button2, cancellation);
             else
-                return client.SendAsync(serviceId, UserNumber, text, Button1, Button2, Button3, cancellation);
+                return client.SendAsync(serviceId, UserId, text, Button1, Button2, Button3, cancellation);
         }
         else
         {
-            return client.SendAsync(serviceId, UserNumber, text, cancellation);
+            return client.SendAsync(serviceId, UserId, text, cancellation);
         }
     }
 }

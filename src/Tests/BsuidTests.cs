@@ -1,0 +1,70 @@
+namespace Devlooped.WhatsApp;
+
+public class BsuidTests
+{
+    [Theory]
+    // Valid: ISO 3166 alpha-2 prefix + alphanumeric suffix
+    [InlineData("US.13491208655302741918", true)]   // docs example
+    [InlineData("AR.aBc123XyZ", true)]              // mixed-case suffix
+    [InlineData("gb.AlphaNum123", true)]            // lowercase country code
+    [InlineData("US.A", true)]                      // single-char suffix
+    // Invalid: phone numbers (all digits, no dot)
+    [InlineData("5491122334455", false)]
+    [InlineData("541122334455", false)]
+    [InlineData("12025551234", false)]
+    // Invalid: wrong prefix (digits instead of letters)
+    [InlineData("54.aBc123XyZ", false)]
+    [InlineData("1.ABCdef", false)]
+    // Invalid: wrong prefix length
+    [InlineData("USA.abc123", false)]               // 3-letter prefix
+    [InlineData("U.abc123", false)]                 // 1-letter prefix
+    // Invalid: structural issues
+    [InlineData(".abc", false)]
+    [InlineData("US.", false)]
+    [InlineData("US.abc-def", false)]               // hyphen in suffix
+    [InlineData("", false)]
+    public void DetectsBusinessScopedUserId(string id, bool expected)
+        => Assert.Equal(expected, User.IsBusinessScopedUserId(id));
+
+    [Fact]
+    public void PhoneOnlyUser_IsNotBSUID()
+    {
+        var user = new User("kzu", "5491122334455", "5491122334455");
+        Assert.False(user.IsBSUID);
+        Assert.Equal("541122334455", user.Number);
+    }
+
+    [Fact]
+    public void ArgentinaPreMigration_NotMisclassifiedAsBSUID()
+    {
+        // Regression: Id is unnormalized ("549..."), Number becomes "54..." after normalization.
+        // Pattern-based detection must not treat this as a BSUID.
+        var user = new User("kzu", "5491122334455", "5491122334455");
+        Assert.False(user.IsBSUID);
+        Assert.NotEqual(user.Id, user.Number);
+    }
+
+    [Fact]
+    public void PrivacyUser_HasNullNumber_IsBSUID()
+    {
+        var user = new User("kzu", "AR.aBc123XyZ", null);
+        Assert.True(user.IsBSUID);
+        Assert.Null(user.Number);
+    }
+
+    [Fact]
+    public void MixedUser_HasBSUIDAndPhone()
+    {
+        var user = new User("kzu", "AR.aBc123XyZ", "5491122334455");
+        Assert.True(user.IsBSUID);
+        Assert.Equal("541122334455", user.Number);
+    }
+
+    [Fact]
+    public void RecipientType_UsesIndividualForPhone()
+        => Assert.Equal("individual", WhatsAppClientExtensions.RecipientType("5491122334455"));
+
+    [Fact]
+    public void RecipientType_UsesBusinessScopedForBsuid()
+        => Assert.Equal("business_scoped_user_id", WhatsAppClientExtensions.RecipientType("AR.aBc123XyZ"));
+}

@@ -7,7 +7,7 @@ namespace Devlooped.WhatsApp.Flows;
 /// <summary>An incoming flow data exchange message, which initiates or continues a flow session.</summary>
 public record FlowDataRequest(
     [property: JsonPropertyName("service")] string ServiceId,
-    [property: JsonPropertyName("user")] string UserNumber,
+    [property: JsonPropertyName("user")] string UserId,
     FlowDataAction Action, string Screen, JsonElement Data,
     [property: JsonPropertyName("flow_token")] FlowToken Token) : IMessage
 {
@@ -34,15 +34,15 @@ public static class FlowDataRequestExtensions
 {
     /// <summary>Creates a <see cref="FlowDataResponse"/> for the given <paramref name="message"/>.</summary>
     public static FlowDataResponse DataResponse(this FlowDataRequest message, string screen, JsonElement data)
-       => new(message.ServiceId, message.UserNumber, screen, data);
+       => new(message.ServiceId, message.UserId, screen, data);
 
     /// <summary>Creates a <see cref="FlowDataResponse"/> for the given <paramref name="message"/>.</summary>
     public static FlowDataResponse DataResponse<T>(this FlowDataRequest message, string screen, T data)
-       => new(message.ServiceId, message.UserNumber, screen, JsonSerializer.SerializeToElement(data, JsonContext.DefaultOptions));
+       => new(message.ServiceId, message.UserId, screen, JsonSerializer.SerializeToElement(data, JsonContext.DefaultOptions));
 }
 
 /// <summary>Represents a response to a flow data exchange request, which is consumed by the flow.</summary>
-public record FlowDataResponse(string ServiceId, string UserNumber, string Screen, JsonElement Data) : Response(ServiceId, UserNumber)
+public record FlowDataResponse(string ServiceId, string UserId, string Screen, JsonElement Data) : Response(ServiceId, UserId)
 {
     /// <devdoc>The flow response is not actually sent via the client, but rather processed by the webhook itself.</devdoc>
     protected override Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellation = default)

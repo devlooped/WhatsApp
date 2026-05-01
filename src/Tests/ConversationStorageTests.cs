@@ -7,7 +7,7 @@ class TestConversationStorage : ConversationStorage
     public TestConversationStorage(CloudStorageAccount storage) : base(storage) { }
 
     protected override IDocumentRepository<IMessage> CreateMessagesRepository()
-        => new MemoryRepository<IMessage>("WhatsAppMessages", x => x.UserNumber, x => x.Id);
+        => new MemoryRepository<IMessage>("WhatsAppMessages", x => x.UserId, x => x.Id);
     protected override ITableStorage<Conversation> CreateConversationsRepository()
         => new MemoryRepository<Conversation>("WhatsAppConversations");
     protected override IDocumentRepository<Conversation> CreateActiveConversationRepository()
@@ -17,7 +17,7 @@ class TestConversationStorage : ConversationStorage
 public class ConversationStorageTests
 {
     readonly static Service service = new("1234", "1234");
-    readonly static User user = new("kzu", "5678");
+    readonly static User user = new("kzu", "5678", "5678");
 
     [Fact]
     public async Task StoreAndLoadAdditionalProperties()
@@ -48,7 +48,7 @@ public class ConversationStorageTests
             }
         });
 
-        var message = await storage.GetMessageAsync(user.Number, messageId);
+        var message = await storage.GetMessageAsync(user.Id, messageId);
 
         Assert.NotNull(message);
         // Assert AdditionalProperties on message and content
@@ -64,7 +64,7 @@ public class ConversationStorageTests
         Assert.Equal(42, text.AdditionalProperties["ContentNum"]);
         Assert.True((bool)text.AdditionalProperties["ContentBool"]!);
 
-        await foreach (var entry in storage.GetMessagesAsync(user.Number, conversationId))
+        await foreach (var entry in storage.GetMessagesAsync(user.Id, conversationId))
         {
             content = Assert.IsType<ContentMessage>(message);
             Assert.NotNull(content.AdditionalProperties);
@@ -79,7 +79,7 @@ public class ConversationStorageTests
 
         await storage.SaveAsync(message);
 
-        var updatedMessage = await storage.GetMessageAsync(user.Number, messageId);
+        var updatedMessage = await storage.GetMessageAsync(user.Id, messageId);
 
         Assert.NotNull(updatedMessage?.AdditionalProperties);
         Assert.Equal("Calendar", updatedMessage.AdditionalProperties?["Agent"]);

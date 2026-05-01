@@ -9,15 +9,15 @@ namespace Devlooped.WhatsApp;
 /// <remarks>This abstract record serves as a base type for defining specific response messages or commands that
 /// can be sent through WhatsApp client.</remarks>
 /// <param name="ServiceId">The identifier of the service to use to send the response through.</param>
-/// <param name="UserNumber">The phone number of the recipient in international format.</param>
+/// <param name="UserId">The recipient identifier (phone number or BSUID).</param>
 /// <param name="Context">Optional identifier of the message to which this response may be a reply to.</param>
-public abstract partial record Response(string ServiceId, string UserNumber, string? Context = null) : IMessage
+public abstract partial record Response(string ServiceId, string UserId, string? Context = null) : IMessage
 {
     /// <summary>
     /// Creates an anonymous response that uses a function to send the message.
     /// </summary>
-    public static Response Create(string serviceId, string userNumber, Func<IWhatsAppClient, CancellationToken, Task<string?>> sender, string? context = null)
-        => new AnonymousResponse(serviceId, userNumber, sender, context);
+    public static Response Create(string serviceId, string userId, Func<IWhatsAppClient, CancellationToken, Task<string?>> sender, string? context = null)
+        => new AnonymousResponse(serviceId, userId, sender, context);
 
     /// <summary>
     /// Creates an anonymous response that uses a function to send the message.

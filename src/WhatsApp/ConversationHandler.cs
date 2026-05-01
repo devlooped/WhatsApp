@@ -63,7 +63,7 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
         if (!string.IsNullOrEmpty(conversationId))
         {
             var conversation = await storage
-                    .GetMessagesAsync(message.UserNumber, conversationId, cancellationToken)
+                    .GetMessagesAsync(message.UserId, conversationId, cancellationToken)
                     // We need to sort in-memory since table-storage does not support ordering by timestamp 
                     // unless we're using CosmosDB, which we can't assume. 
                     // Note that conversations in WhatsApp are nevertheless short-lived, so this is acceptable.
@@ -94,7 +94,7 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
         // Even if the timeout is expired
         if (!string.IsNullOrEmpty(message.Context))
         {
-            var context = await storage.GetMessageAsync(message.UserNumber, message.Context, cancellationToken);
+            var context = await storage.GetMessageAsync(message.UserId, message.Context, cancellationToken);
             if (context?.ConversationId is { Length: > 0 } contextConversationId)
                 return contextConversationId;
         }
@@ -102,7 +102,7 @@ class ConversationHandler(IWhatsAppHandler inner, IConversationStorage storage, 
         var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds() - ConversationWindowSeconds;
 
         // Use the conversation id for a message processed in the last ConversationWindowInSeconds seconds
-        var conversation = await storage.GetActiveConversationAsync(message.UserNumber, cancellationToken);
+        var conversation = await storage.GetActiveConversationAsync(message.UserId, cancellationToken);
         conversationId = conversation?.Id;
 
         if (conversationId == null || conversation?.Timestamp < timestamp)

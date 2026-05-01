@@ -40,9 +40,10 @@ public interface IMessage
     string Id { get; }
 
     /// <summary>
-    /// Gets the phone number associated with the message sender.
+    /// Gets the user identifier associated with the message sender.
+    /// Either a phone number or a WhatsApp Business-Scoped User ID (BSUID).
     /// </summary>
-    string UserNumber { get; }
+    string UserId { get; }
 
     /// <summary>
     /// Gets the unique identifier for the service.

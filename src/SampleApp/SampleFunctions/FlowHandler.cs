@@ -68,7 +68,7 @@ static class FlowExtensions
             {
                 agent = "list",
                 service = flow.ServiceId,
-                user = flow.UserNumber,
+                user = flow.UserId,
                 flow = flow.Token.Flow,
             }),
         };
