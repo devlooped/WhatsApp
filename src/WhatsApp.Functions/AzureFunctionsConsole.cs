@@ -29,11 +29,17 @@ class AzureFunctionsConsole(
         => new RedirectResult(req.Path.Value.Replace("whatsappcli", "whatsapp/cli"), true, true);
 
     [Function("whatsapp_console")]
-    public async Task<IActionResult> MessageConsole([HttpTrigger(AuthorizationLevel.Anonymous, ["post", "get"], Route = "whatsapp/cli")] HttpRequest req)
+    public async Task<IActionResult> MessageConsole([HttpTrigger(AuthorizationLevel.Anonymous, ["post", "get", "head"], Route = "whatsapp/cli")] HttpRequest req)
     {
         // This endpoint is only available in development environments, since it allows sending messages from the debug console.
         if (environment.IsProduction())
             return new UnauthorizedResult();
+
+        if (req.Method.Equals("HEAD", StringComparison.OrdinalIgnoreCase))
+        {
+            req.HttpContext.Response.Headers["X-WhatsApp-Version"] = ThisAssembly.Info.InformationalVersion;
+            return new OkResult();
+        }
 
         if (req.Method.Equals("GET", StringComparison.OrdinalIgnoreCase))
         {
