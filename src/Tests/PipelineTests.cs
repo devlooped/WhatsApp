@@ -9,7 +9,7 @@ namespace Devlooped.WhatsApp;
 public class PipelineTests(ITestOutputHelper output)
 {
     readonly static Service service = new("1234", "1234");
-    readonly static User user = new("kzu", "5678");
+    readonly static User user = new("kzu", "5678", "5678");
 
     [Fact]
     public async Task CanBuildEmptyPipeline()
@@ -169,7 +169,7 @@ public class PipelineTests(ITestOutputHelper output)
             .Build();
 
         var storage = new MemoryConversationStorage();
-        var response = AsyncEnum<Response>([new TextResponse(service.Id, user.Number, "1234", null)
+        var response = AsyncEnum<Response>([new TextResponse(service.Id, user.Id, "1234", null)
         {
             ConversationId = "Bye"
         }]);
@@ -298,6 +298,6 @@ public class PipelineTests(ITestOutputHelper output)
             => MemoryRepository.Create<Conversation>();
 
         protected override IDocumentRepository<IMessage> CreateMessagesRepository()
-            => MemoryRepository.Create<IMessage>("messages", x => x.UserNumber, x => x.Id);
+            => MemoryRepository.Create<IMessage>("messages", x => x.UserId, x => x.Id);
     }
 }

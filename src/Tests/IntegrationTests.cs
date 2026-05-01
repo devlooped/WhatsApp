@@ -8,7 +8,7 @@ namespace Devlooped.WhatsApp;
 public class IntegrationTests : IDisposable
 {
     readonly static Service service = new("1234", "1234");
-    readonly static User user = new("kzu", "5678");
+    readonly static User user = new("kzu", "5678", "5678");
 
     public void Dispose()
     {

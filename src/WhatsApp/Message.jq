@@ -1,5 +1,5 @@
 (
-  .entry[] | 
+  .entry[] |
   .id as $notification |
   .changes[] |
   select(.value.messages != null) |
@@ -25,7 +25,8 @@
         },
         "user": {
           "name": ($user.profile.name // ""),
-          "number": $msg.from
+          "id": ($user.user_id // $msg.from),
+          "number": (if $user.user_id then (if $msg.from != $user.user_id then $msg.from else null end) else $msg.from end)
         },
         "data": $data,
         "source": ($data.flow_token // null)
@@ -43,7 +44,8 @@
         },
         "user": {
           "name": ($user.profile.name // ""),
-          "number": $msg.from
+          "id": ($user.user_id // $msg.from),
+          "number": (if $user.user_id then (if $msg.from != $user.user_id then $msg.from else null end) else $msg.from end)
         },
         "selection": {
           "id": ($msg.interactive.button_reply?.id // $msg.interactive.list_reply?.id // $msg.button.payload),
@@ -54,8 +56,8 @@
       {
         "$type": "reaction",
         "notification": $notification,
-        "id": "",                    
-        "context": $context,              
+        "id": "",
+        "context": $context,
         "timestamp": $msg.timestamp | tonumber,
         "service": {
           "id": $phone.phone_number_id,
@@ -63,7 +65,8 @@
         },
         "user": {
           "name": ($user.profile.name // ""),
-          "number": $msg.from
+          "id": ($user.user_id // $msg.from),
+          "number": (if $user.user_id then (if $msg.from != $user.user_id then $msg.from else null end) else $msg.from end)
         },
         "emoji": $msg.reaction.emoji
       }
@@ -80,7 +83,8 @@
         },
         "user": {
           "name": ($user.profile.name // ""),
-          "number": $msg.from
+          "id": ($user.user_id // $msg.from),
+          "number": (if $user.user_id then (if $msg.from != $user.user_id then $msg.from else null end) else $msg.from end)
         },
         "content": (
           if $msgType == "document" then
@@ -141,7 +145,8 @@
         },
         "user": {
           "name": ($user.profile.name // ""),
-          "number": $msg.from
+          "id": ($user.user_id // $msg.from),
+          "number": (if $user.user_id then (if $msg.from != $user.user_id then $msg.from else null end) else $msg.from end)
         },
         "raw": $msg
       }
@@ -150,7 +155,7 @@
   )
 ),
 (
-  .entry[] | 
+  .entry[] |
   .id as $notification |
   .changes[] |
   select(.value.statuses != null) |
@@ -170,6 +175,7 @@
        },
        "user": {
          "name": "",
+         "id": $status.recipient_id,
          "number": $status.recipient_id
        },
        "error": {
@@ -190,6 +196,7 @@
        },
        "user": {
          "name": "",
+         "id": $status.recipient_id,
          "number": $status.recipient_id
        },
        "status": $status.status

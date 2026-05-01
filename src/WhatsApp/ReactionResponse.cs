@@ -6,24 +6,24 @@
 /// <remarks>This response is used to react to a message by sending an emoji. The reaction is associated with a
 /// specific  message identified by the <see cref="Context"/> property in the context of a conversation.</remarks>
 /// <param name="ServiceId">The identifier of the service handling the message.</param>
-/// <param name="UserNumber">The phone number of the recipient in international format.</param>
+/// <param name="UserId">The phone number of the recipient in international format.</param>
 /// <param name="Context">The unique identifier of the message to which the reaction is being sent.</param>
 /// <param name="Emoji">The emoji representing the reaction to the message.</param>
-public record ReactionResponse(string ServiceId, string UserNumber, string Context, string Emoji) : Response(ServiceId, UserNumber, Context)
+public record ReactionResponse(string ServiceId, string UserId, string Context, string Emoji) : Response(ServiceId, UserId, Context)
 {
     // If this variable is not null, it means the originating message came from WhatsApp
     // and there's an ongoing conversation with the CLI simultaneously.
     readonly CompositeService? service;
 
-    internal ReactionResponse(Service service, string userNumber, string context, string emoji)
-        : this(service.Id, userNumber, context, emoji)
+    internal ReactionResponse(Service service, string userId, string context, string emoji)
+        : this(service.Id, userId, context, emoji)
         => this.service = service as CompositeService;
 
     /// <inheritdoc/>
     protected override async Task<string?> SendCoreAsync(IWhatsAppClient client, CancellationToken cancellationToken = default)
     {
         if (service != null)
-            await client.ReactAsync(service.Secondary.Id, UserNumber, Context!, this.ConsoleText ?? Emoji, cancellationToken);
+            await client.ReactAsync(service.Secondary.Id, UserId, Context!, this.ConsoleText ?? Emoji, cancellationToken);
 
         // If service is null, it's either a WhatsApp regular without CLI, or it's pure CLI.
         // In the former case, we don't want to send messages that are CLI-only if the service id 
@@ -32,7 +32,7 @@ public record ReactionResponse(string ServiceId, string UserNumber, string Conte
             return null;
 
         // It may not be CLI-only but still provide a CLI-enhanced text.
-        await client.ReactAsync(ServiceId, UserNumber, Context!,
+        await client.ReactAsync(ServiceId, UserId, Context!,
             // Automatically pick the CLI version of the text if sending to the CLI
             ServiceId.IsCLI() ? this.ConsoleText ?? Emoji : Emoji);
 

@@ -9,14 +9,14 @@ namespace Devlooped.WhatsApp;
 /// </summary>
 /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/messages/interactive-flow-messages"/>
 /// <param name="ServiceId">The identifier of the service handling the message.</param>
-/// <param name="UserNumber">The phone number of the recipient in international format.</param>
+/// <param name="UserId">The phone number of the recipient in international format.</param>
 /// <param name="Text">The content of the message calling to initiate the flow.</param>
 /// <param name="Action">The action button text.</param>
 public record CallToFlowResponse : Response
 {
     /// <summary>Initializes a new instance of the <see cref="CallToFlowResponse"/> record.</summary>
     [JsonConstructor]
-    public CallToFlowResponse(string serviceId, string userNumber, string text, string action, FlowParameters flow) : base(serviceId, userNumber)
+    public CallToFlowResponse(string serviceId, string userId, string text, string action, FlowParameters flow) : base(serviceId, userId)
     {
         Text = text;
         Action = action;
@@ -25,12 +25,12 @@ public record CallToFlowResponse : Response
 
     /// <summary>Initializes a new instance of the <see cref="CallToFlowResponse"/> record using an existing message.</summary>
     public CallToFlowResponse(IMessage message, string text, string action, long flowId)
-        : this(message.ServiceId, message.UserNumber, text, action, new FlowParameters(flowId))
+        : this(message.ServiceId, message.UserId, text, action, new FlowParameters(flowId))
     { }
 
     /// <summary>Initializes a new instance of the <see cref="CallToFlowResponse"/> record using an existing message.</summary>
     public CallToFlowResponse(IMessage message, string text, string action, string flowName)
-        : this(message.ServiceId, message.UserNumber, text, action, new FlowParameters(flowName))
+        : this(message.ServiceId, message.UserId, text, action, new FlowParameters(flowName))
     { }
 
     /// <summary>The text message that prompts the user to initiate the flow via the <see cref="Action"/> button.</summary>
@@ -74,8 +74,8 @@ public record CallToFlowResponse : Response
         var id = await client.SendAsync(ServiceId, new
         {
             messaging_product = "whatsapp",
-            recipient_type = "individual",
-            to = UserNumber,
+            recipient_type = User.IsBusinessScopedUserId(UserId) ? "business_scoped_user_id" : "individual",
+            to = UserId,
             type = "interactive",
             interactive = new
             {

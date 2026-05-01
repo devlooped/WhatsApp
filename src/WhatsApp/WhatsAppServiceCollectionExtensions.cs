@@ -230,7 +230,7 @@ static class WhatsAppServiceCollectionExtensions
     {
         services.AddHttpClient("whatsapp").AddStandardResilienceHandler();
         services.AddHybridCache();
-        services.AddSingleton<Idempotency>(sp => new Idempotency(
+        services.AddSingleton(sp => new Idempotency(
             sp.GetRequiredService<HybridCache>(),
             sp.GetKeyedService<TableServiceClient>(IdempotencyStorageExtensions.ServiceKey)));
 
@@ -243,26 +243,7 @@ static class WhatsAppServiceCollectionExtensions
                 services.GetRequiredService<IConfiguration>()["AzureWebJobsStorage"]!));
         }
 
-        builder.Services.AddOptionsWithValidateOnStart<MetaOptions>()
-            .BindConfiguration("Meta")
-            .PostConfigure<IConfiguration>((options, config) =>
-            {
-                // The configuration system can't bind a scalar string to string[].
-                // Support "Numbers": "id" or "Numbers": "id1,id2" as alternatives to "Numbers:0": "id".
-                foreach (var (accountId, account) in options.Accounts)
-                {
-                    if (account.Numbers.Length == 0)
-                    {
-                        var value = config[$"Meta:Accounts:{accountId}:Numbers"];
-                        if (!string.IsNullOrEmpty(value))
-                            account.Numbers = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-                    }
-                }
-            })
-            .ValidateDataAnnotations();
-
-        var options = services.AddOptions<WhatsAppOptions>()
-            .BindConfiguration("WhatsApp");
+        var options = services.ConfigureCoreOptions();
 
         if (configure != null)
             options.Configure(configure);
@@ -281,5 +262,29 @@ static class WhatsAppServiceCollectionExtensions
         builder.UseTaskSchedulerProcessor();
 
         return builder;
+    }
+
+    internal static Microsoft.Extensions.Options.OptionsBuilder<WhatsAppOptions> ConfigureCoreOptions(this IServiceCollection services)
+    {
+        services.AddOptionsWithValidateOnStart<MetaOptions>()
+            .BindConfiguration("Meta")
+            .PostConfigure<IConfiguration>((options, config) =>
+            {
+                // The configuration system can't bind a scalar string to string[].
+                // Support "Numbers": "id" or "Numbers": "id1,id2" as alternatives to "Numbers:0": "id".
+                foreach (var (accountId, account) in options.Accounts)
+                {
+                    if (account.Numbers.Length == 0)
+                    {
+                        var value = config[$"Meta:Accounts:{accountId}:Numbers"];
+                        if (!string.IsNullOrEmpty(value))
+                            account.Numbers = value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    }
+                }
+            })
+            .ValidateDataAnnotations();
+
+        return services.AddOptions<WhatsAppOptions>()
+            .BindConfiguration("WhatsApp");
     }
 }

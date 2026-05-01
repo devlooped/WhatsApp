@@ -8,9 +8,9 @@
 /// <see cref="Messages"/> property contains all messages associated with the conversation, while the <see
 /// cref="Timestamp"/> property represents the time the conversation was created or last updated, depending on the
 /// context.</remarks>
-/// <param name="Number">The phone number associated with the conversation. Cannot be null or empty.</param>
+/// <param name="UserId">The user identifier (phone number or BSUID) associated with the conversation. Cannot be null or empty.</param>
 /// <param name="Id">The unique identifier for the conversation. Cannot be null or empty.</param>
 /// <param name="Messages">A list of messages exchanged in the conversation. Cannot be null; may be empty if no messages exist.</param>
 /// <param name="Timestamp">The timestamp of the conversation, represented as the number of milliseconds since the Unix epoch.</param>
 [Table("WhatsAppConversations")]
-public record Conversation([PartitionKey] string Number, [RowKey] string Id, List<IMessage> Messages, long Timestamp);
+public record Conversation([PartitionKey] string UserId, [RowKey] string Id, List<IMessage> Messages, long Timestamp);

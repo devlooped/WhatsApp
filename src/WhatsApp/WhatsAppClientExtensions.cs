@@ -9,6 +9,14 @@ namespace Devlooped.WhatsApp;
 public static partial class WhatsAppClientExtensions
 {
     /// <summary>
+    /// Selects the WhatsApp Cloud API <c>recipient_type</c> value based on the shape of the
+    /// given user identifier: <c>"business_scoped_user_id"</c> for BSUIDs, <c>"individual"</c>
+    /// for phone numbers.
+    /// </summary>
+    internal static string RecipientType(string userId)
+        => User.IsBusinessScopedUserId(userId) ? "business_scoped_user_id" : "individual";
+
+    /// <summary>
     /// Creates an authenticated HTTP client for the given service number.
     /// </summary>
     public static HttpClient CreateHttp(this IWhatsAppClient client, Service service)
@@ -55,24 +63,24 @@ public static partial class WhatsAppClientExtensions
     /// <param name="cancellation">The cancellation token.</param>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#reaction-object"/>
     public static Task ReactAsync(this IWhatsAppClient client, UserMessage message, string emoji, CancellationToken cancellation = default)
-        => ReactAsync(client, message.Service.Id, message.User.Number, message.Id, emoji, cancellation);
+        => ReactAsync(client, message.Service.Id, message.User.Id, message.Id, emoji, cancellation);
 
     /// <summary>
     /// Reacts to a message.
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="serviceId">The service number to send the reaction through.</param>
-    /// <param name="userNumber">The user phone number to send the reaction to.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) to send the reaction to.</param>
     /// <param name="messageId">The message identifier to react to.</param>
     /// <param name="emoji">The reaction emoji.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#reaction-object"/>
-    public static Task ReactAsync(this IWhatsAppClient client, string serviceId, string userNumber, string messageId, string emoji, CancellationToken cancellation = default)
+    public static Task ReactAsync(this IWhatsAppClient client, string serviceId, string userId, string messageId, string emoji, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
-            recipient_type = "individual",
-            to = userNumber.NormalizeNumber(),
+            recipient_type = RecipientType(userId),
+            to = userId,
             type = "reaction",
             reaction = new
             {
@@ -86,17 +94,17 @@ public static partial class WhatsAppClientExtensions
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="serviceId">The service number to send the template through.</param>
-    /// <param name="userNumber">The user phone number to send the template message to.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) to send the template message to.</param>
     /// <param name="template">The raw template object to serialize and send, including name, language and other properties.</param>
     /// <param name="cancellation">Cancellation token for the async operation.</param>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/api/messages/message-templates#supported-languages"/>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
-    public static Task SendTemplateAsync(this IWhatsAppClient client, string serviceId, string userNumber, MessageTemplate template, CancellationToken cancellation = default)
+    public static Task SendTemplateAsync(this IWhatsAppClient client, string serviceId, string userId, MessageTemplate template, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
-            to = userNumber.NormalizeNumber(),
+            to = userId,
             type = "template",
             template
         }, cancellation);
@@ -106,19 +114,19 @@ public static partial class WhatsAppClientExtensions
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="serviceId">The service number to send through.</param>
-    /// <param name="userNumber">The user phone number to send to.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) to send to.</param>
     /// <param name="reply">The text message to respond with.</param>
     /// <param name="replyTo">The message to reply to.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The identifier of the reply.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#text-object"/>
-    public static Task<string?> ReplyAsync(this IWhatsAppClient client, string serviceId, string userNumber, string replyTo, string reply, CancellationToken cancellation = default)
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, string serviceId, string userId, string replyTo, string reply, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = userNumber.NormalizeNumber(),
+            recipient_type = RecipientType(userId),
+            to = userId,
             type = "text",
             context = new
             {
@@ -135,20 +143,20 @@ public static partial class WhatsAppClientExtensions
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="serviceId">The service number to send through.</param>
-    /// <param name="userNumber">The user phone number to send to.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) to send to.</param>
     /// <param name="reply">The text message to respond with.</param>
     /// <param name="replyTo">The message to reply to.</param>
     /// <param name="button">Interactive button for users to reply.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The identifier of the reply message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
-    public static Task<string?> ReplyAsync(this IWhatsAppClient client, string serviceId, string userNumber, string replyTo, string text, Button button, CancellationToken cancellation = default)
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, string serviceId, string userId, string replyTo, string text, Button button, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = userNumber.NormalizeNumber(),
+            recipient_type = RecipientType(userId),
+            to = userId,
             type = "interactive",
             context = new
             {
@@ -176,7 +184,7 @@ public static partial class WhatsAppClientExtensions
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="serviceId">The service number to send through.</param>
-    /// <param name="userNumber">The user phone number to send to.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) to send to.</param>
     /// <param name="reply">The text message to respond with.</param>
     /// <param name="replyTo">The message to reply to.</param>
     /// <param name="button1">Interactive button for a user choice.</param>
@@ -184,13 +192,13 @@ public static partial class WhatsAppClientExtensions
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The identifier of the reply message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
-    public static Task<string?> ReplyAsync(this IWhatsAppClient client, string serviceId, string userNumber, string replyTo, string reply, Button button1, Button button2, CancellationToken cancellation = default)
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, string serviceId, string userId, string replyTo, string reply, Button button1, Button button2, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = userNumber.NormalizeNumber(),
+            recipient_type = RecipientType(userId),
+            to = userId,
             type = "interactive",
             context = new
             {
@@ -219,7 +227,7 @@ public static partial class WhatsAppClientExtensions
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="serviceId">The service number to send through.</param>
-    /// <param name="userNumber">The user phone number to send to.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) to send to.</param>
     /// <param name="reply">The text message to respond with.</param>
     /// <param name="replyTo">The message to reply to.</param>
     /// <param name="button1">Interactive button for a user choice.</param>
@@ -228,13 +236,13 @@ public static partial class WhatsAppClientExtensions
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The identifier of the reply message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
-    public static Task<string?> ReplyAsync(this IWhatsAppClient client, string serviceId, string userNumber, string replyTo, string reply, Button button1, Button button2, Button button3, CancellationToken cancellation = default)
+    public static Task<string?> ReplyAsync(this IWhatsAppClient client, string serviceId, string userId, string replyTo, string reply, Button button1, Button button2, Button button3, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = userNumber.NormalizeNumber(),
+            recipient_type = RecipientType(userId),
+            to = userId,
             type = "interactive",
             context = new
             {
@@ -269,7 +277,7 @@ public static partial class WhatsAppClientExtensions
     /// <returns>The identifier of the reply message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#text-object"/>
     public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, CancellationToken cancellation = default)
-        => ReplyAsync(client, message.Service.Id, message.User.Number, message.Id, reply, cancellation);
+        => ReplyAsync(client, message.Service.Id, message.User.Id, message.Id, reply, cancellation);
 
     /// <summary>
     /// Replies to a user message with an additional interactive button.
@@ -282,7 +290,7 @@ public static partial class WhatsAppClientExtensions
     /// <returns>The identifier of the reply message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
     public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button, CancellationToken cancellation = default)
-        => ReplyAsync(client, message.Service.Id, message.User.Number, message.Id, reply, button, cancellation);
+        => ReplyAsync(client, message.Service.Id, message.User.Id, message.Id, reply, button, cancellation);
 
     /// <summary>
     /// Replies to a user message with additional interactive buttons.
@@ -296,7 +304,7 @@ public static partial class WhatsAppClientExtensions
     /// <returns>The identifier of the reply message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
     public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button1, Button button2, CancellationToken cancellation = default)
-        => ReplyAsync(client, message.Service.Id, message.User.Number, message.Id, reply, button1, button2, cancellation);
+        => ReplyAsync(client, message.Service.Id, message.User.Id, message.Id, reply, button1, button2, cancellation);
 
     /// <summary>
     /// Replies to a user message with additional interactive buttons.
@@ -311,7 +319,7 @@ public static partial class WhatsAppClientExtensions
     /// <returns>The identifier of the reply message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
     public static Task<string?> ReplyAsync(this IWhatsAppClient client, UserMessage message, string reply, Button button1, Button button2, Button button3, CancellationToken cancellation = default)
-        => ReplyAsync(client, message.Service.Id, message.User.Number, message.Id, reply, button1, button2, button3, cancellation);
+        => ReplyAsync(client, message.Service.Id, message.User.Id, message.Id, reply, button1, button2, button3, cancellation);
 
     /// <summary>
     /// Replies to the message a user reacted to.
@@ -327,8 +335,8 @@ public static partial class WhatsAppClientExtensions
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = message.User.Number.NormalizeNumber(),
+            recipient_type = RecipientType(message.User.Id),
+            to = message.User.Id,
             type = "text",
             context = new
             {
@@ -355,8 +363,8 @@ public static partial class WhatsAppClientExtensions
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = message.User.Number.NormalizeNumber(),
+            recipient_type = RecipientType(message.User.Id),
+            to = message.User.Id,
             type = "interactive",
             context = new
             {
@@ -395,8 +403,8 @@ public static partial class WhatsAppClientExtensions
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = message.User.Number.NormalizeNumber(),
+            recipient_type = RecipientType(message.User.Id),
+            to = message.User.Id,
             type = "interactive",
             context = new
             {
@@ -437,8 +445,8 @@ public static partial class WhatsAppClientExtensions
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = message.User.Number.NormalizeNumber(),
+            recipient_type = RecipientType(message.User.Id),
+            to = message.User.Id,
             type = "interactive",
             context = new
             {
@@ -473,7 +481,7 @@ public static partial class WhatsAppClientExtensions
     /// <returns>The identifier of the sent message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#text-object"/>
     public static Task<string?> SendAsync(this IWhatsAppClient client, Message source, string message, CancellationToken cancellation = default)
-        => SendAsync(client, source.Service.Id, source.User.Number, message, cancellation);
+        => SendAsync(client, source.Service.Id, source.User.Id, message, cancellation);
 
     /// <summary>
     /// Sends a text message a user given his incoming message, without making it a reply.
@@ -486,7 +494,7 @@ public static partial class WhatsAppClientExtensions
     /// <returns>The identifier of the sent message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
     public static Task<string?> SendAsync(this IWhatsAppClient client, Message source, string message, Button button, CancellationToken cancellation = default)
-        => SendAsync(client, source.Service.Id, source.User.Number, message, button, cancellation);
+        => SendAsync(client, source.Service.Id, source.User.Id, message, button, cancellation);
 
     /// <summary>
     /// Sends a text message a user given his incoming message, without making it a reply.
@@ -500,7 +508,7 @@ public static partial class WhatsAppClientExtensions
     /// <returns>The identifier of the sent message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
     public static Task<string?> SendAsync(this IWhatsAppClient client, Message source, string message, Button button1, Button button2, CancellationToken cancellation = default)
-        => SendAsync(client, source.Service.Id, source.User.Number, message, button1, button2, cancellation);
+        => SendAsync(client, source.Service.Id, source.User.Id, message, button1, button2, cancellation);
 
     /// <summary>
     /// Sends a text message a user given his incoming message, without making it a reply.
@@ -515,24 +523,24 @@ public static partial class WhatsAppClientExtensions
     /// <returns>The identifier of the sent message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
     public static Task<string?> SendAsync(this IWhatsAppClient client, Message source, string message, Button button1, Button button2, Button button3, CancellationToken cancellation = default)
-        => SendAsync(client, source.Service.Id, source.User.Number, message, button1, button2, button3, cancellation);
+        => SendAsync(client, source.Service.Id, source.User.Id, message, button1, button2, button3, cancellation);
 
     /// <summary>
     /// Sends a text message a user.
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="serviceId">The service number to send the message through.</param>
-    /// <param name="userNumber">The user phone number to send the message to.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) to send the message to.</param>
     /// <param name="message">The text message to send.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The identifier of the sent message.</returns>
-    public static Task<string?> SendAsync(this IWhatsAppClient client, string serviceId, string userNumber, string message, CancellationToken cancellation = default)
+    public static Task<string?> SendAsync(this IWhatsAppClient client, string serviceId, string userId, string message, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = userNumber.NormalizeNumber(),
+            recipient_type = RecipientType(userId),
+            to = userId,
             type = "text",
             text = new
             {
@@ -545,19 +553,19 @@ public static partial class WhatsAppClientExtensions
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="serviceId">The service number to send the message through.</param>
-    /// <param name="userNumber">The user phone number to send the message to.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) to send the message to.</param>
     /// <param name="message">The text message to send.</param>
     /// <param name="button">Interactive button for users to reply.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The identifier of the sent message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
-    public static Task<string?> SendAsync(this IWhatsAppClient client, string serviceId, string userNumber, string message, Button button, CancellationToken cancellation = default)
+    public static Task<string?> SendAsync(this IWhatsAppClient client, string serviceId, string userId, string message, Button button, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = userNumber.NormalizeNumber(),
+            recipient_type = RecipientType(userId),
+            to = userId,
             type = "interactive",
             interactive = new
             {
@@ -581,20 +589,20 @@ public static partial class WhatsAppClientExtensions
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="serviceId">The service number to send the message through.</param>
-    /// <param name="userNumber">The user phone number to send the message to.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) to send the message to.</param>
     /// <param name="message">The text message to send.</param>
     /// <param name="button1">Interactive button for a user choice.</param>
     /// <param name="button2">Interactive button for a user choice.</param>
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The identifier of the sent message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
-    public static Task<string?> SendAsync(this IWhatsAppClient client, string serviceId, string userNumber, string message, Button button1, Button button2, CancellationToken cancellation = default)
+    public static Task<string?> SendAsync(this IWhatsAppClient client, string serviceId, string userId, string message, Button button1, Button button2, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = userNumber.NormalizeNumber(),
+            recipient_type = RecipientType(userId),
+            to = userId,
             type = "interactive",
             interactive = new
             {
@@ -619,7 +627,7 @@ public static partial class WhatsAppClientExtensions
     /// </summary>
     /// <param name="client">The WhatsApp client.</param>
     /// <param name="serviceId">The service number to send the message through.</param>
-    /// <param name="userNumber">The user phone number to send the message to.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) to send the message to.</param>
     /// <param name="message">The text message to send.</param>
     /// <param name="button1">Interactive button for a user choice.</param>
     /// <param name="button2">Interactive button for a user choice.</param>
@@ -627,13 +635,13 @@ public static partial class WhatsAppClientExtensions
     /// <param name="cancellation">The cancellation token.</param>
     /// <returns>The identifier of the sent message.</returns>
     /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#interactive-object"/>
-    public static Task<string?> SendAsync(this IWhatsAppClient client, string serviceId, string userNumber, string message, Button button1, Button button2, Button button3, CancellationToken cancellation = default)
+    public static Task<string?> SendAsync(this IWhatsAppClient client, string serviceId, string userId, string message, Button button1, Button button2, Button button3, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
             preview_url = false,
-            recipient_type = "individual",
-            to = userNumber.NormalizeNumber(),
+            recipient_type = RecipientType(userId),
+            to = userId,
             type = "interactive",
             interactive = new
             {
@@ -689,17 +697,17 @@ public static partial class WhatsAppClientExtensions
     /// </summary>
     /// <param name="client">The WhatsApp client used to send the message.</param>
     /// <param name="serviceId">The identifier for the service sending the message.</param>
-    /// <param name="userNumber">The phone number of the recipient. Must be in a valid format.</param>
+    /// <param name="userId">The user identifier (phone number or BSUID) of the recipient.</param>
     /// <param name="message">The text message to be sent to the user.</param>
     /// <param name="action">The text displayed on the call-to-action button.</param>
     /// <param name="cancellation">A token to monitor for cancellation requests. Defaults to <see cref="CancellationToken.None"/>.</param>
     /// <returns>A task representing the asynchronous operation.</returns>
-    public static Task<string?> CallToActionAsync(this IWhatsAppClient client, string serviceId, string userNumber, string message, string action, string url, CancellationToken cancellation = default)
+    public static Task<string?> CallToActionAsync(this IWhatsAppClient client, string serviceId, string userId, string message, string action, string url, CancellationToken cancellation = default)
         => client.SendAsync(serviceId, new
         {
             messaging_product = "whatsapp",
-            recipient_type = "individual",
-            to = userNumber.NormalizeNumber(),
+            recipient_type = RecipientType(userId),
+            to = userId,
             type = "interactive",
             interactive = new
             {

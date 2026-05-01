@@ -21,8 +21,8 @@ public class FlowToken
     /// <summary>Gets the service identifier from the token data.</summary>
     public string ServiceId => Data.TryGetValue("service", out var service) ? service : throw new KeyNotFoundException("service");
 
-    /// <summary>Gets the user phone number from the token data.</summary>
-    public string UserNumber => Data.TryGetValue("user", out var user) ? user : throw new KeyNotFoundException("user");
+    /// <summary>Gets the user identifier (phone number or BSUID) from the token data.</summary>
+    public string UserId => Data.TryGetValue("user", out var user) ? user : throw new KeyNotFoundException("user");
 
     /// <summary>Gets the flow identifier or name from the token data.</summary>
     public string Flow => Data.TryGetValue("flow", out var flow) ? flow : throw new KeyNotFoundException("flow");
@@ -32,7 +32,7 @@ public class FlowToken
     {
         var sb = new StringBuilder()
             .Append("service:").Append(message.ServiceId).Append(';')
-            .Append("user:").Append(message.UserNumber).Append(';')
+            .Append("user:").Append(message.UserId).Append(';')
             .Append("flow:").Append(message.Flow.Name ?? message.Flow.Id?.ToString() ?? throw new ArgumentException("Either flow name or id is required"));
 
         if (!string.IsNullOrEmpty(message.Flow.Token))

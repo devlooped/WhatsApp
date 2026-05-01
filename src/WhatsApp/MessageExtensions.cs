@@ -58,14 +58,14 @@ public static partial class MessageExtensions
         /// </summary>
         public ReactionResponse React(string emoji)
             => message is UserMessage user
-                ? new(user.Service, message.UserNumber, message.Id, emoji)
-                : new(message.ServiceId, message.UserNumber, message.Id, emoji);
+                ? new(user.Service, message.UserId, message.Id, emoji)
+                : new(message.ServiceId, message.UserId, message.Id, emoji);
 
         /// <summary>
         /// Creates a simple template response for the message.
         /// </summary>
         public TemplateResponse Template(string name, string language)
-            => new(message.ServiceId, message.UserNumber, message.Id, name, language);
+            => new(message.ServiceId, message.UserId, message.Id, name, language);
 
         /// <summary>
         /// Creates a complex template response for the message.
@@ -75,7 +75,7 @@ public static partial class MessageExtensions
         /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#template-object"/>
         /// <see cref="https://developers.facebook.com/docs/whatsapp/cloud-api/reference/messages/#components-object"/>
         public TemplateResponse Template(MessageTemplate template)
-            => new(message.ServiceId, message.UserNumber, message.Id, template);
+            => new(message.ServiceId, message.UserId, message.Id, template);
 
         /// <summary>
         /// Sends an interactive call to action response to the user message.
@@ -85,8 +85,8 @@ public static partial class MessageExtensions
         /// <param name="url">The URL to navigate to when the action button is clicked.</param>
         public CallToActionResponse CallToAction(string text, string action, Uri uri)
             => message is UserMessage user
-            ? new(user.Service, message.UserNumber, text, action, uri.AbsoluteUri)
-            : new(message.ServiceId, message.UserNumber, text, action, uri.AbsoluteUri);
+            ? new(user.Service, message.UserId, text, action, uri.AbsoluteUri)
+            : new(message.ServiceId, message.UserId, text, action, uri.AbsoluteUri);
 
         /// <summary>
         /// Sends an interactive call to initiate a flow response to the user message.
@@ -95,7 +95,7 @@ public static partial class MessageExtensions
         /// <param name="action">The action button text.</param>
         /// <param name="flowName">The name of the flow to initiate.</param>
         public CallToFlowResponse CallToAction(string text, string action, string flowName, bool draft = false)
-            => new(message.ServiceId, message.UserNumber, text, action, new FlowParameters(flowName) { Mode = draft ? FlowMode.Draft : FlowMode.Published });
+            => new(message.ServiceId, message.UserId, text, action, new FlowParameters(flowName) { Mode = draft ? FlowMode.Draft : FlowMode.Published });
 
         /// <summary>
         /// Sends an interactive call to initiate a flow response to the user message.
@@ -104,7 +104,7 @@ public static partial class MessageExtensions
         /// <param name="action">The action button text.</param>
         /// <param name="flowId">The id of the flow to initiate.</param>
         public CallToFlowResponse CallToAction(string text, string action, long flowId, bool draft = false)
-            => new(message.ServiceId, message.UserNumber, text, action, new FlowParameters(flowId) { Mode = draft ? FlowMode.Draft : FlowMode.Published });
+            => new(message.ServiceId, message.UserId, text, action, new FlowParameters(flowId) { Mode = draft ? FlowMode.Draft : FlowMode.Published });
 
         /// <summary>
         /// Sends an interactive call to initiate a flow response to the user message.
@@ -113,39 +113,39 @@ public static partial class MessageExtensions
         /// <param name="action">The action button text.</param>
         /// <param name="flowId">The id of the flow to initiate.</param>
         public CallToFlowResponse CallToAction(string text, string action, FlowParameters flow)
-            => new(message.ServiceId, message.UserNumber, text, action, flow);
+            => new(message.ServiceId, message.UserId, text, action, flow);
 
         /// <summary>
         /// Creates a text reply for the message.
         /// </summary>
         public TextResponse Reply(string text)
             => message is UserMessage user
-            ? new(user.Service, message.UserNumber, message.Id, text)
-            : new(message.ServiceId, message.UserNumber, message.Id, text);
+            ? new(user.Service, message.UserId, message.Id, text)
+            : new(message.ServiceId, message.UserId, message.Id, text);
 
         /// <summary>
         /// Creates a text reply with buttons for the message.
         /// </summary>
         public TextResponse Reply(string text, Button button1, Button? button2 = default, Button? button3 = default)
             => message is UserMessage user
-                ? new(user.Service, message.UserNumber, message.Id, text, button1, button2, button3)
-                : new(message.ServiceId, message.UserNumber, message.Id, text, button1, button2, button3);
+                ? new(user.Service, message.UserId, message.Id, text, button1, button2, button3)
+                : new(message.ServiceId, message.UserId, message.Id, text, button1, button2, button3);
 
         /// <summary>
         /// Creates a text response for the originating user, but not a message reply.
         /// </summary>
         public TextResponse Send(string text)
             => message is UserMessage user
-            ? new(user.Service, message.UserNumber, null, text)
-            : new(message.ServiceId, message.UserNumber, null, text);
+            ? new(user.Service, message.UserId, null, text)
+            : new(message.ServiceId, message.UserId, null, text);
 
         /// <summary>
         /// Creates a text response for the originating user, but not a message reply.
         /// </summary>
         public TextResponse Send(string text, Button button1, Button? button2 = default, Button? button3 = default)
             => message is UserMessage user
-                ? new(user.Service, message.UserNumber, null, text, button1, button2, button3)
-                : new(message.ServiceId, message.UserNumber, null, text, button1, button2, button3);
+                ? new(user.Service, message.UserId, null, text, button1, button2, button3)
+                : new(message.ServiceId, message.UserId, null, text, button1, button2, button3);
     }
 
     extension(UserMessage message)
@@ -154,7 +154,7 @@ public static partial class MessageExtensions
         /// Sends a typing indicator status to signal that there is an ongoing response to the user message.
         /// </summary>
         public TypingResponse Typing()
-            => new(message.Service, message.User.Number, message.Id);
+            => new(message.Service, message.User.Id, message.Id);
     }
 
     extension<T>(T message) where T : IMessage
