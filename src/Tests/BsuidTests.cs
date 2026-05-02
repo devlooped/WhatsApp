@@ -61,6 +61,41 @@ public class BsuidTests
     }
 
     [Fact]
+    public void PhoneOnlyUser_NoNumberArg_NumberEqualsNormalizedId()
+    {
+        // When number is omitted and Id is a phone, Number is auto-set from Id.
+        var user = new User("kzu", "5491122334455");
+        Assert.False(user.IsBSUID);
+        Assert.Equal("541122334455", user.Number);
+    }
+
+    [Fact]
+    public void PhoneOnlyUser_ExplicitNullNumber_NumberEqualsNormalizedId()
+    {
+        // Explicit null behaves the same as omitting the number argument.
+        var user = new User("kzu", "5491122334455", null);
+        Assert.False(user.IsBSUID);
+        Assert.Equal("541122334455", user.Number);
+    }
+
+    [Fact]
+    public void PhoneOnlyUser_LeadingPlus_NumberStripsPlus()
+    {
+        var user = new User("kzu", "+12025551234");
+        Assert.False(user.IsBSUID);
+        Assert.Equal("12025551234", user.Number);
+    }
+
+    [Fact]
+    public void BsuidUser_NoNumberArg_NumberRemainsNull()
+    {
+        // BSUID users with no phone number keep Number = null even when number is omitted.
+        var user = new User("kzu", "AR.aBc123XyZ");
+        Assert.True(user.IsBSUID);
+        Assert.Null(user.Number);
+    }
+
+    [Fact]
     public void RecipientType_UsesIndividualForPhone()
         => Assert.Equal("individual", WhatsAppClientExtensions.RecipientType("5491122334455"));
 

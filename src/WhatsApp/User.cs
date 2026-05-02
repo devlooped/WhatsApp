@@ -35,6 +35,8 @@ public record User
         Name = name;
         Id = id;
         Number = number?.NormalizeNumber();
+        if (Number is null && !IsBSUID)
+            Number = Id.NormalizeNumber();
     }
 
     /// <summary>
