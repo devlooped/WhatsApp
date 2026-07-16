@@ -28,8 +28,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.5" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
-    <PackageReference Include="System.CommandLine" Version="2.0.9" />
-    <PackageReference Include="System.Formats.Asn1" Version="10.0.9" />
+    <PackageReference Include="System.CommandLine" Version="2.0.10" />
+    <PackageReference Include="System.Formats.Asn1" Version="10.0.10" />
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
     <PackageReference Include="Spectre.Console.Json" Version="0.55.2" />
     <PackageReference Include="ThisAssembly.Git" Version="2.1.2" PrivateAssets="all" />
