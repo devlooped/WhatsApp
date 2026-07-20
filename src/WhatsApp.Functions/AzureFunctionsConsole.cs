@@ -15,7 +15,7 @@ namespace Devlooped.WhatsApp;
 class AzureFunctionsConsole(
     IWhatsAppClient client,
     Func<IWhatsAppHandler> handler,
-    ILogger<AzureFunctionsWebhook> logger,
+    ILogger<ServiceHandler> logger,
     IHostEnvironment environment)
 {
     static readonly JsonSerializerOptions options = new(JsonSerializerDefaults.Web)

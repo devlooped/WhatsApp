@@ -81,7 +81,7 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         IOptions<WhatsAppOptions> whatsappOptions,
         IHostEnvironment hosting,
         Func<IWhatsAppHandler> handlerFactory,
-        ILogger<WhatsAppEndpoints> logger,
+        ILogger<ServiceHandler> logger,
         string? accountId = null)
     {
         var json = body.GetRawText();
@@ -215,7 +215,7 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         [FromQuery(Name = "hub.verify_token")] string? verifyToken,
         [FromQuery(Name = "hub.challenge")] string? challenge,
         IOptions<MetaOptions> metaOptions,
-        ILogger<WhatsAppEndpoints> logger,
+        ILogger<ServiceHandler> logger,
         string? accountId = null)
     {
         var valid = false;
@@ -229,7 +229,8 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         if (valid)
         {
             logger.LogInformation("Registering webhook callback.");
-            return Results.Ok(challenge);
+            logger.LogDebug("Verify Token {Verify}, challenge {Challenge}", verifyToken, challenge);
+            return Results.Content(challenge, "text/plain");
         }
 
         logger.LogError("Received token {ACTUAL} but no matching account verify token found.", verifyToken);
@@ -284,7 +285,7 @@ public static class WhatsAppEndpointRouteBuilderExtensions
         IWhatsAppClient client,
         Func<IWhatsAppHandler> handlerFactory,
         IHostEnvironment environment,
-        ILogger<WhatsAppEndpoints> logger)
+        ILogger<ServiceHandler> logger)
     {
         // This endpoint is only available in development environments, since it allows sending messages from the debug console.
         if (environment.IsProduction())
@@ -336,9 +337,4 @@ public static class WhatsAppEndpointRouteBuilderExtensions
 
         return Results.Ok();
     }
-
-    /// <summary>
-    /// Marker class for logging from WhatsApp endpoints.
-    /// </summary>
-    class WhatsAppEndpoints { }
 }
