@@ -28,7 +28,7 @@ class AzureFunctionsWebhook(
     IOptions<MetaOptions> metaOptions,
     IOptions<WhatsAppOptions> functionOptions,
     IHostEnvironment hosting,
-    ILogger<AzureFunctionsWebhook> logger)
+    ILogger<ServiceHandler> logger)
 {
     static readonly JsonSerializerOptions options = new(JsonSerializerDefaults.Web)
     {
@@ -200,7 +200,12 @@ class AzureFunctionsWebhook(
             if (valid)
             {
                 logger.LogInformation("Registering webhook callback.");
-                return new OkObjectResult(challenge);
+                return new ContentResult
+                {
+                    Content = challenge,
+                    ContentType = "text/plain",
+                    StatusCode = 200
+                };
             }
         }
 
