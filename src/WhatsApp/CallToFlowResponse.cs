@@ -74,8 +74,9 @@ public record CallToFlowResponse : Response
         var id = await client.SendAsync(ServiceId, new
         {
             messaging_product = "whatsapp",
-            recipient_type = User.IsBusinessScopedUserId(UserId) ? "business_scoped_user_id" : "individual",
-            to = UserId,
+            recipient_type = "individual",
+            to = WhatsAppClientExtensions.ToField(UserId),
+            recipient = WhatsAppClientExtensions.RecipientField(UserId),
             type = "interactive",
             interactive = new
             {

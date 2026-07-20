@@ -27,7 +27,7 @@ public class MetaOptionsTests
         Assert.NotNull(options);
         Assert.Equal("test-challenge", options.GetVerifyToken("1234567890"));
         Assert.Equal("test-access-token", options.GetToken("1234567890"));
-        Assert.Equal("v22.0", options.ApiVersion);
+        Assert.Equal("v25.0", options.ApiVersion);
     }
 
     [Fact]

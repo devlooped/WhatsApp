@@ -26,9 +26,9 @@ public class AccountOptions
 /// </summary>
 public class MetaOptions
 {
-    /// <summary>API version for messages, defaults to v22.0.</summary>
-    [DefaultValue("v22.0")]
-    public string ApiVersion { get; set; } = "v22.0";
+    /// <summary>API version for messages, defaults to v25.0.</summary>
+    [DefaultValue("v25.0")]
+    public string ApiVersion { get; set; } = "v25.0";
 
     /// <summary>
     /// WhatsApp Business Accounts indexed by account ID. Each account holds its access token, 
