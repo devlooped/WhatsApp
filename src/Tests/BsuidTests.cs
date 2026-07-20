@@ -96,10 +96,31 @@ public class BsuidTests
     }
 
     [Fact]
-    public void RecipientType_UsesIndividualForPhone()
-        => Assert.Equal("individual", WhatsAppClientExtensions.RecipientType("5491122334455"));
+    public void PhoneId_GoesInToField_NotRecipient()
+    {
+        Assert.Equal("5491122334455", WhatsAppClientExtensions.ToField("5491122334455"));
+        Assert.Null(WhatsAppClientExtensions.RecipientField("5491122334455"));
+    }
 
     [Fact]
-    public void RecipientType_UsesBusinessScopedForBsuid()
-        => Assert.Equal("business_scoped_user_id", WhatsAppClientExtensions.RecipientType("AR.aBc123XyZ"));
+    public void Bsuid_GoesInRecipientField_NotTo()
+    {
+        // Meta keeps recipient_type="individual" and puts the BSUID in the newer
+        // "recipient" field — not recipient_type="business_scoped_user_id" / to.
+        Assert.Null(WhatsAppClientExtensions.ToField("AR.aBc123XyZ"));
+        Assert.Equal("AR.aBc123XyZ", WhatsAppClientExtensions.RecipientField("AR.aBc123XyZ"));
+    }
+
+    [Fact]
+    public void PreferAddress_UsesPhoneWhenAvailable()
+    {
+        var mixed = new User("kzu", "AR.aBc123XyZ", "5491122334455");
+        Assert.Equal("541122334455", WhatsAppClientExtensions.PreferAddress(mixed));
+
+        var privacy = new User("kzu", "AR.aBc123XyZ", null);
+        Assert.Equal("AR.aBc123XyZ", WhatsAppClientExtensions.PreferAddress(privacy));
+
+        var phone = new User("kzu", "5491122334455");
+        Assert.Equal("541122334455", WhatsAppClientExtensions.PreferAddress(phone));
+    }
 }
