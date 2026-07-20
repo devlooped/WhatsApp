@@ -1,5 +1,25 @@
 # Changelog
 
+## [v2.0.0-rc.1](https://github.com/devlooped/WhatsApp/tree/v2.0.0-rc.1) (2026-07-20)
+
+[Full Changelog](https://github.com/devlooped/WhatsApp/compare/v2.0.0-beta...v2.0.0-rc.1)
+
+:sparkles: Implemented enhancements:
+
+- Revisit the usage of the TableClient by the AzureFunctions [\#112](https://github.com/devlooped/WhatsApp/issues/112)
+- Auto-populate User.Number from Id when no phone number is provided [\#408](https://github.com/devlooped/WhatsApp/pull/408) (@kzu)
+- Add BSUID support - rename UserNumber to UserId [\#407](https://github.com/devlooped/WhatsApp/pull/407) (@kzu)
+- Add connectivity ping to CLI with backend version header [\#399](https://github.com/devlooped/WhatsApp/pull/399) (@kzu)
+
+:bug: Fixed bugs:
+
+- Fix challenge return from register webhook callback [\#439](https://github.com/devlooped/WhatsApp/pull/439) (@kzu)
+
+:twisted_rightwards_arrows: Merged:
+
+- Fix BSUID send addressing: use recipient field, not invalid recipient\_type [\#440](https://github.com/devlooped/WhatsApp/pull/440) (@kzu)
+- Honor cancellation token in CLI endpoint prompt loop [\#402](https://github.com/devlooped/WhatsApp/pull/402) (@kzu)
+
 ## [v2.0.0-beta](https://github.com/devlooped/WhatsApp/tree/v2.0.0-beta) (2026-04-18)
 
 [Full Changelog](https://github.com/devlooped/WhatsApp/compare/v2.0.0-alpha...v2.0.0-beta)
