@@ -33,7 +33,7 @@
 
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.80.0" />
 
-    <PackageReference Include="JsonSchema.Net" Version="9.3.0" />
+    <PackageReference Include="JsonSchema.Net" Version="9.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="NuGetizer" Version="1.4.9" />
     <PackageReference Include="PolySharp" Version="1.16.0" PrivateAssets="all" />
