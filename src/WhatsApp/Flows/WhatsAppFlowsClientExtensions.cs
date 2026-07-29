@@ -201,12 +201,12 @@ public static class WhatsAppFlowsClientExtensions
         do
         {
             var queryString = !string.IsNullOrEmpty(after) ? $"?after={Uri.EscapeDataString(after)}" : "";
-            var response = await http.GetAsync($"{flowId}/assets", cancellation);
+            var response = await http.GetAsync($"{flowId}/assets{queryString}", cancellation);
             response.EnsureSuccessStatusCode();
             var page = await response.Content.ReadFromJsonAsync<GetFlowAssetsResponse>(FlowsJsonContext.DefaultOptions, cancellation) ?? throw new InvalidOperationException("Invalid response");
 
-            foreach (var flow in page.Data ?? Enumerable.Empty<FlowAsset>())
-                yield return flow;
+            foreach (var asset in page.Data ?? Enumerable.Empty<FlowAsset>())
+                yield return asset;
 
             after = page.Paging?.Cursors?.After;
 
