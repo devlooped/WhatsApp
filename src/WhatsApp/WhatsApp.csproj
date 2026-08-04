@@ -31,7 +31,7 @@
     <PackageReference Include="Devlooped.JQSharp" Version="1.0.1" />
     <PackageReference Include="Devlooped.TableStorage" Version="5.5.0" />
 
-    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.80.0" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.83.0" />
 
     <PackageReference Include="JsonSchema.Net" Version="9.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
