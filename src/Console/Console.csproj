@@ -9,6 +9,7 @@
     <Description>A WhatsApp simulator client that complements Devlooped.WhatsApp.</Description>
     <ToolCommandName>whatsapp</ToolCommandName>
     <PackageTags>dotnet-tool whatsapp</PackageTags>
+    <PackageLicenseFile>OSMFEULA.txt</PackageLicenseFile>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
     <PackAsTool>true</PackAsTool>
 
@@ -53,5 +54,13 @@
   <ItemGroup>
     <ProjectReference Include="..\WhatsApp\WhatsApp.csproj" />
   </ItemGroup>
+
+  <Target Name="IncludePackageAssets" AfterTargets="_GetPackageFiles">
+    <ItemGroup>
+      <_PackageFilesToExclude Remove="@(Content->WithMetadataValue('PackagePath', 'OSMFEULA.txt'))" />
+      <_PackageFiles Include="@(Content->WithMetadataValue('PackagePath', 'OSMFEULA.txt'))" Pack="true" />
+      <_PackageFiles Include="@(None->WithMetadataValue('PackagePath', 'icon.png'))" Pack="true" />
+    </ItemGroup>
+  </Target>
 
 </Project>
